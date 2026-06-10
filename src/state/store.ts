@@ -39,6 +39,8 @@ interface AppState {
   soundOn: boolean;
   reducedMotion: boolean;
   contextLost: boolean;
+  /* true once a chamber fully covers the canvas — the RAF loop pauses (§8 perf budget) */
+  canvasCovered: boolean;
   entry: Entry;
   bootFonts: number;
   bootShaders: number;
@@ -61,6 +63,7 @@ interface AppState {
   toggleSound: () => void;
   setReducedMotion: (v: boolean) => void;
   setContextLost: (v: boolean) => void;
+  setCanvasCovered: (v: boolean) => void;
 }
 
 function combineBoot(fonts: number, shaders: number, prev: number): number {
@@ -75,6 +78,7 @@ export const useStore = create<AppState>((set, get) => ({
   soundOn: false,
   reducedMotion: false,
   contextLost: false,
+  canvasCovered: false,
   entry: { target: 'threshold', chamber: null },
   bootFonts: 0,
   bootShaders: 0,
@@ -134,4 +138,5 @@ export const useStore = create<AppState>((set, get) => ({
   toggleSound: () => set((s) => ({ soundOn: !s.soundOn })),
   setReducedMotion: (reducedMotion) => set({ reducedMotion }),
   setContextLost: (contextLost) => set({ contextLost }),
+  setCanvasCovered: (canvasCovered) => set({ canvasCovered }),
 }));

@@ -383,6 +383,113 @@ a {
   background: radial-gradient(ellipse 110% 90% at 50% 48%, transparent 58%, rgba(0, 0, 0, 0.42) 100%);
 }
 
+/* ---------- Act I: threshold lockup ---------- */
+.lockup {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-lockup);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding-bottom: 9vh;
+  text-align: center;
+  pointer-events: none;
+  visibility: hidden; /* gsap autoAlpha reveals */
+}
+.lockup::before {
+  /* legibility scrim — neutral black alpha, not a hue gradient */
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: min(120vw, 1400px);
+  height: 64vh;
+  transform: translateX(-50%);
+  background: radial-gradient(ellipse 50% 55% at 50% 72%, rgba(10, 10, 12, 0.62), transparent 72%);
+  pointer-events: none;
+}
+.lockup > * {
+  position: relative;
+}
+.lockup-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+.lockup-h1 {
+  margin-top: 18px;
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-style: italic;
+  font-variation-settings: 'opsz' 144;
+  font-size: clamp(2.8rem, 6vw, 5.5rem);
+  line-height: 1.04;
+  color: var(--bone);
+  text-shadow: 0 0 38px rgba(232, 162, 61, 0.18);
+}
+.lockup-sub {
+  margin-top: 14px;
+  font-family: var(--font-body);
+  font-size: 15px;
+  color: var(--dim);
+}
+.enter-wrap {
+  margin-top: 5.5vh;
+  pointer-events: auto;
+}
+.enter-ring {
+  position: relative;
+  width: 104px;
+  height: 104px;
+  border-radius: 50%;
+  border: 1px solid rgba(232, 162, 61, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: enter-breathe 4s ease-in-out infinite;
+}
+@keyframes enter-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.03);
+  }
+}
+.enter-label {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.22em;
+  color: var(--amber);
+  padding-left: 0.22em; /* optically recenter tracked text */
+}
+.enter-charge {
+  position: absolute;
+  inset: -1px;
+  transform: rotate(-90deg);
+}
+.enter-charge circle {
+  fill: none;
+  stroke: var(--amber);
+  stroke-width: 1.5;
+  stroke-dasharray: 304.7;
+  stroke-dashoffset: 304.7;
+  transition: stroke-dashoffset 0.7s var(--ease-out);
+}
+.enter-ring:hover .enter-charge circle,
+.enter-ring:focus-visible .enter-charge circle {
+  stroke-dashoffset: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .enter-ring {
+    animation: none;
+  }
+}
+
 /* ---------- webgl context-loss fallback (§9.7) ---------- */
 .context-lost {
   position: fixed;

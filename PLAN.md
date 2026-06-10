@@ -19,17 +19,20 @@
 - [x] Custom cursor (dot + lerped amber ring, mode morphs: enter/node/back/text)
 - [x] Grain + vignette overlays
 - [x] A11y nav (hidden text equivalent of hub) + WebGL context-loss fallback component
-- [ ] typecheck + build green → smoke test → commit `P0`
+- [x] typecheck + build green → smoke test → commit `P0`
 
-## P1 — Act I: Threshold  [TODO]
-- [ ] Persistent R3F Canvas (dpr clamp [1,2], PerformanceMonitor, RAF pause on visibilitychange)
-- [ ] Wireframe ridgeline terrain — 4 depth planes, noise displacement, amber edge glow, vertex pulses
-- [ ] Volumetric-ish fog planes (shader) + starfield with sub-pixel twinkle
-- [ ] Mouse parallax (±1.5°, lerped); device-tilt or drift on touch
-- [ ] Type lockup (eyebrow / Fraunces italic headline / Geist sub) + ENTER affordance (breathing ring, magnetic hover, conic charge)
-- [ ] Enter via click, Enter key, Space — guarded against double-fire
-- [ ] Shader precompile wired to boot progress (real)
-- [ ] Phase exit ritual
+## P1 — Act I: Threshold  [DONE]
+- [x] Persistent R3F Canvas (dpr clamp [1,2], PerformanceMonitor, RAF pause on visibilitychange)
+- [x] Wireframe ridgeline terrain — 4 depth planes, noise displacement, amber edge glow, vertex pulses
+- [x] Fog sheets (shader) + starfield with sub-pixel twinkle
+- [x] Mouse parallax (±1.5°, lerped); device-tilt or drift on touch
+- [x] Type lockup (eyebrow / Fraunces italic headline / Geist sub) + ENTER affordance (breathing ring, magnetic hover, conic charge on hover)
+- [x] Enter via click, Enter key, Space — double-fire guarded in store action
+- [x] Shader precompile (gl.compileAsync) wired to boot progress
+- [x] PostFX: three-native composer (UnrealBloom + custom grade pass + OutputPass) — see DECISIONS #11/#12
+- [x] Phase exit ritual (typecheck ✓ build ✓ browser smoke ✓ console clean on preview ✓)
+- NOTE: BreachDriver is a 600ms placeholder — replaced by the real master timeline in P2.
+- NOTE: PostFX.tsx still carries dev-only A/B query switches (nobloom/nograde/noout/bt999) + window.__composer debug exposure — strip in P2.
 
 ## P2 — Act II: Breach  [TODO]
 - [ ] Master GSAP timeline (~3.2s): approach (FOV 45→70) → seam split (vertex peel via uniform) → wormhole tunnel (GLSL: amber/jade streaks, polar noise, hex lattice) → arrival whiteout → hub materialize

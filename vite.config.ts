@@ -9,7 +9,7 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          three: ['three', '@react-three/fiber', '@react-three/drei', '@react-three/postprocessing'],
+          three: ['three', '@react-three/fiber', '@react-three/drei'],
           gsap: ['gsap', '@gsap/react'],
         },
       },

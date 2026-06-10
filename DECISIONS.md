@@ -20,3 +20,15 @@
    unavailable; also useful for users who want the static experience explicitly.
 10. **Boot progress weights: fonts 0.6 / shader-compile 0.4** — both real signals; fonts dominate
     wall-time on broadband, shader compile dominates on first GPU warm-up.
+11. **Dropped `@react-three/postprocessing`; post chain is three's own composer**
+    (`UnrealBloomPass` + one custom grade ShaderPass + `OutputPass`, all from `three/examples/jsm` —
+    zero added dependencies). Root cause that broke BOTH libraries identically: terrain shaders emitted
+    NaN fragments (`pow(x<0, y)` is undefined in GLSL → NaN on Metal/ANGLE); bloom's mip blur chain
+    smeared NaN across the entire frame and `base + NaN = NaN` blacked out the canvas. Direct rendering
+    masked it. Fixed by writing gaussians as `exp(-t*t)` and clamping every pow base. Kept the
+    three-native chain anyway: one custom grade pass = chromatic aberration + amber whiteout + fisheye
+    in a single fragment — fewer passes than the drei equivalent and exact control for the breach.
+12. **Shader NaN discipline (project rule):** no `pow` with a possibly-negative base, no reversed
+    smoothstep edges, no division that can hit 0 — one NaN pixel destroys the whole bloom chain.
+13. **Lockup legibility scrim** — neutral black-alpha radial behind the type block (not a hue gradient;
+    anti-slop rules ban hue gradients outside WebGL, black alpha is fine).

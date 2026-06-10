@@ -1,7 +1,9 @@
 import { useEffect } from 'react';
 import { useStore } from './state/store';
 import Scene from './scene/Scene';
+import BreachDriver from './scene/BreachDriver';
 import Boot from './ui/Boot';
+import ThresholdLockup from './ui/ThresholdLockup';
 import HUD from './ui/HUD';
 import Cursor from './ui/Cursor';
 import Grain from './ui/Grain';
@@ -23,6 +25,8 @@ export default function App() {
   return (
     <>
       <Scene />
+      <BreachDriver />
+      <ThresholdLockup />
       <A11yNav />
       <HUD />
       <Boot />
