@@ -1,0 +1,426 @@
+/* ============================================================
+   EVEREST.OS — global stylesheet
+   Palette / type / motion tokens per spec §4–§5. Bespoke CSS, no framework.
+   ============================================================ */
+
+:root {
+  --ink: #0a0a0c;
+  --ink-2: #111114;
+  --bone: #ede8df;
+  --amber: #e8a23d;
+  --jade: #38d9a9;
+  /* spec value was 0.45 alpha → 3.9:1 on ink; brightened to 0.55 for WCAG AA (§9.8) */
+  --dim: rgba(237, 232, 223, 0.55);
+  --hairline: rgba(237, 232, 223, 0.08);
+  --red: #e04438; /* reserved: live-status ticks only */
+
+  --font-display: 'Fraunces Variable', Georgia, 'Times New Roman', serif;
+  --font-mono: 'JetBrains Mono Variable', 'Courier New', monospace;
+  --font-body: 'Geist Variable', 'Avenir Next', 'Helvetica Neue', sans-serif;
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --t-micro: 200ms;
+  --t-reveal: 550ms;
+
+  --z-scene: 1;
+  --z-lockup: 10;
+  --z-chamber: 40;
+  --z-hud: 60;
+  --z-vignette: 79;
+  --z-grain: 80;
+  --z-boot: 90;
+  --z-cursor: 100;
+}
+
+/* ---------- reset ---------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+  background: var(--ink);
+  color: var(--bone);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden; /* the app is a stage, not a page; chambers scroll internally */
+}
+
+#root {
+  height: 100%;
+}
+
+::selection {
+  background: rgba(232, 162, 61, 0.3);
+  color: var(--bone);
+}
+
+/* custom cursor owns the pointer on fine-pointer devices (§5) */
+@media (pointer: fine) {
+  body,
+  body a,
+  body button {
+    cursor: none;
+  }
+  /* never break native text-selection cursors inside chamber body copy */
+  .prose,
+  .prose * {
+    cursor: text;
+  }
+  .prose a,
+  .prose button {
+    cursor: none;
+  }
+}
+
+button {
+  background: none;
+  border: none;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+:focus {
+  outline: none;
+}
+:focus-visible {
+  outline: 1px solid var(--amber);
+  outline-offset: 4px;
+}
+
+/* ---------- utilities ---------- */
+.mono {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---------- scene root ---------- */
+.scene-root {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-scene);
+  background: var(--ink);
+}
+
+/* ---------- boot (Act 0) ---------- */
+.boot {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-boot);
+  background: var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.5s var(--ease-out);
+}
+.boot.is-leaving {
+  opacity: 0;
+  pointer-events: none;
+}
+.boot-line {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  color: var(--bone);
+}
+.boot-line .boot-pct {
+  color: var(--amber);
+  display: inline-block;
+  min-width: 4ch;
+  text-align: right;
+}
+.boot-line.is-glitching {
+  text-shadow:
+    -2px 0 rgba(255, 0, 60, 0.85),
+    2px 0 rgba(0, 255, 200, 0.85);
+  transform: translateX(1px);
+}
+.boot-bar {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 1px;
+  background: var(--amber);
+  box-shadow: 0 0 8px rgba(232, 162, 61, 0.7);
+  transition: width 120ms linear;
+}
+
+/* ---------- HUD ---------- */
+.hud {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-hud);
+  pointer-events: none;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+.hud > * {
+  position: fixed;
+  opacity: 0;
+  transition:
+    opacity 0.6s var(--ease-out),
+    color var(--t-micro) var(--ease-out);
+}
+.hud > .is-on {
+  opacity: 1;
+}
+.hud-tl {
+  top: 20px;
+  left: 24px;
+}
+.hud-tr {
+  top: 20px;
+  right: 24px;
+  display: flex;
+  gap: 20px;
+  align-items: baseline;
+}
+.hud-bl {
+  bottom: 20px;
+  left: 24px;
+}
+.hud-br {
+  bottom: 20px;
+  right: 24px;
+}
+.hud button,
+.hud a {
+  pointer-events: auto;
+  color: var(--dim);
+  transition: color var(--t-micro) var(--ease-out);
+  letter-spacing: inherit;
+  text-transform: inherit;
+  font-family: inherit;
+  font-size: inherit;
+}
+.hud button:hover,
+.hud a:hover {
+  color: var(--amber);
+}
+.hud time {
+  color: var(--dim);
+}
+.hud .crumb-live {
+  color: var(--bone);
+}
+
+/* ---------- custom cursor (§5) ---------- */
+.cursor-dot,
+.cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: var(--z-cursor);
+  pointer-events: none;
+  will-change: transform;
+}
+.cursor-dot {
+  width: 4px;
+  height: 4px;
+  margin: -2px 0 0 -2px;
+  border-radius: 50%;
+  background: var(--bone);
+}
+.cursor-ring {
+  width: 28px;
+  height: 28px;
+  margin: -14px 0 0 -14px;
+  border-radius: 50%;
+  border: 1px solid rgba(232, 162, 61, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    width 250ms var(--ease-out),
+    height 250ms var(--ease-out),
+    margin 250ms var(--ease-out),
+    opacity 250ms var(--ease-out),
+    border-color 250ms var(--ease-out);
+}
+.cursor-hidden .cursor-dot,
+.cursor-hidden .cursor-ring {
+  opacity: 0;
+}
+.cursor-ring .cursor-glyph {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--amber);
+  opacity: 0;
+  transition: opacity 200ms var(--ease-out);
+}
+/* enter mode — ring expands over the ENTER affordance */
+.cursor-ring[data-mode='enter'] {
+  width: 64px;
+  height: 64px;
+  margin: -32px 0 0 -32px;
+  border-color: var(--amber);
+}
+/* node mode — crosshair ring */
+.cursor-ring[data-mode='node'] {
+  width: 36px;
+  height: 36px;
+  margin: -18px 0 0 -18px;
+  border-color: var(--amber);
+}
+.cursor-ring::before,
+.cursor-ring::after {
+  content: '';
+  position: absolute;
+  background: var(--amber);
+  opacity: 0;
+  transition: opacity 200ms var(--ease-out);
+}
+.cursor-ring::before {
+  width: 1px;
+  height: 8px;
+  left: 50%;
+  top: -4px;
+  box-shadow: 0 36px 0 var(--amber);
+}
+.cursor-ring::after {
+  width: 8px;
+  height: 1px;
+  top: 50%;
+  left: -4px;
+  box-shadow: 36px 0 0 var(--amber);
+}
+.cursor-ring[data-mode='node']::before {
+  opacity: 1;
+  box-shadow: 0 32px 0 var(--amber);
+}
+.cursor-ring[data-mode='node']::after {
+  opacity: 1;
+  box-shadow: 32px 0 0 var(--amber);
+}
+/* back mode — left arrow */
+.cursor-ring[data-mode='back'] {
+  border-color: var(--amber);
+}
+.cursor-ring[data-mode='back'] .cursor-glyph {
+  opacity: 1;
+}
+/* text mode — step aside for native selection */
+.cursor-ring[data-mode='text'] {
+  opacity: 0.2;
+}
+[data-mode='text'] ~ .cursor-dot {
+  opacity: 0.2;
+}
+
+/* ---------- grain + vignette (§4 texture) ---------- */
+.grain {
+  position: fixed;
+  inset: -100%;
+  width: 300%;
+  height: 300%;
+  z-index: var(--z-grain);
+  pointer-events: none;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: grain-shift 1.4s steps(7) infinite;
+}
+@keyframes grain-shift {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  15% {
+    transform: translate3d(-2.4%, -3.1%, 0);
+  }
+  30% {
+    transform: translate3d(1.8%, -1.2%, 0);
+  }
+  45% {
+    transform: translate3d(-1.1%, 2.6%, 0);
+  }
+  60% {
+    transform: translate3d(2.9%, 1.4%, 0);
+  }
+  75% {
+    transform: translate3d(-2.2%, 0.8%, 0);
+  }
+  90% {
+    transform: translate3d(1.3%, -2.7%, 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+.vignette {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-vignette);
+  pointer-events: none;
+  background: radial-gradient(ellipse 110% 90% at 50% 48%, transparent 58%, rgba(0, 0, 0, 0.42) 100%);
+}
+
+/* ---------- webgl context-loss fallback (§9.7) ---------- */
+.context-lost {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-boot);
+  background: var(--ink);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  color: var(--bone);
+  text-align: center;
+  padding: 24px;
+}
+.context-lost .cl-amber {
+  color: var(--amber);
+}
+.context-lost .cl-dim {
+  color: var(--dim);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .grain {
+    animation: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .hud-tl,
+  .hud-bl {
+    left: 16px;
+  }
+  .hud-tr,
+  .hud-br {
+    right: 16px;
+  }
+}
