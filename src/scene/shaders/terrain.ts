@@ -1,9 +1,10 @@
 import { GLSL_NOISE } from './noise';
 import { GLSL_SEASON } from '../season';
 
-/* Shared height-field + seam displacement, used by both the wireframe lines and the pulse points
-   so they stay welded together. Seam peel (§2 Act II): vertices part around x≈0 as uSeam rises. */
-const GLSL_TERRAIN_COMMON = /* glsl */ `
+/* Shared height-field + seam displacement, used by the wireframe lines, the pulse points,
+   the treeline, and the elk walker so they stay welded together. Seam peel (§2 Act II):
+   vertices part around x≈0 as uSeam rises. Consumers supply uAmp/uFreq/uSeed/uSeam. */
+export const GLSL_TERRAIN_COMMON = /* glsl */ `
 uniform float uAmp;
 uniform float uFreq;
 uniform float uSeed;

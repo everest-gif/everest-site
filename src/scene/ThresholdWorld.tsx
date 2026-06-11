@@ -9,6 +9,8 @@ import { fogVert, fogFrag, starVert, starFrag, skyVert, skyFrag } from './shader
 import { seasonU, seasonGlobals, mixSeasonGlobals, SEASON_IDX } from './season';
 import SeasonParticles from './SeasonParticles';
 import AscentField from './AscentField';
+import Treeline from './Treeline';
+import LifeEvents from './LifeEvents';
 
 /* Layer recipe: 4 depth planes, each its own seed/amplitude/brightness — far layers dimmer, taller.
    The front layer runs past the camera's bottom ray (M3 full-bleed: no dead band). */
@@ -311,6 +313,8 @@ export default function ThresholdWorld() {
       <SeasonParticles />
       <SeasonDriver />
       <SeamLight />
+      <Treeline />
+      <LifeEvents />
       <AscentField />
     </group>
   );

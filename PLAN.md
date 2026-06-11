@@ -42,9 +42,15 @@
       current ringed amber + `0n / NAME` beside, hover names each stop in mono, clicks
       ride the S4 direct flight, native-button keyboard order, aria-current; mobile: own
       band above the chips, 44×44 targets (probe-verified), tooltip yields to the label.
-- [ ] S2 Threshold lives: season-aware instanced treeline (shader-welded to terrain heightAt)
-      + ambient life events (8–20s cadence, season-matched silhouettes, rare ridgeline elk);
-      reduced-motion disabled
+- [x] S2 Threshold lives: Treeline.tsx — 2 instanced stands (150+100 pines, 2 draw calls)
+      welded via exported GLSL_TERRAIN_COMMON (ride displaceSeam + thresholdFade), band
+      filter keeps the GLOWING lower slopes only (floor + crests bare), true silhouettes
+      darker than sky ink (sRGB-lift lesson), season tints + tip glow + front shimmer;
+      LifeEvents.tsx — scheduler 8–20s, season-matched shadow-forms (night star/owl,
+      winter hawk, spring flock, autumn geese V), elk ≥45s cooldown on layer-3 ridge,
+      3 one-time draws, rm = disabled. Tuning loop ×3 from posters (teepee fix → band
+      placement). Evidence: life.webm (shooting star at f_040 + autumn front w/ trees),
+      threshold-{season}.png; check-paths 7/7 re-run clean.
 - [ ] S3 Cosmos: milky-way band behind hub, deep-space violet-indigo allowance 6–12%
       (sky only), drift + parallax; DECISIONS entry
 - [ ] S8 Verification & ship: motion evidence ×5 + poster tests, no-cut audits, collision logs,
