@@ -5,7 +5,7 @@ import s from './Everclash.module.css';
 
 /* Layout language: arcade character-select energy on a 12-col editorial grid —
    type, hairlines, and corner marks, no neon. The roster is the visual mass of
-   the spread; the headline physically lands on its top edge. */
+   the spread, in its own band below the headline (S5 overlap law). */
 
 const ROSTER = [
   { name: 'KESTREL', style: 'rushdown' },
@@ -128,7 +128,6 @@ const STACK = [
 export default function Everclash() {
   return (
     <div className={s.root}>
-      {/* head crosses the planet's limb AND descends onto the roster grid below */}
       <header className={`${s.head} ch-head-overlap`}>
         <div className={s.headTitle}>
           <ChamberTitle kicker="EVERCLASH — 2D PVP FIGHTER">

@@ -3,7 +3,7 @@ import type * as THREE from 'three';
 import gsap from 'gsap';
 import { useThree } from '@react-three/fiber';
 import { useStore } from '../state/store';
-import { handles, HUB_Y } from './handles';
+import { handles, nodeWorld, nodeRadius, HUB_Y } from './handles';
 import { beginHubReveal, hubPreGlow } from './HubWorld';
 
 /* Act II (S1) — THE ASCENT. One unbroken shot, zero cuts, no whiteout: the blade draws
@@ -84,7 +84,10 @@ const revF = monotoneCubic([0, 0.35, 0.8, 1.2], [50, 57, 52, 45.2]);
 
 /* scrub/verification hook — handles are inspectable on preview builds (?scrub=1) */
 if (import.meta.env.DEV || window.location.search.includes('scrub')) {
-  (window as unknown as Record<string, unknown>).__handles = handles;
+  const w = window as unknown as Record<string, unknown>;
+  w.__handles = handles;
+  w.__nodeWorld = nodeWorld;
+  w.__nodeRadius = nodeRadius;
 }
 
 function resetTransitHandles() {

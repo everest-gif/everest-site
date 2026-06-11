@@ -25,10 +25,16 @@ const _mid = new THREE.Vector3();
 const _fwd = new THREE.Vector3();
 
 /* chamber framing: camera core-side + viewer-side of the planet looking outward, so the
-   system stays behind the lens and the right two-thirds is clean space for content.
-   The look target is pushed right so the planet anchors the LEFT third. */
+   system stays behind the lens and the right side is clean space for content.
+   S5 gutter law: the planet's visual body stays inside the left 38vw — the look
+   offset and distance are tuned so limb ≤ 38vw with the column starting at 42vw. */
 /* per-chamber framing distance — dolomite reads "the planet large" (M7 radar spread) */
-const DIST_K: Partial<Record<NodeId, number>> = { dolomite: 4.0, bigback: 6.0 };
+const DIST_K: Partial<Record<NodeId, number>> = { dolomite: 4.6, bigback: 6.0 };
+/* look-right offset ≈ planet center at NDC −K → center ~24vw; larger or laggier
+   bodies sit further left so their limb holds inside the zone while the camera
+   tracks the live orbit */
+const LOOK_K: Partial<Record<NodeId, number>> = { dolomite: 0.56, emerge: 0.58, bigback: 0.58 };
+const LOOK_K_DEFAULT = 0.52;
 
 export function chamberCam(
   id: NodeId,
@@ -58,12 +64,12 @@ export function chamberCam(
     outLook.y -= tanV * dist * 0.55;
     return true;
   }
-  /* push the look right of the planet → planet lands at NDC x ≈ −0.38: the limb
-     tucks under the content column so headlines physically cross it (M1) */
+  /* push the look right of the planet → planet anchors the left zone (S5: body
+     within 33–38vw, a hard ≥6vw gutter before the content column at 42vw) */
   _mid.crossVectors(_fwd, _out.set(0, 1, 0)).normalize(); /* camera-right */
   outLook
     .copy(p)
-    .addScaledVector(_mid, tanH * dist * 0.37)
+    .addScaledVector(_mid, tanH * dist * (LOOK_K[id] ?? LOOK_K_DEFAULT))
     .y -= tanV * dist * 0.07;
   return true;
 }

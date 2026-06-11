@@ -1,7 +1,8 @@
 /* ============================================================
    EVERCLASH — arcade character-select on a 12-col editorial grid.
-   The roster carries the visual mass; the headline lands on its
-   top edge. Type, hairlines, and corner marks — no neon.
+   The roster carries the visual mass in its own band below the
+   headline (S5 overlap law: text never crosses text). Type,
+   hairlines, and corner marks — no neon.
    ============================================================ */
 .root {
   --rowgap: clamp(64px, 9.5vh, 112px);
@@ -12,16 +13,13 @@
 }
 
 /* ---------- head: kicker + headline left, cabinet readout top-right.
-   ch-head-overlap (global) lifts it to z2; the negative margin on
-   .rosterSec pulls the grid up under the headline's descenders. ---------- */
+   Flex siblings — the readout clears the headline at every width (S5). ---------- */
 .head {
   grid-column: 1 / 13;
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   gap: 24px;
-  /* the headline lies on top of the roster — let hovers reach the slots beneath */
-  pointer-events: none;
 }
 
 .headTitle {
@@ -126,14 +124,13 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* ---------- roster: the character-select grid — the mass of the spread.
-   Pulled up through the row gap so the headline physically crosses its
-   top rule and the first row of slots. ---------- */
+/* ---------- roster: the character-select grid — the mass of the spread,
+   in its own band with clean margins (S5: the headline never lands on it).
+   The tightened row gap above keeps the arcade energy without the collision. ---------- */
 .rosterSec {
   grid-column: 1 / 13;
   position: relative;
-  z-index: 1;
-  margin-top: calc(-1 * var(--rowgap) - clamp(48px, 7vh, 72px));
+  margin-top: calc(-1 * var(--rowgap) + clamp(28px, 4.5vh, 48px));
 }
 
 .rosterGrid {

@@ -700,8 +700,8 @@ a {
   background: linear-gradient(
     90deg,
     rgba(10, 10, 12, 0) 0%,
-    rgba(10, 10, 12, 0.12) 30vw,
-    rgba(10, 10, 12, 0.86) 44vw,
+    rgba(10, 10, 12, 0.12) 37vw,
+    rgba(10, 10, 12, 0.86) 47vw,
     rgba(10, 10, 12, 0.92) 100%
   );
   pointer-events: none;
@@ -718,10 +718,11 @@ a {
   background: radial-gradient(ellipse 46% 46% at 38% 50%, rgba(232, 162, 61, 0.085), transparent 70%);
   pointer-events: none;
 }
-/* M8.6 — styled chamber scrollbar: 2px bone track, amber thumb */
+/* M8.6 — styled chamber scrollbar: 2px bone track, amber thumb.
+   S5 fixed zones: planet body ≤ 38vw, hard gutter ≥ 6vw, column from 42vw. */
 .chamber-scroll {
   position: absolute;
-  inset: 0 0 0 33vw;
+  inset: 0 0 0 42vw;
   overflow-y: auto;
   overflow-x: hidden;
   scrollbar-width: thin;
@@ -730,7 +731,7 @@ a {
 /* ---------- M6: EXPLORE chips — travel to the neighbours, obviously clickable ---------- */
 .chamber-chips {
   position: absolute;
-  left: 35vw;
+  left: 42vw;
   right: clamp(20px, 4vw, 56px);
   bottom: 62px; /* clear of the hud-br return control */
   display: flex;
@@ -1211,12 +1212,18 @@ a {
   font-weight: 300;
   font-style: italic;
   font-variation-settings: 'opsz' 144;
-  /* M1 scale courage — fills 60–75% of the content column */
-  font-size: clamp(3.2rem, 6.6vw, 6.8rem);
+  /* M1 scale courage — fills 60–75% of the content column (S5: the column starts
+     at 42vw now; the ratio holds, the absolute size scales with the new measure) */
+  font-size: clamp(3rem, 5.8vw, 6rem);
   line-height: 1.0;
   letter-spacing: -0.01em;
   color: var(--bone);
   visibility: hidden; /* gsap reveals */
+  /* S5 — SplitText masks carry ±0.2/0.24em clip headroom for swashes/descenders;
+     the first mask's NEGATIVE top margin collapses through the h2 and pulls its box
+     over the kicker — padding blocks the collapse, margin handles the bottom */
+  margin: 0 0 0.26em;
+  padding-top: 0.04em;
 }
 /* M1 — the headline block crosses the planet's limb. The pull stays inside the
    column padding (the scroll container clips at its edge); the rest of the

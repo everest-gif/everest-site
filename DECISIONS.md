@@ -182,7 +182,15 @@
     cleared. The range itself dims to 45% as the gaze sweeps up the corridor — four
     additive wireframe layers viewed edge-on would otherwise flood the lens (same fix,
     held at 40%, protects the descent dive).
-50. **Recording tooling: deviceScaleFactor pinned to 1.** A PerformanceMonitor dpr step
+50a. **S5 — the gutter law retires the limb-overlap headline on desktop.** With the planet
+    body capped at 38vw and a mandated ≥6vw gutter before the 42vw column, a headline can
+    no longer reach the limb without crossing the gutter ("content never enters the
+    gutter" wins — the overlap allowance is a MAY, not a MUST). ch-head-overlap keeps its
+    small in-column pull for edge tension. The collision audit models TEXT BLOCKS (not
+    inline spans — giant display digits bleed their em-box past the line box, which is
+    typography, not layout), exempts aria-hidden decoration except headlines themselves,
+    and checks the floating travel chrome as its own layer.
+51. **Recording tooling: deviceScaleFactor pinned to 1.** A PerformanceMonitor dpr step
     mid-flight resizes the canvas and stalls Chromium's screencast — the page stays
     healthy (rAF sampler + live probe proved it) while the video freezes on its last
     frame. Pinning dsf=1 sidesteps the decline. Perf evidence comes from the rAF

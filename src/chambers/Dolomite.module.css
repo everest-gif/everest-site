@@ -32,12 +32,14 @@
   grid-column: 4 / 10;
 }
 
-/* ---------- mission board: thin mono ops list beside the radar, baselines met ---------- */
+/* ---------- mission board: thin mono ops list beside the radar, baselines met.
+   S5 — full content width: the narrowed column starved the ops track and the
+   mission rows overflowed onto the radar. ---------- */
 .board {
-  grid-column: 5 / 13;
+  grid-column: 1 / 13;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) clamp(216px, 24vw, 280px);
-  gap: 32px clamp(32px, 4vw, 56px);
+  grid-template-columns: minmax(0, 1fr) clamp(200px, 22vw, 264px);
+  gap: 32px clamp(28px, 3.5vw, 48px);
   align-items: end;
 }
 
@@ -88,8 +90,8 @@
 
 .mission {
   display: grid;
-  grid-template-columns: 52px 110px minmax(0, 1fr) max-content;
-  gap: 6px 16px;
+  grid-template-columns: 44px 96px minmax(0, 1fr) max-content;
+  gap: 6px 14px;
   align-items: baseline;
   padding: 13px 0;
   border-top: 1px solid var(--hairline);

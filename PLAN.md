@@ -13,8 +13,13 @@
       ripple chroma in grade pass. Motion evidence recorded fwd+rev (motion/), arrival probe
       clean, check-paths 7/7 (rm veil, abort mid-ascent, re-entry), console silent.
       Recorder pins deviceScaleFactor=1 (dpr-step screencast stall).
-- [ ] S5 Chamber grid: gutter law (planet left 33–38vw + ≥6vw gutter), Everclash rebuilt,
-      automated collision audit at 1440/1280/mobile — zero intersections
+- [x] S5 Chamber grid: gutter law live — planet limb ≤38vw (LOOK_K/DIST_K retuned, verified
+      8/8 by planet-zone.mjs), column from 42vw, scrim/chips moved, title scale 6.6→5.8vw
+      (ratio to new measure). Everclash rebuilt (roster in own band, meta clears headline).
+      Dolomite board overflow fixed (full-width grid). SplitText margin-collapse fix
+      (padding-top blocks the negative-mask collapse). collision-audit.mjs (text-block
+      model, decorative exempt, floating layer separate): ALL CLEAN ×24 (8 chambers ×
+      1440/1280/390). Logs in verification/summit/.
 - [ ] S6 Planet LOD: hero variants for all 8 (atmosphere rim + per-identity micro-detail),
       chamber-only mounting, hub perf untouched
 - [ ] S4 Direct planet-to-planet flight: single dolly arc 1.0–1.2s, de-rez in first 0.3s,

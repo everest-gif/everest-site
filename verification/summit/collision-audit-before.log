@@ -1,0 +1,48 @@
+[1440] jarvis: 46 parts, 2 INTERSECTIONS
+    ✗ p.ch-kicker "JARVIS — PERSONAL AI ORCHEST" × h2.ch-title "Four agents. One operator." (882.9×5px)
+    ✗ h2.ch-title "Four agents. One operator." × span.ch-marginalia "It builds while I sleep." (882.9×8.8px)
+[1440] luven: 32 parts, 1 INTERSECTIONS
+    ✗ p.ch-kicker "FOUNDER · LUVEN TECHNOLOGIES" × h2.ch-title "Every missed call is a misse" (882.9×5px)
+[1440] emerge: 46 parts, 1 INTERSECTIONS
+    ✗ p.ch-kicker "EMERGE AI — CLIENT WORK" × h2.ch-title "Four agents live. None of th" (595.9×5px)
+[1440] dolomite: 33 parts, 4 INTERSECTIONS
+    ✗ p.ch-kicker "DOLOMITE — MISSION CONTROL ·" × h2.ch-title "Every project answers to one" (738.7×5px)
+    ✗ h2.ch-title "Every project answers to one" × span.ch-marginalia "Internal tool. One machine. " (738.7×8.8px)
+    ✗ span._mMode_431fx_119 "semi-auto" × figure._radarFig_431fx_142 "scope — all projectsJARVISLU" (24.8×17.6px)
+    ✗ span._mMode_431fx_119 "semi-auto" × figure._radarFig_431fx_142 "scope — all projectsJARVISLU" (24.8×17.6px)
+[1440] everclash: 62 parts, 4 INTERSECTIONS
+    ✗ p.ch-kicker "EVERCLASH — 2D PVP FIGHTER" × h2.ch-title "Ten fighters. Eight players." (511.1×5px)
+    ✗ h2.ch-title "Ten fighters. Eight players." × span._slotNum_13zyq_277 "01" (15.8×17.6px)
+    ✗ h2.ch-title "Ten fighters. Eight players." × span._slotNum_13zyq_277 "02" (15.8×17.6px)
+    ✗ h2.ch-title "Ten fighters. Eight players." × span._slotNum_13zyq_277 "03" (15.8×17.6px)
+[1440] voxhalla: 73 parts, 1 INTERSECTIONS
+    ✗ p.ch-kicker "VOXHALLA — BROWSER VOXEL HER" × h2.ch-title "Ten champions, no engine, pa" (580.1×5px)
+[1440] bigback: 15 parts, CLEAN
+[1440] beyond: 68 parts, 2 INTERSECTIONS
+    ✗ p.ch-kicker "NODE 08 — THE PERSON" × h2.ch-title "The coordinates keep changin" (882.9×5px)
+    ✗ h2.ch-title "The coordinates keep changin" × span.ch-marginalia "athlete · the route · everyt" (882.9×6.8px)
+[1280] jarvis: 46 parts, 1 INTERSECTIONS
+    ✗ h2.ch-title "Four agents. One operator." × span.ch-marginalia "It builds while I sleep." (770.6×6.3px)
+[1280] luven: 32 parts, CLEAN
+[1280] emerge: 46 parts, CLEAN
+[1280] dolomite: 33 parts, 3 INTERSECTIONS
+    ✗ h2.ch-title "Every project answers to one" × span.ch-marginalia "Internal tool. One machine. " (644.7×6.3px)
+    ✗ span._mMode_431fx_119 "semi-auto" × figure._radarFig_431fx_142 "scope — all projectsJARVISLU" (83.3×17.6px)
+    ✗ span._mMode_431fx_119 "semi-auto" × figure._radarFig_431fx_142 "scope — all projectsJARVISLU" (83.3×17.6px)
+[1280] everclash: 62 parts, 3 INTERSECTIONS
+    ✗ h2.ch-title "Ten fighters. Eight players." × span._slotNum_13zyq_277 "01" (15.8×17.6px)
+    ✗ h2.ch-title "Ten fighters. Eight players." × span._slotNum_13zyq_277 "02" (15.8×17.6px)
+    ✗ h2.ch-title "Ten fighters. Eight players." × span._slotNum_13zyq_277 "03" (15.8×17.6px)
+[1280] voxhalla: 73 parts, CLEAN
+[1280] bigback: 15 parts, CLEAN
+[1280] beyond: 68 parts, 1 INTERSECTIONS
+    ✗ h2.ch-title "The coordinates keep changin" × span.ch-marginalia "athlete · the route · everyt" (770.6×4.3px)
+[mobile] jarvis: 46 parts, CLEAN
+[mobile] luven: 32 parts, CLEAN
+[mobile] emerge: 46 parts, CLEAN
+[mobile] dolomite: 36 parts, CLEAN
+[mobile] everclash: 62 parts, CLEAN
+[mobile] voxhalla: 73 parts, CLEAN
+[mobile] bigback: 15 parts, CLEAN
+[mobile] beyond: 68 parts, CLEAN
+COLLISION AUDIT: 23 FAILURES
