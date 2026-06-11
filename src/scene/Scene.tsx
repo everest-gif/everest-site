@@ -19,7 +19,13 @@ function Precompiler() {
     const done = () => {
       if (!cancelled) useStore.getState().setBootShaders(1);
     };
-    gl.compileAsync(scene, camera).then(done, done);
+    /* compileAsync needs KHR_parallel_shader_compile — fall back silently where absent */
+    if (gl.getContext().getExtension('KHR_parallel_shader_compile')) {
+      gl.compileAsync(scene, camera).then(done, done);
+    } else {
+      gl.compile(scene, camera);
+      done();
+    }
     return () => {
       cancelled = true;
     };

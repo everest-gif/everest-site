@@ -4,6 +4,7 @@ import Scene from './scene/Scene';
 import Boot from './ui/Boot';
 import ThresholdLockup from './ui/ThresholdLockup';
 import HubOverlay from './ui/HubOverlay';
+import ChamberLayer from './ui/ChamberLayer';
 import HUD from './ui/HUD';
 import Cursor from './ui/Cursor';
 import Grain from './ui/Grain';
@@ -27,6 +28,7 @@ export default function App() {
       <Scene />
       <ThresholdLockup />
       <HubOverlay />
+      <ChamberLayer />
       <A11yNav />
       <HUD />
       <Boot />

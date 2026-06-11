@@ -1,0 +1,173 @@
+/* Bigback — product teaser card with lots of air. The restraint is the design. */
+
+.root {
+  display: grid;
+  place-items: center;
+  min-height: clamp(440px, 68vh, 760px);
+  padding-block: clamp(12px, 4vh, 48px);
+}
+
+.card {
+  position: relative;
+  width: min(640px, 100%);
+  border: 1px solid var(--hairline);
+  background: linear-gradient(rgba(10, 10, 12, 0), rgba(10, 10, 12, 0.4)), var(--ink-2);
+  padding: clamp(48px, 10vh, 96px) clamp(22px, 6vw, 68px);
+  text-align: center;
+}
+
+/* registration ticks — reads as a spec plate, not a box */
+.corner {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border: 0 solid rgba(232, 162, 61, 0.55);
+}
+
+.tl {
+  top: -1px;
+  left: -1px;
+  border-top-width: 1px;
+  border-left-width: 1px;
+}
+
+.tr {
+  top: -1px;
+  right: -1px;
+  border-top-width: 1px;
+  border-right-width: 1px;
+}
+
+.bl {
+  bottom: -1px;
+  left: -1px;
+  border-bottom-width: 1px;
+  border-left-width: 1px;
+}
+
+.br {
+  bottom: -1px;
+  right: -1px;
+  border-bottom-width: 1px;
+  border-right-width: 1px;
+}
+
+/* ---------- the one statement ---------- */
+.statement {
+  max-width: 42ch;
+  margin: clamp(22px, 4vh, 34px) auto 0;
+  opacity: 0;
+  animation: rise 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.55s forwards;
+}
+
+/* ---------- supporting mono rows ---------- */
+.rows {
+  margin: clamp(40px, 8vh, 72px) 0 0;
+  text-align: left;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 88px minmax(0, 1fr);
+  gap: 16px;
+  align-items: baseline;
+  padding: 12px 0;
+  border-top: 1px solid var(--hairline);
+  opacity: 0;
+  animation: rise 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.row:nth-child(1) {
+  animation-delay: 0.75s;
+}
+
+.row:nth-child(2) {
+  animation-delay: 0.87s;
+}
+
+.row:nth-child(3) {
+  animation-delay: 0.99s;
+}
+
+.key {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+
+.val {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  line-height: 1.6;
+  color: var(--bone);
+}
+
+/* the one permitted live-status tick — filing is in motion */
+.tick {
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  margin-right: 9px;
+  border-radius: 50%;
+  background: var(--red);
+  vertical-align: 1px;
+  animation: pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+/* reduced motion — store toggle (.still) and OS preference */
+.still .statement,
+.still .row {
+  animation: none;
+  opacity: 1;
+  transform: none;
+}
+
+.still .tick {
+  animation: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .statement,
+  .row {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  .tick {
+    animation: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .row {
+    grid-template-columns: 72px minmax(0, 1fr);
+    gap: 12px;
+  }
+}

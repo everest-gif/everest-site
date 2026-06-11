@@ -1,0 +1,336 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+}
+
+/* ---------- header: title left, lobby readout right ---------- */
+.head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.lobby {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-end;
+  text-align: right;
+}
+
+.lobbyLive {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--bone);
+}
+
+.liveDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--red); /* the one permitted live-status tick */
+  animation: pulse 2.4s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+.lobbyMeta {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+
+/* ---------- roster: the character-select grid ---------- */
+.rosterBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--hairline);
+  margin-bottom: 18px;
+}
+
+.timer {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  color: var(--amber);
+  font-variant-numeric: tabular-nums;
+}
+
+.rosterGrid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.slot {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  border: 1px solid rgba(232, 162, 61, 0.2);
+  background:
+    repeating-linear-gradient(
+      -45deg,
+      rgba(237, 232, 223, 0.025) 0,
+      rgba(237, 232, 223, 0.025) 1px,
+      transparent 1px,
+      transparent 7px
+    ),
+    var(--ink-2);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+  transition:
+    border-color 200ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 200ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.slot:hover {
+  transform: translateY(-2px);
+}
+
+.slot:hover,
+.live {
+  border-color: rgba(232, 162, 61, 0.8);
+}
+
+.corner {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border: 1px solid rgba(232, 162, 61, 0.45);
+  transition: border-color 200ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.corner[data-c='tl'] {
+  top: -1px;
+  left: -1px;
+  border-right: none;
+  border-bottom: none;
+}
+.corner[data-c='tr'] {
+  top: -1px;
+  right: -1px;
+  border-left: none;
+  border-bottom: none;
+}
+.corner[data-c='bl'] {
+  bottom: -1px;
+  left: -1px;
+  border-right: none;
+  border-top: none;
+}
+.corner[data-c='br'] {
+  bottom: -1px;
+  right: -1px;
+  border-left: none;
+  border-top: none;
+}
+
+.slot:hover .corner,
+.live .corner {
+  border-color: rgba(232, 162, 61, 0.95);
+}
+
+.scan {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 1px;
+  background: rgba(232, 162, 61, 0.3);
+  opacity: 0;
+}
+
+.slot:hover .scan,
+.live .scan {
+  opacity: 1;
+  animation: scan 3.2s linear infinite;
+}
+
+@keyframes scan {
+  0% {
+    top: 0%;
+  }
+  100% {
+    top: 100%;
+  }
+}
+
+.slotTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.slotNum {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: var(--dim);
+}
+
+.slotTag {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--amber);
+  opacity: 0;
+  transform: translateX(4px);
+  transition:
+    opacity 180ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 180ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.slot:hover .slotTag {
+  opacity: 1;
+  transform: none;
+}
+
+.slotFoot {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.slotName {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--bone);
+  transition: color 200ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.slot:hover .slotName {
+  color: var(--amber);
+}
+
+.slotStyle {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+
+/* ---------- stack readout ---------- */
+.specBar {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  border: 1px solid var(--hairline);
+}
+
+.specCell {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px 18px;
+  border-left: 1px solid var(--hairline);
+}
+
+.specCell:nth-child(1) {
+  border-left: none;
+}
+
+.specKey {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+
+.specVal {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--bone);
+}
+
+/* ---------- prose + stats band ---------- */
+.band {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+  gap: 32px;
+  align-items: start;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px 24px;
+}
+
+/* ---------- responsive ---------- */
+@media (max-width: 860px) {
+  .band {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .lobby {
+    align-items: flex-start;
+    text-align: left;
+  }
+  .rosterGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .slot {
+    aspect-ratio: 3 / 2;
+  }
+  .specBar {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .specCell:nth-child(odd) {
+    border-left: none;
+  }
+  .specCell:nth-child(n + 3) {
+    border-top: 1px solid var(--hairline);
+  }
+}
+
+/* ---------- reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .liveDot {
+    animation: none;
+  }
+  .scan {
+    display: none;
+  }
+  .slot,
+  .slot:hover {
+    transform: none;
+  }
+}

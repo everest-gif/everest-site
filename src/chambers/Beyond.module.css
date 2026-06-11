@@ -1,0 +1,352 @@
+/* BEYOND — editorial timeline / map hybrid. Warmest chamber: bone-forward, generous air. */
+
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(56px, 9vh, 96px);
+  max-width: 880px;
+  margin: 0 auto;
+}
+
+.head {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.tagline {
+  color: rgba(232, 162, 61, 0.8);
+}
+
+.intro {
+  font-size: 17.5px;
+  line-height: 1.85;
+}
+
+/* ---------- thread sections ---------- */
+.thread {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.threadHead {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+}
+
+.threadNum {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  color: var(--amber);
+}
+
+.threadLabel {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--bone);
+}
+
+.threadRule {
+  flex: 1;
+  height: 1px;
+  background: var(--hairline);
+  align-self: center;
+}
+
+/* ---------- 01 · athlete ---------- */
+.races {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+}
+
+.race {
+  display: flex;
+  gap: 22px;
+  padding: 16px 0;
+  border-top: 1px solid var(--hairline);
+}
+
+.race:last-child {
+  border-bottom: 1px solid var(--hairline);
+}
+
+.raceTag {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: var(--amber);
+  min-width: 86px;
+  padding-top: 3px;
+}
+
+.raceBody {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.raceName {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  color: var(--bone);
+}
+
+.raceNote {
+  font-family: var(--font-body);
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--dim);
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  max-width: 560px;
+}
+
+/* ---------- 02 · voyager — route map ---------- */
+.map {
+  border: 1px solid var(--hairline);
+  background: var(--ink-2);
+  padding: 18px 14px 10px;
+}
+
+.routeSvg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.anim {
+  visibility: hidden; /* gsap reveals; reduced-motion sets visible */
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .anim {
+    visibility: visible;
+    opacity: 1;
+  }
+}
+
+.routePast {
+  fill: none;
+  stroke: var(--amber);
+  stroke-width: 1.4;
+}
+
+.routeFuture {
+  stroke: var(--jade);
+  stroke-width: 1;
+  stroke-dasharray: 4 5;
+  stroke-opacity: 0.8;
+}
+
+.dotPast {
+  fill: var(--bone);
+  fill-opacity: 0.75;
+}
+
+.dotFuture {
+  fill: var(--jade);
+  fill-opacity: 0.8;
+}
+
+.dotLive {
+  fill: var(--amber);
+}
+
+.dotRing {
+  fill: none;
+  stroke: var(--amber);
+  stroke-opacity: 0.5;
+}
+
+.lbl {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.12em;
+  fill: var(--bone);
+  text-anchor: middle;
+}
+
+.lblFuture {
+  fill: var(--jade);
+  fill-opacity: 0.9;
+}
+
+.sub {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: 0.14em;
+  fill: rgba(237, 232, 223, 0.55);
+  text-anchor: middle;
+}
+
+.mapCap {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--dim);
+  text-align: right;
+  padding-top: 10px;
+}
+
+.manifest {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+}
+
+.mRow {
+  display: grid;
+  grid-template-columns: 36px 250px 1fr;
+  gap: 14px;
+  padding: 11px 0;
+  border-top: 1px solid var(--hairline);
+  align-items: baseline;
+}
+
+.mIdx {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: var(--amber);
+}
+
+.mPlace {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  color: var(--bone);
+}
+
+.mNote {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--dim);
+}
+
+@media (max-width: 700px) {
+  .mRow {
+    grid-template-columns: 28px 1fr;
+  }
+  .mNote {
+    grid-column: 2;
+  }
+}
+
+/* ---------- 03 · small joys ---------- */
+.joys {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+}
+
+.joy {
+  display: grid;
+  grid-template-columns: 170px 1fr;
+  gap: 18px;
+  padding: 15px 0;
+  border-top: 1px solid var(--hairline);
+  align-items: baseline;
+}
+
+.joy:last-child {
+  border-bottom: 1px solid var(--hairline);
+}
+
+.joyKey {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.13em;
+  color: var(--amber);
+}
+
+.joyNote {
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--bone);
+}
+
+@media (max-width: 600px) {
+  .joy {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+}
+
+/* ---------- contact ---------- */
+.contact {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  border-top: 1px solid var(--hairline);
+  padding-top: 44px;
+}
+
+.contactKicker {
+  color: rgba(232, 162, 61, 0.8);
+}
+
+.cName {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 300;
+  font-variation-settings: 'opsz' 144;
+  font-size: clamp(1.6rem, 3vw, 2.3rem);
+  color: var(--bone);
+}
+
+.cRows {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+}
+
+.cRow {
+  display: flex;
+  gap: 18px;
+  padding: 12px 0;
+  border-top: 1px solid var(--hairline);
+  align-items: baseline;
+}
+
+.cLabel {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: var(--dim);
+  min-width: 86px;
+}
+
+.cLink {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: var(--bone);
+  transition: color var(--t-micro) var(--ease-out);
+}
+
+.cLink:hover {
+  color: var(--amber);
+}
+
+.cPending {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--dim);
+  opacity: 0.65;
+}

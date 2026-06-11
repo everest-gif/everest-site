@@ -43,3 +43,20 @@
     orchestration metaphor legible without labels.
 18. **Sector arc-text drawn into CanvasTextures** with the bundled JetBrains Mono (no troika/external
     font fetch); characters traversed clockwise (descending angle) or the text mirrors.
+19. **Chambers use CSS Modules** (spec allows "CSS Modules or a single global stylesheet"): eight
+    parallel agents each own exactly `<Name>.tsx` + `<Name>.module.css` — zero merge conflicts.
+    System-level styles stay in the global sheet.
+20. **Mini-orchestrator is a 2D canvas, not a second WebGL view.** While a chamber covers the main
+    canvas the RAF loop pauses (§8); the widget keeps pulses firing at ~30fps for almost nothing,
+    doubles as a click-to-return control, and reads as deliberate instrument design.
+21. **Media manifest:** static hosting can't list directories, so the §3 media convention is
+    `/public/media/<id>/manifest.json` (`{"images":[...]}`); dropping files + manifest needs zero
+    code changes. Documented in public/media/README.md.
+22. **Verification environment:** Playwright installed as devDependency (spec-sanctioned fallback).
+    The Playwright MCP drives the user's desktop Chrome — when that window is occluded, Chromium
+    throttles rAF to 1fps; headless SwiftShader turns GSAP timelines glacial (lagSmoothing caps
+    deltas at 33ms against ~1000ms frames). §9 runs use a freshly-launched HEADED chromium with GPU.
+23. **Beyond chamber:** built by its workflow agent up to Beyond.tsx, then the agent died on an API
+    spend limit before writing Beyond.module.css — stylesheet completed by the main session in the
+    same layout language. (TS passed even with the CSS missing — ambient vite types don't resolve
+    css-module files; the build catches it. Worth knowing.)

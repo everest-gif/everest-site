@@ -1,0 +1,194 @@
+/* Luven — a business one-pager with editorial weight:
+   letterhead rule, marginal section labels, ledger rows set like a term sheet. */
+
+.root {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---------- letterhead ---------- */
+.docRule {
+  height: 2px;
+  background: var(--bone);
+  opacity: 0.7;
+}
+
+.docline {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  padding-top: 10px;
+}
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tick {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--red); /* the one permitted live-status tick */
+  animation: tick-pulse 2.4s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+@keyframes tick-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+
+/* ---------- headline ---------- */
+.head {
+  margin-top: clamp(48px, 8vh, 84px);
+  max-width: 18ch;
+}
+
+/* ---------- numbered sections — label hangs in the left margin ---------- */
+.section {
+  margin-top: clamp(56px, 9vh, 88px);
+  display: grid;
+  grid-template-columns: 148px minmax(0, 1fr);
+  column-gap: clamp(24px, 4vw, 56px);
+  align-items: start;
+}
+
+.secLabel {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--dim);
+  border-top: 1px solid var(--hairline);
+  padding-top: 8px;
+}
+
+.secIndex {
+  color: var(--amber);
+  margin-right: 10px;
+}
+
+.secBody {
+  min-width: 0;
+}
+
+/* ---------- 01 · the product, one sentence ---------- */
+.lede p {
+  font-size: clamp(19px, 2.4vw, 23px);
+  line-height: 1.55;
+  max-width: 40ch;
+}
+
+/* ---------- 02 · the ledger ---------- */
+.ledger {
+  border-top: 1px solid var(--hairline);
+}
+
+.row {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--hairline);
+  animation: row-rise 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes row-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.rowLabel {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+
+.leader {
+  flex: 1 1 24px;
+  min-width: 24px;
+  border-bottom: 1px dotted var(--dim);
+  opacity: 0.35;
+  align-self: center;
+}
+
+.rowEnd {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 5px;
+}
+
+.rowValue {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-style: italic;
+  font-variation-settings: 'opsz' 144;
+  font-size: clamp(1.45rem, 2.4vw, 2rem);
+  line-height: 1.05;
+  color: var(--bone);
+}
+
+.starValue {
+  color: var(--amber);
+  font-size: clamp(1.8rem, 3.2vw, 2.6rem);
+}
+
+.rowNote {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+
+/* ---------- signature ---------- */
+.foot {
+  margin-top: clamp(64px, 10vh, 96px);
+}
+
+.footRule {
+  display: block;
+  height: 2px;
+  background: var(--bone);
+  opacity: 0.7;
+  margin-bottom: 12px;
+}
+
+.footLine {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+}
+
+/* ---------- mobile ---------- */
+@media (max-width: 760px) {
+  .section {
+    grid-template-columns: 1fr;
+    row-gap: 20px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tick,
+  .row {
+    animation: none;
+  }
+}

@@ -1,0 +1,349 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+}
+
+/* ---------- head: title left, instrument readout right ---------- */
+.head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 28px;
+  align-items: end;
+}
+
+.headLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.readout {
+  border: 1px solid var(--hairline);
+  background: var(--ink-2);
+  padding: 14px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 224px;
+}
+
+.readoutRow {
+  display: grid;
+  grid-template-columns: 88px auto;
+  gap: 12px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.readoutLabel {
+  color: var(--dim);
+}
+
+.readoutValue {
+  color: var(--bone);
+}
+
+.clock {
+  color: var(--amber);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 760px) {
+  .head {
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+  .readout {
+    min-width: 0;
+    width: fit-content;
+  }
+}
+
+/* ---------- board: radar | missions ---------- */
+.board {
+  display: grid;
+  grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+  gap: 28px;
+  align-items: stretch;
+}
+
+@media (max-width: 860px) {
+  .board {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---------- radar scope ---------- */
+.radarPanel {
+  position: relative;
+  border: 1px solid var(--hairline);
+  background: var(--ink-2);
+  padding: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.radar {
+  width: 100%;
+  max-width: 420px;
+  display: block;
+}
+
+.scopeTag {
+  position: absolute;
+  top: 10px;
+  left: 12px;
+  font-size: 10px;
+}
+
+.sweepTag {
+  position: absolute;
+  bottom: 10px;
+  right: 12px;
+  font-size: 10px;
+}
+
+.ring {
+  fill: none;
+  stroke: rgba(232, 162, 61, 0.16);
+  stroke-width: 1;
+}
+
+.ringOuter {
+  stroke: rgba(232, 162, 61, 0.32);
+}
+
+.cross {
+  stroke: rgba(237, 232, 223, 0.07);
+  stroke-width: 1;
+}
+
+.tick {
+  stroke: rgba(232, 162, 61, 0.4);
+  stroke-width: 1;
+}
+
+.blip {
+  fill: var(--amber);
+}
+
+.blipLabel {
+  font-family: var(--font-mono);
+  font-size: 7.5px;
+  letter-spacing: 0.14em;
+  fill: rgba(237, 232, 223, 0.55);
+}
+
+.center {
+  fill: var(--jade);
+}
+
+.centerRing {
+  fill: none;
+  stroke: rgba(56, 217, 169, 0.4);
+  stroke-width: 1;
+}
+
+.sweepLine {
+  stroke: rgba(232, 162, 61, 0.85);
+  stroke-width: 1;
+}
+
+.sweepFillStart {
+  stop-color: var(--amber);
+  stop-opacity: 0;
+}
+
+.sweepFillEnd {
+  stop-color: var(--amber);
+  stop-opacity: 0.26;
+}
+
+.sweep {
+  transform-box: view-box;
+  transform-origin: 50% 50%;
+  /* continuous instrument rotation — linear like the global placeholder scan */
+  animation: sweep 7s linear infinite;
+}
+
+@keyframes sweep {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.ping {
+  fill: none;
+  stroke: var(--amber);
+  stroke-width: 1;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: ping 3.5s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+@keyframes ping {
+  0% {
+    transform: scale(0.25);
+    opacity: 0.9;
+  }
+  80% {
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1.35);
+    opacity: 0;
+  }
+}
+
+/* ---------- mission board ---------- */
+.missions {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.boardHead {
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.missionList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.mission {
+  display: grid;
+  grid-template-columns: 56px 128px minmax(0, 1fr) max-content;
+  gap: 6px 16px;
+  align-items: baseline;
+  padding: 18px 2px;
+  border-bottom: 1px solid var(--hairline);
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.mId {
+  color: rgba(232, 162, 61, 0.6);
+}
+
+.mVerb {
+  color: var(--bone);
+  letter-spacing: 0.14em;
+}
+
+.mDesc {
+  color: var(--dim);
+}
+
+.mStatus {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  justify-self: end;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.dotRunning {
+  background: var(--red); /* the one permitted live-status tick */
+  animation: live 2.2s ease-in-out infinite;
+}
+
+@keyframes live {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+
+.dotComplete {
+  background: var(--jade);
+}
+
+.dotScheduled {
+  background: rgba(237, 232, 223, 0.3);
+}
+
+.dotContinuous {
+  background: var(--amber);
+}
+
+.stRunning {
+  color: var(--bone);
+}
+
+.stComplete {
+  color: var(--jade);
+}
+
+.stScheduled {
+  color: var(--dim);
+}
+
+.stContinuous {
+  color: var(--amber);
+}
+
+@media (max-width: 600px) {
+  .mission {
+    grid-template-columns: 56px minmax(0, 1fr) max-content;
+  }
+  .mId {
+    grid-row: 1;
+    grid-column: 1;
+  }
+  .mVerb {
+    grid-row: 1;
+    grid-column: 2;
+  }
+  .mStatus {
+    grid-row: 1;
+    grid-column: 3;
+  }
+  .mDesc {
+    grid-row: 2;
+    grid-column: 2 / 4;
+  }
+}
+
+/* ---------- stat strip ---------- */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+}
+
+@media (max-width: 480px) {
+  .stats {
+    gap: 14px;
+  }
+}
+
+/* ---------- reduced motion: freeze the instrument ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .sweep,
+  .ping,
+  .dotRunning {
+    animation: none;
+  }
+  .ping {
+    opacity: 0;
+  }
+}

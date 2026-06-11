@@ -7,10 +7,12 @@ import './styles/global.css';
 import App from './App';
 import { initRouter } from './state/router';
 import { trackFontLoading } from './lib/fonts';
+import { initAudio } from './lib/audio';
 import { useStore } from './state/store';
 
 initRouter();
 trackFontLoading();
+initAudio();
 
 if (import.meta.env.DEV) {
   const log: Array<{ t: number; act: string }> = [];

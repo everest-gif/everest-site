@@ -575,6 +575,297 @@ a {
   will-change: transform, opacity;
 }
 
+/* ---------- Act IV: chambers ---------- */
+.chamber {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-chamber);
+}
+.chamber-scrim {
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 10, 12, 0.55);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  opacity: 0;
+}
+.chamber-panel {
+  position: absolute;
+  inset: 0;
+  visibility: hidden; /* gsap reveals via clip + autoAlpha */
+  outline: none;
+}
+.chamber-scroll {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
+}
+.chamber-scroll::-webkit-scrollbar {
+  display: none;
+}
+.chamber-content {
+  min-height: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: clamp(72px, 10vh, 120px) clamp(20px, 5vw, 64px) 64px;
+}
+.chamber-foot {
+  display: flex;
+  justify-content: center;
+  padding: 72px 0 32px;
+}
+.chamber-return {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--dim);
+  transition: color var(--t-micro) var(--ease-out);
+}
+.chamber-return:hover {
+  color: var(--amber);
+}
+.chamber-beam {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--amber);
+  box-shadow:
+    0 0 14px rgba(232, 162, 61, 0.9),
+    0 0 38px rgba(232, 162, 61, 0.4);
+  opacity: 0;
+  pointer-events: none;
+}
+.chamber-scanlines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(237, 232, 223, 0.05) 0px,
+    rgba(237, 232, 223, 0.05) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+}
+/* single RGB-split flicker on marginalia as the chamber locks in */
+.chamber-panel.is-flick .ch-marginalia,
+.chamber-panel.is-flick .ch-kicker,
+.chamber-panel.is-flick .ch-stat-label {
+  text-shadow:
+    -1.5px 0 rgba(255, 0, 60, 0.9),
+    1.5px 0 rgba(0, 255, 200, 0.9);
+}
+
+/* ---------- chamber typography & primitives ---------- */
+.ch-kicker {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--amber);
+  margin-bottom: 14px;
+}
+.ch-title {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-style: italic;
+  font-variation-settings: 'opsz' 144;
+  font-size: clamp(2.4rem, 5vw, 4.4rem);
+  line-height: 1.05;
+  color: var(--bone);
+  visibility: hidden; /* gsap reveals */
+}
+.ch-marginalia {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+.ch-stat {
+  border-top: 1px solid var(--hairline);
+  padding-top: 14px;
+}
+.ch-stat-value {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(1.7rem, 2.6vw, 2.4rem);
+  color: var(--amber);
+  line-height: 1.1;
+}
+.ch-stat-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-top: 6px;
+}
+.prose {
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.75;
+  color: var(--bone);
+  max-width: 62ch;
+}
+.prose p + p {
+  margin-top: 1em;
+}
+.prose .dim {
+  color: var(--dim);
+}
+
+/* ---------- gallery + procedural placeholder frames ---------- */
+.ch-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 18px;
+}
+.ch-shot {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--hairline);
+}
+.ch-shot img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.ch-shot-cap {
+  position: absolute;
+  left: 10px;
+  bottom: 8px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--bone);
+  background: rgba(10, 10, 12, 0.75);
+  padding: 3px 8px;
+}
+.ch-ph {
+  position: relative;
+  border: 1px solid rgba(232, 162, 61, 0.22);
+  background:
+    linear-gradient(rgba(232, 162, 61, 0.03), rgba(232, 162, 61, 0.015)),
+    var(--ink-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  animation: ph-breathe 5s ease-in-out infinite;
+}
+@keyframes ph-breathe {
+  0%,
+  100% {
+    border-color: rgba(232, 162, 61, 0.18);
+  }
+  50% {
+    border-color: rgba(232, 162, 61, 0.38);
+  }
+}
+.ch-ph-corner {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border: 1px solid rgba(232, 162, 61, 0.8);
+}
+.ch-ph-corner.tl {
+  top: -1px;
+  left: -1px;
+  border-right: none;
+  border-bottom: none;
+}
+.ch-ph-corner.tr {
+  top: -1px;
+  right: -1px;
+  border-left: none;
+  border-bottom: none;
+}
+.ch-ph-corner.bl {
+  bottom: -1px;
+  left: -1px;
+  border-right: none;
+  border-top: none;
+}
+.ch-ph-corner.br {
+  bottom: -1px;
+  right: -1px;
+  border-left: none;
+  border-top: none;
+}
+.ch-ph-scan {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: rgba(232, 162, 61, 0.35);
+  animation: ph-scan 4.2s linear infinite;
+}
+@keyframes ph-scan {
+  0% {
+    top: 0%;
+  }
+  100% {
+    top: 100%;
+  }
+}
+.ch-ph-cap {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--dim);
+  text-align: center;
+  padding: 0 14px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ch-ph,
+  .ch-ph-scan {
+    animation: none;
+  }
+}
+
+/* ---------- mini orchestrator widget ---------- */
+.mini-orch {
+  position: absolute;
+  left: 24px;
+  bottom: 52px;
+  width: 148px;
+  height: 148px;
+  border: 1px solid var(--hairline);
+  background: rgba(17, 17, 20, 0.85);
+  opacity: 0;
+  pointer-events: auto;
+}
+.mini-orch canvas {
+  display: block;
+}
+.mini-orch-label {
+  position: absolute;
+  right: 6px;
+  bottom: 4px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  color: var(--dim);
+}
+.mini-orch:hover {
+  border-color: rgba(232, 162, 61, 0.5);
+}
+@media (max-width: 640px) {
+  .mini-orch {
+    display: none;
+  }
+}
+
 /* ---------- webgl context-loss fallback (§9.7) ---------- */
 .context-lost {
   position: fixed;

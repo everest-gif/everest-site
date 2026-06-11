@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import { useFrame, useThree } from '@react-three/fiber';
 import { useStore } from '../state/store';
 import { handles, HUB_Y } from './handles';
+import { chamberFocus } from '../chambers/control';
 
 /* Camera homes per stable act. The breach timelines own the camera during transit. */
 const HOMES = {
@@ -76,6 +77,15 @@ export default function CameraRig() {
     );
     _pos.copy(home.pos).add(_offset);
     _look.copy(home.look);
+
+    /* chamber handoff (§2 Act IV.2): camera pushes toward the opened node */
+    if (act === 'chamber' && chamberFocus.id) {
+      _pos.x += chamberFocus.localX * 0.16;
+      _pos.y += chamberFocus.localY * 0.16;
+      _pos.z -= 1.1;
+      _look.x += chamberFocus.localX * 0.3;
+      _look.y += chamberFocus.localY * 0.3;
+    }
 
     /* settle toward home (covers act switches without a timeline, e.g. skip intro) */
     const settle = 1 - Math.exp(-dt * 4.5);

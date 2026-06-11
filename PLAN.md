@@ -54,13 +54,16 @@
 - [x] Phase exit ritual (typecheck ✓ build ✓ hover/keyboard/Esc verified in browser ✓ console clean ✓)
 - LESSON: hard-reload (cache-bust ?cb=) when verifying preview builds — a stale cached index.html cost a debugging detour.
 
-## P4 — Act IV: Chambers  [TODO]
-- [ ] Transition system: isolation (0.3s) → handoff (0.4s, orchestrator → live mini-widget bottom-left) → CRT scan-line materialization from node position
-- [ ] Fraunces opsz axis animation on chamber headline reveals (mandatory)
-- [ ] 8 chambers, distinct layouts, §3 copy: jarvis (console) / luven (one-pager) / emerge (dossier) / dolomite (radar) / everclash (character select) / voxhalla (spec-sheet) / bigback (teaser) / beyond (timeline+map, contact block §7)
-- [ ] Media convention: /public/media/<id>/ manifest check, procedural placeholder frames
-- [ ] Lenis chamber scrolling synced to GSAP ticker; Esc + return controls; de-rez close
-- [ ] Phase exit ritual
+## P4 — Act IV: Chambers  [DONE]
+- [x] Transition system (`src/ui/ChamberLayer.tsx`): isolation (scrim + node surge via hover state) → handoff (camera push via chamberFocus + orchestrator collapses into live 2D-canvas mini-widget) → CRT scan-line materialization (twin beams from node screen-Y + clip-path reveal + scanline texture + single ≤80ms RGB flicker on marginalia). De-rez close reverses into the node. Esc + HUD + in-content + widget all close.
+- [x] Fraunces opsz 9→144 sweep on every chamber headline (shared ChamberTitle — mandatory §11.4)
+- [x] 8 chambers, distinct layouts, full §3 copy — 6 built by parallel workflow agents, Beyond.tsx by agent (died mid-run on API spend limit; its missing module.css written by main session), Jarvis by main session as reference. All reviewed against §4/§5 by main session, all verified visually at 1440×900.
+- [x] Media convention: fetch /media/<id>/manifest.json → gallery; absent → glowing wireframe placeholder frames (public/media/README.md documents it)
+- [x] Lenis on chamber scroll container, driven by gsap.ticker; destroyed on close
+- [x] RAF pause while chamber covers canvas (canvasCovered → frameloop 'never'); mini-widget keeps the system visibly alive
+- [x] compileAsync guarded behind KHR_parallel_shader_compile check (kills three.js warning on SwiftShader)
+- [x] Phase exit ritual (typecheck ✓ build ✓ all 8 chambers shot + inspected headed ✓ console clean ✓)
+- NOTE: verification runs use a controlled Playwright (devDep) headed browser — the MCP browser (user's Chrome) suffers 1fps rAF throttle when occluded; headless SwiftShader makes GSAP timelines crawl via lagSmoothing. Headed + GPU is the honest §9 environment.
 
 ## P5 — Polish  [TODO]
 - [ ] Sound layer (Web Audio synth: hub hum, breach whoosh, hover tick; default OFF, lazy AudioContext)
