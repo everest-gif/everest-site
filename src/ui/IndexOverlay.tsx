@@ -52,12 +52,13 @@ export default function IndexOverlay() {
     const beam = root.querySelector<HTMLElement>('.index-beam');
     const rows = root.querySelectorAll<HTMLElement>('.index-row, .index-ghead');
     if (panel) {
+      /* visible NOW (synchronously) — the first row must be focusable immediately */
+      gsap.set(panel, { autoAlpha: 1 });
       if (reduced) {
-        gsap.set(panel, { autoAlpha: 1, clipPath: 'inset(0% 0 0% 0)' });
+        gsap.set(panel, { clipPath: 'inset(0% 0 0% 0)' });
       } else {
         gsap
           .timeline()
-          .set(panel, { autoAlpha: 1 }, 0)
           .fromTo(
             panel,
             { clipPath: 'inset(50% 0 50% 0)' },
@@ -66,7 +67,8 @@ export default function IndexOverlay() {
           )
           .fromTo(beam, { autoAlpha: 1, top: '50%' }, { top: '0%', duration: 0.38, ease: 'power3.out' }, 0)
           .to(beam, { autoAlpha: 0, duration: 0.16 }, 0.36)
-          .fromTo(rows, { autoAlpha: 0, y: 8 }, { autoAlpha: 1, y: 0, duration: 0.4, ease: 'power3.out', stagger: 0.022 }, 0.12);
+          /* opacity only — rows must stay focusable from frame one (keyboard nav) */
+          .fromTo(rows, { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.4, ease: 'power3.out', stagger: 0.022 }, 0.12);
       }
     }
     root.querySelector<HTMLElement>('.index-row')?.focus();

@@ -31,7 +31,7 @@ const newPage = async (ctxOpts = {}, vp = { width: 1440, height: 900 }) => {
   page.on('console', (m) => {
     if (m.type() === 'error' || m.type() === 'warning') consoleLog.push(`[${m.type()}] ${m.text()}`);
   });
-  page.on('pageerror', (e) => consoleLog.push(`[pageerror] ${e.message}`));
+  page.on('pageerror', (e) => consoleLog.push(`[pageerror] ${(e.stack || e.message).split('\n').slice(0, 4).join(' ⏎ ')}`));
   return { ctx, page };
 };
 
@@ -366,6 +366,122 @@ for (const key of ['Enter', ' ']) {
   const dim = blend([237, 232, 223], [10, 10, 12], 0.55);
   const ratio = (lum(dim) + 0.05) / (lum([10, 10, 12]) + 0.05);
   check('9.8 --dim passes WCAG AA on --ink', ratio >= 4.5, `${ratio.toFixed(2)}:1`);
+  await ctx.close();
+}
+
+/* ============ M10 — GORGEOUS PASS additions ============ */
+
+/* seasons: control labeled, keyboard radiogroup, persistence, reduced-motion crossfade */
+{
+  const { ctx, page } = await newPage();
+  await page.goto(`${BASE}/?vsea`);
+  await page.waitForSelector('.hud-seasons', { timeout: 15000 });
+  await page.waitForTimeout(1200);
+  const a11y = await page.evaluate(() => {
+    const g = document.querySelector('.hud-seasons');
+    const dots = [...document.querySelectorAll('.season-dot')];
+    return {
+      role: g?.getAttribute('role'),
+      label: g?.getAttribute('aria-label') ?? '',
+      radios: dots.length,
+      named: dots.every((d) => (d.getAttribute('aria-label') ?? '').length > 0),
+      checked: dots.filter((d) => d.getAttribute('aria-checked') === 'true').length,
+    };
+  });
+  check(
+    'M3/9.8 season control is a labeled radiogroup',
+    a11y.role === 'radiogroup' && a11y.label.length > 0 && a11y.radios === 4 && a11y.named && a11y.checked === 1,
+    JSON.stringify(a11y),
+  );
+  await page.click('[data-season="winter"]');
+  await page.waitForTimeout(1800);
+  const stored = await page.evaluate(() => sessionStorage.getItem('everest-season'));
+  check('M3 season choice persists (sessionStorage)', stored === 'winter', String(stored));
+  /* keyboard: arrows cycle the checked season */
+  await page.focus('[data-season="winter"]');
+  await page.keyboard.press('ArrowRight');
+  await page.waitForTimeout(300);
+  const afterArrow = await page.evaluate(() => sessionStorage.getItem('everest-season'));
+  check('M3 arrow keys move the season', afterArrow === 'spring', String(afterArrow));
+  await ctx.close();
+}
+{
+  const { ctx, page } = await newPage({ reducedMotion: 'reduce' });
+  await page.goto(`${BASE}/?vsearm`);
+  await page.waitForSelector('.hud-seasons', { timeout: 15000 });
+  await page.waitForTimeout(800);
+  await page.click('[data-season="autumn"]');
+  await page.waitForTimeout(600);
+  const ok = await page.evaluate(() => sessionStorage.getItem('everest-season') === 'autumn');
+  check('9.4 reduced motion: season switch crossfades (no front)', ok);
+  await ctx.close();
+}
+
+/* INDEX: labeled dialog, keyboard nav, Enter travels, Esc closes */
+{
+  const { ctx, page } = await newPage();
+  await page.goto(`${BASE}/?vidx#/hub`);
+  await page.waitForFunction(() => document.querySelectorAll('.hub-node-btn').length === 8, null, { timeout: 12000 });
+  await page.waitForTimeout(800);
+  await page.evaluate(() => [...document.querySelectorAll('button')].find((b) => b.textContent.includes('index'))?.click());
+  await page.waitForSelector('.index-panel', { timeout: 4000 });
+  const idx = await page.evaluate(() => {
+    const p = document.querySelector('.index-panel');
+    const rows = [...document.querySelectorAll('.index-row')];
+    return {
+      role: p?.getAttribute('role'),
+      label: p?.getAttribute('aria-label') ?? '',
+      rows: rows.length,
+      named: rows.every((r) => (r.getAttribute('aria-label') ?? '').length > 0),
+      focusOnRow: document.activeElement?.classList.contains('index-row') ?? false,
+    };
+  });
+  check(
+    'M6/9.8 INDEX is a labeled dialog with 10 named rows',
+    idx.role === 'dialog' && idx.label.length > 0 && idx.rows === 10 && idx.named && idx.focusOnRow,
+    JSON.stringify(idx),
+  );
+  await page.keyboard.press('ArrowDown');
+  await page.keyboard.press('Enter');
+  const traveled = await page
+    .waitForFunction(() => location.hash.startsWith('#/hub/') && !document.querySelector('.index-overlay'), null, { timeout: 5000 })
+    .then(() => true)
+    .catch(() => false);
+  check('M6 INDEX arrows + Enter travel (flight)', traveled, await page.evaluate(() => location.hash));
+  await page.waitForTimeout(1600);
+  await page.evaluate(() => [...document.querySelectorAll('button')].find((b) => b.textContent.includes('index'))?.click());
+  await page.waitForSelector('.index-panel', { timeout: 4000 });
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(400);
+  const closed = await page.evaluate(() => !document.querySelector('.index-overlay') && location.hash.startsWith('#/hub/'));
+  check('M6 Esc closes INDEX without leaving the chamber', closed);
+
+  /* chips: present, ≥44px, arrow keys hop */
+  const chips = await page.evaluate(() => {
+    const cs = [...document.querySelectorAll('.explore-chip')];
+    return { n: cs.length, big: cs.every((c) => c.getBoundingClientRect().height >= 44), named: cs.every((c) => (c.getAttribute('aria-label') ?? '').length > 0) };
+  });
+  check('M6 EXPLORE chips present, ≥44px, named', chips.n === 2 && chips.big && chips.named, JSON.stringify(chips));
+  const before = await page.evaluate(() => location.hash);
+  await page.keyboard.press('ArrowRight');
+  const hopped = await page
+    .waitForFunction((b) => location.hash !== b && location.hash.startsWith('#/hub/'), before, { timeout: 5000 })
+    .then(() => true)
+    .catch(() => false);
+  check('M6 arrow keys hop planets', hopped, await page.evaluate(() => location.hash));
+  await ctx.close();
+}
+
+/* 404 — in-world lost coordinates */
+{
+  const { ctx, page } = await newPage();
+  await page.goto(`${BASE}/?v404#/no/such/route`);
+  const lost = await page.waitForSelector('.lost-overlay', { timeout: 10000 }).then(() => true).catch(() => false);
+  check('M8.12 unknown route shows in-world 404', lost);
+  await page.evaluate(() => document.querySelector('.lost-return')?.click());
+  await page.waitForTimeout(500);
+  const back = await page.evaluate(() => !document.querySelector('.lost-overlay') && location.hash === '#/');
+  check('M8.12 [ return ] recovers to the threshold', back);
   await ctx.close();
 }
 

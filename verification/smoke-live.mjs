@@ -116,6 +116,59 @@ check('beyond contact: github live', contact.github);
 check('beyond contact: linkedin live', contact.linkedin);
 check('beyond contact: X dropped, nothing pending', contact.noX && contact.noPending);
 
+/* ============ GORGEOUS PASS interactions (M10.7) ============ */
+
+/* INDEX: open → arrow → Enter travels → Esc closes */
+await page.keyboard.press('Escape');
+await page.waitForFunction(() => location.hash === '#/hub', null, { timeout: 5000 });
+await page.evaluate(() => [...document.querySelectorAll('button')].find((x) => x.textContent.includes('index'))?.click());
+const idxOpen = await page.waitForSelector('.index-panel', { timeout: 5000 }).then(() => true).catch(() => false);
+check('INDEX opens from HUD', idxOpen);
+await page.keyboard.press('ArrowDown');
+await page.keyboard.press('Enter');
+const idxTravel = await page
+  .waitForFunction(() => location.hash.startsWith('#/hub/') && !document.querySelector('.index-overlay'), null, { timeout: 6000 })
+  .then(() => true)
+  .catch(() => false);
+check('INDEX row travels (flight)', idxTravel, await page.evaluate(() => location.hash));
+await page.waitForTimeout(1500);
+
+/* EXPLORE chips + arrow-key hop */
+const chips = await page.evaluate(() => document.querySelectorAll('.explore-chip').length);
+check('EXPLORE chips present in chamber', chips === 2);
+const hashBefore = await page.evaluate(() => location.hash);
+await page.keyboard.press('ArrowRight');
+const hopped = await page
+  .waitForFunction((h) => location.hash !== h && location.hash.startsWith('#/hub/'), hashBefore, { timeout: 6000 })
+  .then(() => true)
+  .catch(() => false);
+check('arrow-key hop works', hopped, await page.evaluate(() => location.hash));
+await page.keyboard.press('Escape');
+await page.waitForFunction(() => location.hash === '#/hub', null, { timeout: 5000 });
+
+/* seasons: switch persists; terrain seasonalizes */
+await page.evaluate(() => [...document.querySelectorAll('button')].find((x) => x.textContent.includes('return to mountains'))?.click());
+await page.waitForSelector('.hud-seasons', { timeout: 8000 });
+await page.waitForTimeout(2200);
+await page.click('[data-season="winter"]');
+await page.waitForTimeout(1800);
+const season = await page.evaluate(() => sessionStorage.getItem('everest-season'));
+check('season switch + persist (winter)', season === 'winter', String(season));
+
+/* in-world 404 */
+await page.goto(`${BASE}/?live404#/no/such`);
+const lost = await page.waitForSelector('.lost-overlay', { timeout: 8000 }).then(() => true).catch(() => false);
+check('unknown route → in-world 404', lost);
+
+/* font payload ≤280KB (M1) */
+const fontBytes = await page.evaluate(() =>
+  performance
+    .getEntriesByType('resource')
+    .filter((r) => r.name.endsWith('.woff2'))
+    .reduce((s, r) => s + (r.encodedBodySize || r.transferSize || 0), 0),
+);
+check('font payload ≤280KB', fontBytes > 0 && fontBytes <= 280 * 1024, `${(fontBytes / 1024).toFixed(1)}KB`);
+
 /* og tags on the served document */
 const og = await page.evaluate(() => ({
   url: document.querySelector('meta[property="og:url"]')?.content ?? '',

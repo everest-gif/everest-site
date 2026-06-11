@@ -1,0 +1,74 @@
+[
+  {
+    "id": "jarvis",
+    "titlePct": 100,
+    "fontPx": 95.04,
+    "ghost": true,
+    "ghostText": "01",
+    "pull": true,
+    "pass": true
+  },
+  {
+    "id": "luven",
+    "titlePct": 100,
+    "fontPx": 95.04,
+    "ghost": true,
+    "ghostText": "02",
+    "pull": true,
+    "pass": true
+  },
+  {
+    "id": "emerge",
+    "titlePct": 100,
+    "fontPx": 95.04,
+    "ghost": true,
+    "ghostText": "03",
+    "pull": true,
+    "pass": true
+  },
+  {
+    "id": "dolomite",
+    "titlePct": 100,
+    "fontPx": 95.04,
+    "ghost": true,
+    "ghostText": "04",
+    "pull": true,
+    "pass": true
+  },
+  {
+    "id": "everclash",
+    "titlePct": 100,
+    "fontPx": 95.04,
+    "ghost": true,
+    "ghostText": "05",
+    "pull": true,
+    "pass": true
+  },
+  {
+    "id": "voxhalla",
+    "titlePct": 100,
+    "fontPx": 95.04,
+    "ghost": true,
+    "ghostText": "06",
+    "pull": true,
+    "pass": true
+  },
+  {
+    "id": "bigback",
+    "titlePct": 100,
+    "fontPx": 64,
+    "ghost": true,
+    "ghostText": "07",
+    "pull": true,
+    "pass": true
+  },
+  {
+    "id": "beyond",
+    "titlePct": 100,
+    "fontPx": 95.04,
+    "ghost": true,
+    "ghostText": "08",
+    "pull": true,
+    "pass": true
+  }
+]
