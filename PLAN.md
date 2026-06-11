@@ -56,7 +56,15 @@
       sweep systemized (.chip-charge), cursor ring-pulse on click, 54bpm season glyph,
       in-world 404 (router→lost flag, Fraunces 404 over live threshold, [ return ]).
       M9: tick attack 25ms, ambience LP 130Hz, 0.5s pitch-down close-whoosh (chamber→hub).
-- [ ] M10 Verification, evidence in verification/gorgeous/, deploy, production smoke
+- [x] M10 Protocol 58/58 (verify.mjs §9 + M-checks, console gate clean); motion evidence ×5
+      recorded + 6-frame poster sets (motion/); no-cut 15 frames @12fps zero cuts; type audit
+      8/8 (headline 100% col, ghosts, pull-stats); drift audit logged; BEFORE-AFTER.md;
+      deployed (vercel --prod --archive=tgz + NODE_OPTIONS=--tls-max-v1.2 for this network's
+      SSL bad-record-mac; git push needs http.version=HTTP/1.1) → LIVE SMOKE 21/21 incl.
+      INDEX/chips/arrows/seasons/404/font-payload. All 9 M11 criteria MET —
+      VERIFICATION_REPORT.md rewritten.
+
+## GORGEOUS PASS COMPLETE — all M11 criteria met, production verified
 
 ## R1 — Breach total rework  [IN PROGRESS]
 - [x] BEFORE evidence captured (verification/r2/before/: breach video+frames, hub, 8 nodes, 2 chambers)
