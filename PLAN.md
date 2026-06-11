@@ -80,9 +80,9 @@
 
 ## BUILD COMPLETE — all phases done, all §11 criteria met, evidence in VERIFICATION_REPORT.md
 
-## P7 — Launch  [IN PROGRESS]
+## P7 — Launch  [DONE]
 - [x] §7 contact values filled: email everest@luven.ai · github.com/everest-gif · linkedin (X entry dropped — key removed from CONTACT, row removed in Beyond.tsx)
 - [x] GitHub repo everest-gif/everest-site (public): created, origin added, main pushed
 - [x] Vercel production deploy → https://everest-site-azure.vercel.app (project everest-site, scope everest-2906, framework preset vite)
 - [x] og:image + og:url (+ twitter:image, same relative-URL issue) absolute on the production alias → rebuilt, redeployed
-- [ ] Playwright smoke vs LIVE production URL: boot → breach → hub → 2 chambers → console gate
+- [x] Playwright smoke vs LIVE https://everest-site-azure.vercel.app — **14/14 PASS** (`node verification/smoke-live.mjs <url>`, headed). First run 13/14: media-manifest probes 404 on Vercel (vite preview had SPA-masked them) → empty manifests pre-seeded for all 8 chambers (DECISIONS #27) → re-run clean. Contact rows, og tags, console gate all verified on production.
