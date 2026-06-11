@@ -1,0 +1,5 @@
+# build inputs only — evidence and tooling never need to ship
+verification
+tools
+*.md
+!README.md

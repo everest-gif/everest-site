@@ -57,8 +57,19 @@
       #7A6FA8 deep-space-only (DECISIONS #52), envelope ≤0.105; reveal-gated with the
       system (invisible during the open phase). Poster: cosmos-hub.png + lean parallax
       shot — no purple-website read.
-- [ ] S8 Verification & ship: motion evidence ×5 + poster tests, no-cut audits, collision logs,
-      §9 protocol re-run, tunnel-remnant grep = zero, deploy + production smoke
+- [x] S8 Verification & ship: motion evidence ×5 recorded + poster-tested (ascent, descent,
+      direct hop, shooting-star life event, autumn front w/ trees — verification/summit/
+      motion/); 6-stop ascent scrub set poster-passed; no-cut audit zero cuts both
+      directions; collision audit ALL CLEAN ×24 + floating layer (chips → true corners);
+      drift audit = M10 baseline; planet-zone 8/8; §9 protocol **63/63 PASS** incl. new
+      SUMMIT checks (ascent 1847ms, rail a11y, hop fov 54.7≤58), console gate zero;
+      tunnel/wormhole live-code grep = zero. Pushed (incremental — bulk pack hit the
+      network's bad-record-mac; descendant push carried failed ancestors). Deployed
+      vercel --prod --archive=tgz + NODE_OPTIONS=--tls-max-v1.2 + NEW .vercelignore
+      (523MB verification/ was breaking the upload). Production smoke **23/23 PASS**
+      (ascent 118fps avg on the wire, rail live, direct hops, console clean).
+
+## SUMMIT PASS COMPLETE — all 8 S9 criteria MET, production verified (VERIFICATION_REPORT.md)
 
 ## GORGEOUS PASS (sequence: M1 → M3 → M2+M7 → M4+M5 → M6 → M8+M9 → M10)
 - [x] M1 Typography: Newsreader prose (17–19px/1.65/38ch), Geist retired, Fraunces full-italic
