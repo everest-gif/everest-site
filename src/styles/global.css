@@ -906,4 +906,8 @@ a {
   .hud-br {
     right: 16px;
   }
+  /* the clock owns the top edge on small screens */
+  .hud-tl {
+    display: none;
+  }
 }
