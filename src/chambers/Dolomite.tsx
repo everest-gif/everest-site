@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
-import { ChamberTitle, Marginalia, Stat, Gallery, HeroArt } from './shared';
+import { ChamberTitle, Marginalia, Stat, PullStat, Gallery, HeroArt } from './shared';
 import { useStore } from '../state/store';
 import s from './Dolomite.module.css';
 
-/* Layout language: a radar / ops board — dark, instrument-like, sparse (§3).
-   Grid: instruments hold the left rail (radar, then the strata band), text the right. */
+/* Layout language: a sparse editorial spread on a 12-col grid (§3).
+   One headline, one prose passage, one quiet instrument low/right.
+   The enlarged planet owns the left third — whitespace is the design. */
 
 const BLIPS = [
   [204, 96, 'JARVIS'],
@@ -52,9 +53,10 @@ function MissionClock() {
   );
 }
 
+/* The chamber's instrument identity — unboxed, small, quiet. */
 function Radar() {
   return (
-    <div className={s.radarPanel}>
+    <figure className={s.radarFig}>
       <Marginalia className={s.scopeTag}>scope — all projects</Marginalia>
       <svg
         className={s.radar}
@@ -93,89 +95,81 @@ function Radar() {
         <circle className={s.center} cx="160" cy="160" r="3.2" />
       </svg>
       <Marginalia className={s.sweepTag}>sweep 7.0s — local</Marginalia>
-    </div>
+    </figure>
   );
 }
 
 export default function Dolomite() {
   return (
     <div className={s.root}>
-      <header className={s.head}>
-        <div className={s.headLeft}>
-          <ChamberTitle kicker="DOLOMITE — MISSION CONTROL · LOCAL">
-            Every project answers to one desk.
-          </ChamberTitle>
-          <Marginalia className={s.tagline}>Internal tool. One machine. One operator.</Marginalia>
-        </div>
-        <div className={s.readout} aria-label="System readout">
-          <p className={s.readoutRow}>
-            <span className={s.readoutLabel}>operator</span>
-            <span className={s.readoutValue}>01</span>
-          </p>
-          <p className={s.readoutRow}>
-            <span className={s.readoutLabel}>uplink</span>
-            <span className={s.readoutValue}>local</span>
-          </p>
-          <p className={s.readoutRow}>
-            <span className={s.readoutLabel}>session</span>
-            <MissionClock />
-          </p>
-        </div>
+      <header className={`${s.head} ch-head-overlap`}>
+        <ChamberTitle kicker="DOLOMITE — MISSION CONTROL · LOCAL">
+          Every project answers to one desk.
+        </ChamberTitle>
+        <Marginalia className={s.tagline}>Internal tool. One machine. One operator.</Marginalia>
       </header>
 
-      <section className={s.section} aria-label="Mission board">
-        <Marginalia className={s.marker}>01 / the board</Marginalia>
-        <div className={s.duo}>
-          <Radar />
-          <div className={s.missions}>
-            <div className={s.boardHead}>
-              <Marginalia>missions</Marginalia>
-              <Marginalia>mode</Marginalia>
-            </div>
-            <ul className={s.missionList}>
-              {MISSIONS.map((m) => (
-                <li key={m.id} className={s.mission}>
-                  <span className={s.mId}>{m.id}</span>
-                  <span className={s.mVerb}>{m.verb}</span>
-                  <span className={s.mDesc}>{m.desc}</span>
-                  <span className={s.mMode}>
-                    <span className={s.dot} aria-hidden="true" />
-                    semi-auto
-                  </span>
-                </li>
-              ))}
-            </ul>
-            <div className={s.stats}>
-              <Stat value="3" label="standing missions" />
-              <Stat value="1" label="operator" />
-              <Stat value="internal" label="no users to count" />
-            </div>
-          </div>
-        </div>
-      </section>
+      <div className={s.pull}>
+        <PullStat value={7} caption="projects under one sweep" />
+      </div>
 
-      <section className={s.section}>
-        <Marginalia className={s.marker}>02 / debrief</Marginalia>
-        <div className={s.duo}>
-          <div className={s.heroWrap}>
-            <HeroArt id="dolomite" alt="Macro rock strata, amber edge light" />
-          </div>
-          <div className={`prose ${s.debrief}`}>
-            <p>
-              Dolomite is local mission control for my other projects. It dispatches missions
-              through coding agents, pulls stray repos into one tree, and audits credentials.
-              Semi-autonomous — the agents do the work, and I am still in the chair.
+      <div className={`prose ${s.debrief}`}>
+        <p>
+          Dolomite is local mission control for my other projects. It dispatches missions
+          through coding agents, pulls stray repos into one tree, and audits credentials.
+          Semi-autonomous — the agents do the work, and I am still in the chair.
+        </p>
+        <p>
+          There are no users to count and no revenue to report. It is an internal tool: every
+          other chamber on this map reports to it. That is the whole job.
+        </p>
+      </div>
+
+      <section className={s.board} aria-label="Mission board">
+        <span className={`ch-rule ${s.boardRule}`} data-rule />
+        <div className={s.ops}>
+          <div className={s.readout} aria-label="System readout">
+            <p className={s.readoutRow}>
+              <span className={s.readoutLabel}>operator</span>
+              <span className={s.readoutValue}>01</span>
             </p>
-            <p>
-              There are no users to count and no revenue to report. It is an internal tool: every
-              other chamber on this map reports to it. That is the whole job.
+            <p className={s.readoutRow}>
+              <span className={s.readoutLabel}>uplink</span>
+              <span className={s.readoutValue}>local</span>
+            </p>
+            <p className={s.readoutRow}>
+              <span className={s.readoutLabel}>session</span>
+              <MissionClock />
             </p>
           </div>
+          <ul className={s.missionList}>
+            {MISSIONS.map((m) => (
+              <li key={m.id} className={s.mission}>
+                <span className={s.mId}>{m.id}</span>
+                <span className={s.mVerb}>{m.verb}</span>
+                <span className={s.mDesc}>{m.desc}</span>
+                <span className={s.mMode}>
+                  <span className={s.dot} aria-hidden="true" />
+                  semi-auto
+                </span>
+              </li>
+            ))}
+          </ul>
+          <div className={s.stats}>
+            <Stat value="3" label="standing missions" />
+            <Stat value="1" label="operator" />
+            <Stat value="internal" label="no users to count" />
+          </div>
         </div>
+        <Radar />
       </section>
 
-      <section className={s.section}>
-        <Marginalia className={s.marker}>03 / evidence</Marginalia>
+      <div className={s.heroBand}>
+        <HeroArt id="dolomite" alt="Macro rock strata, amber edge light" />
+      </div>
+
+      <section className={s.foot} aria-label="Evidence">
+        <span className="ch-rule" data-rule />
         <Gallery id="dolomite" captions={['ops board — live missions', 'dispatch — claude code uplink']} />
       </section>
     </div>

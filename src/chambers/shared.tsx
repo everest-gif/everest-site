@@ -162,6 +162,18 @@ export function useMedia(id: NodeId): string[] | null {
   return files;
 }
 
+/* M2/M8.4 — evidence frame furniture: corner brackets + FIG. 0n mark */
+export function Brackets() {
+  return (
+    <>
+      <span className="ch-bk tl" aria-hidden="true" />
+      <span className="ch-bk tr" aria-hidden="true" />
+      <span className="ch-bk bl" aria-hidden="true" />
+      <span className="ch-bk br" aria-hidden="true" />
+    </>
+  );
+}
+
 export function Gallery({ id, captions, ratio = '16 / 10' }: { id: NodeId; captions: string[]; ratio?: string }) {
   const files = useMedia(id);
   return (
@@ -169,6 +181,8 @@ export function Gallery({ id, captions, ratio = '16 / 10' }: { id: NodeId; capti
       {captions.map((cap, i) =>
         files && files[i] ? (
           <figure key={cap} className="ch-shot" style={{ aspectRatio: ratio }}>
+            <Brackets />
+            <span className="ch-fig" aria-hidden="true">{`FIG. ${String(i + 1).padStart(2, '0')}`}</span>
             <img src={files[i]} alt={cap} loading="lazy" decoding="async" />
             <figcaption className="ch-shot-cap">{cap}</figcaption>
           </figure>
@@ -212,6 +226,7 @@ export function PlaceholderFrame({ caption, ratio = '16 / 10', index = 0 }: { ca
       <span className="ch-ph-corner bl" aria-hidden="true" />
       <span className="ch-ph-corner br" aria-hidden="true" />
       <span className="ch-ph-scan" aria-hidden="true" />
+      <span className="ch-fig" aria-hidden="true">{`FIG. ${String(index + 1).padStart(2, '0')}`}</span>
       <figcaption className="ch-ph-cap">{caption}</figcaption>
     </figure>
   );

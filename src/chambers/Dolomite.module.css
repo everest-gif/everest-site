@@ -1,18 +1,18 @@
+/* ============================================================
+   DOLOMITE — sparse editorial spread on a 12-col grid.
+   Headline → one prose passage → quiet instrument, low/right.
+   The enlarged planet holds the left third; air is the design.
+   ============================================================ */
 .root {
-  display: flex;
-  flex-direction: column;
-  gap: 56px;
-}
-
-/* ---------- head: title left, instrument readout right, bottom edges aligned ---------- */
-.head {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 32px;
-  align-items: end;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: clamp(16px, 2vw, 28px);
+  row-gap: clamp(72px, 11vh, 128px);
 }
 
-.headLeft {
+/* ---------- head: crosses the planet's limb via ch-head-overlap ---------- */
+.head {
+  grid-column: 1 / 11;
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -22,19 +22,43 @@
   color: rgba(232, 162, 61, 0.85);
 }
 
+/* ---------- pull-stat: upper area, right of center, its own band of air ---------- */
+.pull {
+  grid-column: 7 / 13;
+}
+
+/* ---------- debrief: the single text moment — one narrow column, generous margins ---------- */
+.debrief {
+  grid-column: 4 / 10;
+}
+
+/* ---------- mission board: thin mono ops list beside the radar, baselines met ---------- */
+.board {
+  grid-column: 5 / 13;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(216px, 24vw, 280px);
+  gap: 32px clamp(32px, 4vw, 56px);
+  align-items: end;
+}
+
+.boardRule {
+  grid-column: 1 / -1;
+}
+
+.ops {
+  min-width: 0;
+}
+
+/* readout — unboxed mono rows; the clock keeps station time */
 .readout {
-  border: 1px solid var(--hairline);
-  background: var(--ink-2);
-  padding: 16px 20px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  min-width: 224px;
+  gap: 8px;
 }
 
 .readoutRow {
   display: grid;
-  grid-template-columns: 88px auto;
+  grid-template-columns: 96px auto;
   gap: 12px;
   font-family: var(--font-mono);
   font-size: 11px;
@@ -55,82 +79,85 @@
   font-variant-numeric: tabular-nums;
 }
 
-@media (max-width: 760px) {
-  .head {
-    grid-template-columns: 1fr;
-    align-items: start;
-  }
-  .readout {
-    min-width: 0;
-    width: fit-content;
-  }
+/* missions — three thin ledger rows, one mode stamped on each */
+.missionList {
+  list-style: none;
+  margin: 28px 0 0;
+  padding: 0;
 }
 
-/* ---------- section rhythm: mono marker + hairline rule, then content ---------- */
-.section {
+.mission {
+  display: grid;
+  grid-template-columns: 52px 110px minmax(0, 1fr) max-content;
+  gap: 6px 16px;
+  align-items: baseline;
+  padding: 13px 0;
+  border-top: 1px solid var(--hairline);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.mission:last-child {
+  border-bottom: 1px solid var(--hairline);
+}
+
+.mId {
+  color: rgba(232, 162, 61, 0.6);
+}
+
+.mVerb {
+  color: var(--bone);
+  letter-spacing: 0.14em;
+}
+
+.mDesc {
+  color: var(--dim);
+}
+
+.mMode {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  justify-self: end;
+  color: var(--amber);
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--amber);
+}
+
+.stats {
+  margin-top: 32px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+}
+
+/* ---------- radar: unboxed, small, quiet — tags above and below the scope ---------- */
+.radarFig {
+  margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 20px;
-}
-
-.marker {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.marker::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: var(--hairline);
-}
-
-/* ---------- shared two-column seam: instruments left, text right.
-   §01 (radar | missions) and §02 (strata band | debrief) use the same
-   template, so the column edge aligns down the page. ---------- */
-.duo {
-  display: grid;
-  grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
-  gap: 24px;
-  align-items: stretch;
-}
-
-@media (max-width: 860px) {
-  .duo {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
-
-/* ---------- radar scope ---------- */
-.radarPanel {
-  position: relative;
-  border: 1px solid var(--hairline);
-  background: var(--ink-2);
-  padding: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  gap: 12px;
 }
 
 .radar {
   width: 100%;
-  max-width: 420px;
   display: block;
 }
 
 .scopeTag {
-  position: absolute;
-  top: 10px;
-  left: 12px;
   font-size: 10px;
 }
 
 .sweepTag {
-  position: absolute;
-  bottom: 10px;
-  right: 12px;
   font-size: 10px;
+  align-self: flex-end;
 }
 
 .ring {
@@ -159,8 +186,8 @@
 
 .blipLabel {
   font-family: var(--font-mono);
-  font-size: 7.5px;
-  letter-spacing: 0.14em;
+  font-size: 9.5px;
+  letter-spacing: 0.12em;
   fill: rgba(237, 232, 223, 0.55);
 }
 
@@ -225,66 +252,47 @@
   }
 }
 
-/* ---------- mission board: head rule, three rows, stat strip pinned to the
-   board's bottom edge so its baseline meets the radar frame ---------- */
-.missions {
+/* ---------- hero: a low, quiet atmosphere band ---------- */
+.heroBand {
+  grid-column: 1 / 13;
+}
+
+.heroBand :global(.ch-hero) img {
+  height: clamp(160px, 24vh, 240px);
+  aspect-ratio: auto;
+  object-fit: cover;
+}
+
+/* ---------- evidence at the foot ---------- */
+.foot {
+  grid-column: 1 / 13;
   display: flex;
   flex-direction: column;
+  gap: 20px;
 }
 
-.boardHead {
-  display: flex;
-  justify-content: space-between;
-  padding-bottom: 12px;
-  border-bottom: 1px solid var(--hairline);
-}
-
-.missionList {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.mission {
-  display: grid;
-  grid-template-columns: 52px 120px minmax(0, 1fr) max-content;
-  gap: 6px 16px;
-  align-items: baseline;
-  padding: 18px 2px;
-  border-bottom: 1px solid var(--hairline);
-  font-family: var(--font-mono);
-  font-size: 11.5px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-}
-
-.mId {
-  color: rgba(232, 162, 61, 0.6);
-}
-
-.mVerb {
-  color: var(--bone);
-  letter-spacing: 0.14em;
-}
-
-.mDesc {
-  color: var(--dim);
-}
-
-/* one mode, stamped on every row — that uniformity is the point */
-.mMode {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  justify-self: end;
-  color: var(--amber);
-}
-
-.dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--amber);
+/* ---------- mobile: single column, radar scales down cleanly ---------- */
+@media (max-width: 900px) {
+  .root {
+    row-gap: 56px;
+  }
+  .head,
+  .pull,
+  .debrief,
+  .board,
+  .heroBand,
+  .foot {
+    grid-column: 1 / -1;
+  }
+  .board {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: stretch;
+  }
+  .radarFig {
+    width: 100%;
+    max-width: 340px;
+    margin: 0 auto;
+  }
 }
 
 @media (max-width: 600px) {
@@ -309,45 +317,9 @@
   }
 }
 
-.stats {
-  margin-top: auto;
-  padding-top: 20px;
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 24px;
-}
-
 @media (max-width: 480px) {
   .stats {
     gap: 14px;
-  }
-}
-
-/* ---------- debrief: prose centered against the strata band ---------- */
-.debrief {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-.heroWrap {
-  display: flex;
-}
-
-.heroWrap :global(.ch-hero) {
-  flex: 1;
-}
-
-.heroWrap :global(.ch-hero) img {
-  height: 100%;
-  aspect-ratio: auto;
-  object-fit: cover;
-}
-
-@media (max-width: 860px) {
-  .heroWrap :global(.ch-hero) img {
-    height: auto;
-    aspect-ratio: 16 / 9;
   }
 }
 

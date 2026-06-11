@@ -20,7 +20,17 @@
       crossfade via giant edge width; season control bottom-left (drawn glyphs, 54bpm ring,
       radiogroup keyboard, sessionStorage persist); skip-intro → bottom-right; breach
       near-fade regression caught + fixed (uNearBright-driven fade window)
-- [ ] M2+M7 Light/atmosphere + eight editorial chamber spreads
+- [x] M2+M7 Light: --ink-3 third dark + --hairline-2, vignette 0.5, corner-only chromatic
+      fringe in grade pass, planet amber wash (.chamber-glow anchored to planet screen-Y),
+      evidence frames (Brackets + FIG. 0n on gallery/placeholders). Eight editorial spreads
+      (no two alike, 12-col, asymmetric): jarvis console-rail cantilever (main session) ·
+      luven ledger w/ PRODUCT·FIRST SALE·WORKFLOWS table (agent) · emerge stacked case-files
+      w/ mono tabs + raking dividers (agent) · dolomite sparse radar, planet enlarged via
+      DIST_K (agent) · everclash roster-mass w/ overlapping headline (agent) · voxhalla
+      brutalist sheet w/ oversized numerals (agent) · bigback max-air teaser, camera pulled
+      back (agent) · beyond atlas band w/ WONK headline (main session). Pull-stats in all 8
+      (220 · $994 · 4 · 7 · 10 · 6v6 · 1 · 70.3). Mobile medallion framing (portrait
+      chamberCam top-center + 30vh scrim window). All copy preserved verbatim.
 - [ ] M4+M5 Breach ≤2.2s denser + hub (nebula, corona, planet materials, pulses, anti-overlap, arc-text deleted)
 - [ ] M6 INDEX overlay + EXPLORE chips + arrow-key hops
 - [ ] M8+M9 Twelve jewelry details + sound pass

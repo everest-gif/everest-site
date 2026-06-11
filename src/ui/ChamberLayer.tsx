@@ -256,6 +256,8 @@ function ChamberStage({ id }: { id: NodeId }) {
         tabIndex={-1}
       >
         <GhostNumeral index={idx + 1} />
+        {/* M2 — the planet's amber wash grazing the panel's near edge */}
+        <div className="chamber-glow" aria-hidden="true" style={{ top: `${origin.pct}%` }} />
         <div className="chamber-scroll" ref={scrollRef}>
           <div className="chamber-content">
             <Content />

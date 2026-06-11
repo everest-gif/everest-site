@@ -1,8 +1,10 @@
-import { ChamberTitle, Marginalia, Stat, Gallery, HeroArt } from './shared';
+import { Fragment } from 'react';
+import { ChamberTitle, Marginalia, Stat, PullStat, Gallery, HeroArt } from './shared';
 import { useStore } from '../state/store';
 import s from './Emerge.module.css';
 
-/* Layout language: an operator dossier — numbered case files on a hairline-ruled grid. */
+/* Layout language: an operator dossier — full-width case-file rows under mono
+   folder tabs, separated by raking-light rules, composed on a 12-column grid. */
 
 interface CaseFile {
   index: string;
@@ -10,7 +12,6 @@ interface CaseFile {
   title: string;
   body: string;
   exhibit: string;
-  span: string;
 }
 
 const FILES: CaseFile[] = [
@@ -20,7 +21,6 @@ const FILES: CaseFile[] = [
     title: 'Appointment',
     body: 'APM & Solutions Engineer. One desk, both sides of it — I scope the agent on the product side, then build it, ship it, and hold it on the engineering side.',
     exhibit: 'role · emerge ai',
-    span: s.span2,
   },
   {
     index: '02',
@@ -28,7 +28,6 @@ const FILES: CaseFile[] = [
     title: 'Four production agents',
     body: 'Four Claude Managed Agents shipped to production — reception and talent pipelines. All of them built for the company’s clients. The headline is literal.',
     exhibit: 'claude managed agents · ×4',
-    span: s.span4,
   },
   {
     index: '03',
@@ -36,7 +35,6 @@ const FILES: CaseFile[] = [
     title: 'The CEO seminar',
     body: 'I led an AI seminar for a room of fifteen chief executives. If I can’t explain an agent to the people who pay for it, I haven’t finished building it.',
     exhibit: 'audience · 15 ceos',
-    span: s.span3,
   },
   {
     index: '04',
@@ -44,7 +42,6 @@ const FILES: CaseFile[] = [
     title: 'Pricing & usage architecture',
     body: 'I designed how the platform charges for agents — the pricing and usage architecture under every deployment. The meter the business runs on.',
     exhibit: 'scope · platform-wide',
-    span: s.span3,
   },
 ];
 
@@ -52,7 +49,7 @@ export default function Emerge() {
   const reduced = useStore((st) => st.reducedMotion);
   return (
     <div className={reduced ? s.root : `${s.root} ${s.animate}`}>
-      <header className={s.head}>
+      <header className={`${s.head} ch-head-overlap`}>
         <ChamberTitle kicker="EMERGE AI — CLIENT WORK">
           Four agents live. None of them mine.
         </ChamberTitle>
@@ -98,24 +95,41 @@ export default function Emerge() {
         </div>
       </div>
 
+      <div className={s.pull}>
+        <PullStat value={4} caption="Claude managed agents — live in production" />
+      </div>
+
       <section className={s.files} aria-label="Case files">
+        <div className={s.tabs} aria-hidden="true">
+          {FILES.map((f, i) => (
+            <span key={f.index} className={i === 0 ? `${s.tab} ${s.tabActive}` : s.tab}>
+              <span className={s.tabIndex}>{f.index}</span>
+              {f.tag}
+            </span>
+          ))}
+        </div>
         {FILES.map((f) => (
-          <article key={f.index} className={`${s.file} ${f.span}`}>
-            <div className={s.fileHead}>
-              <span className={s.fileIndex}>file {f.index}</span>
-              <span className={s.leader} aria-hidden="true" />
-              <span className={s.fileTag}>{f.tag}</span>
-            </div>
-            <h3 className={s.fileTitle}>{f.title}</h3>
-            <div className={`prose ${s.fileBody}`}>
-              <p>{f.body}</p>
-            </div>
-            <p className={s.exhibit}>
-              <span className={s.exhibitMark} aria-hidden="true" />
-              {f.exhibit}
-            </p>
-          </article>
+          <Fragment key={f.index}>
+            <span className={s.rake} data-rule aria-hidden="true" />
+            <article className={s.row}>
+              <div className={s.rowRail}>
+                <span className={s.fileIndex}>file {f.index}</span>
+                <span className={s.fileTag}>{f.tag}</span>
+              </div>
+              <div className={s.rowMain}>
+                <h3 className={s.fileTitle}>{f.title}</h3>
+                <div className="prose">
+                  <p>{f.body}</p>
+                </div>
+              </div>
+              <p className={s.exhibit}>
+                <span className={s.exhibitMark} aria-hidden="true" />
+                {f.exhibit}
+              </p>
+            </article>
+          </Fragment>
         ))}
+        <span className={s.rake} data-rule aria-hidden="true" />
       </section>
 
       <section className={s.media}>

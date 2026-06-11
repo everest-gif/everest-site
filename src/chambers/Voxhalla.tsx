@@ -1,10 +1,10 @@
-import { useEffect, useRef } from 'react';
-import gsap from 'gsap';
-import { ChamberTitle, Marginalia, Gallery, HeroArt } from './shared';
-import { useStore } from '../state/store';
+import { ChamberTitle, Marginalia, Gallery, HeroArt, PullStat } from './shared';
 import s from './Voxhalla.module.css';
 
-/* Layout language: spec-sheet brutalism — the project rendered as an engineering datasheet. */
+/* Layout language: spec-sheet brutalism — the project rendered as an engineering datasheet.
+   Two fat columns of spec cells, each dominated by an oversized Fraunces value; section
+   numerals set big — oversized numerals are the design language of this sheet. The reveal
+   engine draws each cell's hairline ([data-rule]) and fades the values in (.ch-stat-value). */
 
 const SPEC: ReadonlyArray<readonly [field: string, value: string, note: string]> = [
   ['platform', 'browser', 'runs from a url — no install, no launcher'],
@@ -18,23 +18,6 @@ const SPEC: ReadonlyArray<readonly [field: string, value: string, note: string]>
 const ROSTER = Array.from({ length: 10 }, (_, i) => i + 1);
 
 export default function Voxhalla() {
-  const reduced = useStore((st) => st.reducedMotion);
-  const tableRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (reduced) return;
-    const el = tableRef.current;
-    if (!el) return;
-    const tw = gsap.fromTo(
-      el.children,
-      { autoAlpha: 0, x: -10 },
-      { autoAlpha: 1, x: 0, duration: 0.55, stagger: 0.06, ease: 'power3.out', delay: 0.4 },
-    );
-    return () => {
-      tw.kill();
-    };
-  }, [reduced]);
-
   return (
     <div className={s.root}>
       <header className={s.head}>
@@ -50,13 +33,17 @@ export default function Voxhalla() {
 
       <div className={s.sheet}>
         <div className={s.statusBand}>
-          <span className={s.statusSec}>1.0</span>
+          <span className={s.secNum}>1.0</span>
           <span className={s.statusKey}>status</span>
           <span className={s.statusVal}>
             <i className={s.tick} aria-hidden="true" />
             parked — deliberate
           </span>
           <span className={s.statusNote}>jarvis ships first · voxhalla waits</span>
+        </div>
+
+        <div className={s.pullRow}>
+          <PullStat value={6} suffix="v6" caption="two teams of six — hero shooter" />
         </div>
 
         <div className={s.plate}>
@@ -66,25 +53,27 @@ export default function Voxhalla() {
 
         <section>
           <h3 className={s.secHead}>
-            <span>2.0</span>specification
+            <span className={s.secNum}>2.0</span>
+            <span className={s.secLabel}>specification</span>
           </h3>
-          <div className={s.table} ref={tableRef} role="table" aria-label="Voxhalla specification">
+          <div className={s.specGrid} role="table" aria-label="Voxhalla specification">
             {SPEC.map(([field, value, note], i) => (
               <div
                 key={field}
-                className={field === 'status' ? `${s.row} ${s.rowStatus}` : s.row}
+                className={field === 'status' ? `${s.spec} ${s.specStatus}` : s.spec}
                 role="row"
               >
-                <span className={s.cellIdx} role="cell">
-                  {String(i + 1).padStart(2, '0')}
-                </span>
-                <span className={s.cellField} role="rowheader">
+                <span className={s.specField} role="rowheader">
                   {field}
                 </span>
-                <span className={s.cellSpec} role="cell">
+                <span className={s.specIdx} role="cell">
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+                <span className={s.specRule} data-rule aria-hidden="true" />
+                <span className={`ch-stat-value ${s.specValue}`} role="cell">
                   {value}
                 </span>
-                <span className={s.cellNote} role="cell">
+                <span className={s.specNote} role="cell">
                   {note}
                 </span>
               </div>
@@ -95,7 +84,8 @@ export default function Voxhalla() {
         <div className={s.split}>
           <section className={s.rosterSec}>
             <h3 className={s.secHead}>
-              <span>3.0</span>champion roster — 10 / 10
+              <span className={s.secNum}>3.0</span>
+              <span className={s.secLabel}>champion roster — 10 / 10</span>
             </h3>
             <div className={s.roster} aria-label="Ten champions, each with a full ability kit">
               {ROSTER.map((n) => (
@@ -110,7 +100,8 @@ export default function Voxhalla() {
 
           <section className={s.notesSec}>
             <h3 className={s.secHead}>
-              <span>4.0</span>notes
+              <span className={s.secNum}>4.0</span>
+              <span className={s.secLabel}>notes</span>
             </h3>
             <div className={`prose ${s.notes}`}>
               <p>
@@ -129,7 +120,8 @@ export default function Voxhalla() {
 
         <section>
           <h3 className={s.secHead}>
-            <span>5.0</span>figures
+            <span className={s.secNum}>5.0</span>
+            <span className={s.secLabel}>figures</span>
           </h3>
           <div className={s.figuresBody}>
             <Gallery

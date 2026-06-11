@@ -25,9 +25,8 @@
 }
 
 .intro {
-  font-size: 17.5px;
-  line-height: 1.85;
-  max-width: 62ch;
+  /* M1 — prose measure is global now (17–19px / 1.65 / 38ch) */
+  max-width: 38ch;
 }
 
 /* ---------- thread sections ---------- */
@@ -378,5 +377,42 @@
   .cRow {
     grid-template-columns: 1fr;
     gap: 6px;
+  }
+}
+
+/* ---------- M7 atlas — the route as a full-width band the text sits inside ---------- */
+.atlasBand {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 2.1fr) minmax(0, 1fr);
+  gap: clamp(18px, 2.5vw, 36px);
+  align-items: center;
+  border-top: 1px solid var(--hairline-2);
+  border-bottom: 1px solid var(--hairline-2);
+  /* warmest light in the system — a single-hue amber pool, value shift only */
+  background:
+    radial-gradient(ellipse 64% 88% at 26% 50%, rgba(232, 162, 61, 0.1), transparent 72%),
+    var(--ink-2);
+  padding: clamp(20px, 4vh, 44px) clamp(16px, 2.5vw, 36px);
+}
+
+.atlasMap .map {
+  border: none;
+  background: none;
+  padding: 0;
+}
+
+.atlasText {
+  max-width: 36ch;
+}
+
+.atlasText p {
+  font-size: 17px;
+}
+
+@media (max-width: 900px) {
+  .atlasBand {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 20px 16px;
   }
 }

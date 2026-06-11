@@ -1,9 +1,11 @@
 import { useEffect, useState, type ReactNode } from 'react';
-import { ChamberTitle, Marginalia, Stat, Gallery, HeroArt } from './shared';
+import { ChamberTitle, Marginalia, Stat, PullStat, Gallery, HeroArt } from './shared';
 import { useStore } from '../state/store';
 import s from './Everclash.module.css';
 
-/* Layout language: arcade character-select energy — built from type and motion only. */
+/* Layout language: arcade character-select energy on a 12-col editorial grid —
+   type, hairlines, and corner marks, no neon. The roster is the visual mass of
+   the spread; the headline physically lands on its top edge. */
 
 const ROSTER = [
   { name: 'KESTREL', style: 'rushdown' },
@@ -18,14 +20,28 @@ const ROSTER = [
   { name: 'ZENITH', style: 'anchor' },
 ] as const;
 
-/* Numbered mono marker on a shared hairline — every section hangs from the same rule. */
-function SecBar({ num, label, right }: { num: string; label: string; right?: ReactNode }) {
+/* Numbered mono marker over an animated hairline — every section hangs from the
+   same rule. `end` clusters the marker right, where the headline never reaches. */
+function SecBar({
+  num,
+  label,
+  right,
+  end = false,
+}: {
+  num: string;
+  label: string;
+  right?: ReactNode;
+  end?: boolean;
+}) {
   return (
-    <div className={s.secBar}>
-      <span className={s.secMark}>
-        <span className={s.secNum}>{num} /</span> {label}
-      </span>
-      {right}
+    <div className={`${s.secBar}${end ? ` ${s.secBarEnd}` : ''}`}>
+      <div className={s.secRow}>
+        <span className={s.secMark}>
+          <span className={s.secNum}>{num} /</span> {label}
+        </span>
+        {right}
+      </div>
+      <span className="ch-rule" data-rule />
     </div>
   );
 }
@@ -55,10 +71,11 @@ function Roster() {
   }, [reduced]);
 
   return (
-    <section aria-label="Fighter roster — ten slots, portraits pending">
+    <section className={s.rosterSec} aria-label="Fighter roster — ten slots, portraits pending">
       <SecBar
         num="01"
         label="select your fighter"
+        end
         right={
           <span className={s.timer} aria-hidden="true">
             T-{String(timer).padStart(2, '0')}
@@ -80,6 +97,10 @@ function Roster() {
             <span className={s.corner} data-c="bl" aria-hidden="true" />
             <span className={s.corner} data-c="br" aria-hidden="true" />
             <span className={s.scan} aria-hidden="true" />
+            {/* portrait pending — the fighter's initial stands in, Fraunces ghost */}
+            <span className={s.slotGlyph} aria-hidden="true">
+              {f.name[0]}
+            </span>
             <div className={s.slotTop}>
               <span className={s.slotNum}>{String(i + 1).padStart(2, '0')}</span>
               <span className={s.slotTag} aria-hidden="true">
@@ -107,10 +128,13 @@ const STACK = [
 export default function Everclash() {
   return (
     <div className={s.root}>
-      <header className={s.head}>
-        <ChamberTitle kicker="EVERCLASH — 2D PVP FIGHTER">
-          Ten fighters. Eight players. One browser.
-        </ChamberTitle>
+      {/* head crosses the planet's limb AND descends onto the roster grid below */}
+      <header className={`${s.head} ch-head-overlap`}>
+        <div className={s.headTitle}>
+          <ChamberTitle kicker="EVERCLASH — 2D PVP FIGHTER">
+            Ten fighters. Eight players. One browser.
+          </ChamberTitle>
+        </div>
         <div className={s.lobby}>
           <p className={s.lobbyLive}>
             <span className={s.tick} aria-hidden="true" />
@@ -122,6 +146,10 @@ export default function Everclash() {
 
       <Roster />
 
+      <div className={s.pull}>
+        <PullStat value={10} caption="fighters — every one from the same pipeline" />
+      </div>
+
       <div className={s.heroBand}>
         <div className={s.heroRail}>
           <span className={s.secMark}>
@@ -132,7 +160,7 @@ export default function Everclash() {
         <HeroArt id="everclash" alt="Two energy forms mid-collision" />
       </div>
 
-      <section aria-label="Stack and write-up">
+      <section className={s.runs} aria-label="Stack and write-up">
         <SecBar num="03" label="how it runs" />
         <div className={s.secBody}>
           <div className={s.specBar} role="list" aria-label="Stack">
@@ -175,7 +203,7 @@ export default function Everclash() {
         ]}
       />
 
-      <section aria-label="Currently in the lab">
+      <section className={s.lab} aria-label="Currently in the lab">
         <SecBar num="04" label="meanwhile" />
         <div className="prose">
           <p className={s.labLine}>

@@ -6,12 +6,15 @@
 :root {
   --ink: #0a0a0c;
   --ink-2: #111114;
+  /* M2 — third dark: raised/hover surfaces. Three layered darks, no flat-black fills */
+  --ink-3: #17171c;
   --bone: #ede8df;
   --amber: #e8a23d;
   --jade: #38d9a9;
   /* spec value was 0.45 alpha → 3.9:1 on ink; brightened to 0.55 for WCAG AA (§9.8) */
   --dim: rgba(237, 232, 223, 0.55);
   --hairline: rgba(237, 232, 223, 0.08);
+  --hairline-2: rgba(237, 232, 223, 0.1); /* raised contexts */
   --red: #e04438; /* reserved: live-status ticks only */
 
   --font-display: 'Fraunces Variable', Georgia, 'Times New Roman', serif;
@@ -451,7 +454,8 @@ a {
   inset: 0;
   z-index: var(--z-vignette);
   pointer-events: none;
-  background: radial-gradient(ellipse 110% 90% at 50% 48%, transparent 58%, rgba(0, 0, 0, 0.42) 100%);
+  /* M2 — 0.5-strength corner vignette: the frame's edges fall away */
+  background: radial-gradient(ellipse 108% 88% at 50% 48%, transparent 56%, rgba(0, 0, 0, 0.5) 100%);
 }
 
 /* ---------- Act I: threshold lockup ---------- */
@@ -701,6 +705,18 @@ a {
   );
   pointer-events: none;
 }
+/* M2 — the live planet's light grazes the content panel's near edge.
+   Anchored to the planet's projected screen Y (same origin as the scan reveal)
+   so the wash reads as caused by the body on the left, not as decoration. */
+.chamber-glow {
+  position: absolute;
+  left: 4vw;
+  width: 52vw;
+  height: 78vh;
+  transform: translateY(-50%);
+  background: radial-gradient(ellipse 46% 46% at 38% 50%, rgba(232, 162, 61, 0.085), transparent 70%);
+  pointer-events: none;
+}
 .chamber-scroll {
   position: absolute;
   inset: 0 0 0 33vw;
@@ -748,11 +764,66 @@ a {
   .chamber-scroll {
     inset: 0;
   }
+  /* M7 mobile — the planet becomes a ~30vh header medallion: the scrim stays
+     transparent over the top window, content begins below it */
   .chamber-panel::before {
-    background: rgba(10, 10, 12, 0.78);
+    background: linear-gradient(
+      180deg,
+      rgba(10, 10, 12, 0) 0%,
+      rgba(10, 10, 12, 0.2) 22vh,
+      rgba(10, 10, 12, 0.9) 32vh,
+      rgba(10, 10, 12, 0.94) 100%
+    );
+  }
+  .chamber-content {
+    padding-top: 34vh;
+  }
+  .chamber-glow {
+    left: 50%;
+    top: 16vh !important;
+    width: 90vw;
+    height: 40vh;
+    transform: translate(-50%, -50%);
   }
   .chamber-rail {
     left: 50%;
+  }
+}
+
+/* ---------- M1/M7 — ghost numeral placement per chamber (variety, always cropped) ---------- */
+.chamber[data-chamber='jarvis'] .ch-ghost {
+  left: -0.07em;
+  right: auto;
+  top: 26vh;
+}
+.chamber[data-chamber='luven'] .ch-ghost {
+  top: 44vh;
+}
+.chamber[data-chamber='dolomite'] .ch-ghost {
+  top: auto;
+  bottom: -0.16em;
+}
+.chamber[data-chamber='everclash'] .ch-ghost {
+  top: auto;
+  bottom: -0.14em;
+  right: 12vw;
+}
+.chamber[data-chamber='voxhalla'] .ch-ghost {
+  left: 36vw;
+  right: auto;
+}
+.chamber[data-chamber='beyond'] .ch-ghost {
+  left: 38vw;
+  right: auto;
+  top: auto;
+  bottom: -0.12em;
+}
+@media (max-width: 900px) {
+  .chamber[data-chamber] .ch-ghost {
+    left: auto;
+    right: -0.06em;
+    top: 30vh;
+    bottom: auto;
   }
 }
 .chamber-scroll::-webkit-scrollbar {
@@ -957,8 +1028,6 @@ a {
 }
 .ch-shot {
   position: relative;
-  overflow: hidden;
-  border: 1px solid var(--hairline);
 }
 .ch-shot img {
   width: 100%;
@@ -975,8 +1044,60 @@ a {
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--bone);
-  background: rgba(10, 10, 12, 0.75);
+  background: rgba(17, 17, 20, 0.82);
   padding: 3px 8px;
+}
+/* M2/M8.4 — evidence frame furniture: 1px corner brackets (8px legs) + FIG. 0n marks */
+.ch-bk {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  border: 0 solid rgba(237, 232, 223, 0.55);
+  pointer-events: none;
+  z-index: 1;
+}
+.ch-bk.tl {
+  top: 0;
+  left: 0;
+  border-top-width: 1px;
+  border-left-width: 1px;
+}
+.ch-bk.tr {
+  top: 0;
+  right: 0;
+  border-top-width: 1px;
+  border-right-width: 1px;
+}
+.ch-bk.bl {
+  bottom: 0;
+  left: 0;
+  border-bottom-width: 1px;
+  border-left-width: 1px;
+}
+.ch-bk.br {
+  bottom: 0;
+  right: 0;
+  border-bottom-width: 1px;
+  border-right-width: 1px;
+}
+.ch-fig {
+  position: absolute;
+  top: 7px;
+  right: 10px;
+  z-index: 1;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--dim);
+  background: rgba(17, 17, 20, 0.7);
+  padding: 2px 5px;
+}
+/* M8.2 — hairline rules that scaleX in on reveal */
+.ch-rule {
+  display: block;
+  height: 1px;
+  background: var(--hairline);
 }
 .ch-ph {
   position: relative;

@@ -36,7 +36,10 @@ const BreachFXShader = {
     varying vec2 vUv;
 
     void main() {
-      vec2 shift = (vUv - 0.5) * uChroma;
+      /* M2 — the faintest chromatic fringe at extreme corners only, always on */
+      vec2 cc = (vUv - 0.5) * vec2(uAspect, 1.0);
+      float corner = smoothstep(0.62, 0.95, length(cc));
+      vec2 shift = (vUv - 0.5) * (uChroma + corner * 0.0016);
       float rr = texture2D(tDiffuse, vUv + shift).r;
       float gg = texture2D(tDiffuse, vUv).g;
       float bb = texture2D(tDiffuse, vUv - shift).b;

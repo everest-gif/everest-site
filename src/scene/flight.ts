@@ -27,6 +27,9 @@ const _fwd = new THREE.Vector3();
 /* chamber framing: camera core-side + viewer-side of the planet looking outward, so the
    system stays behind the lens and the right two-thirds is clean space for content.
    The look target is pushed right so the planet anchors the LEFT third. */
+/* per-chamber framing distance — dolomite reads "the planet large" (M7 radar spread) */
+const DIST_K: Partial<Record<NodeId, number>> = { dolomite: 4.0, bigback: 6.0 };
+
 export function chamberCam(
   id: NodeId,
   camera: THREE.PerspectiveCamera,
@@ -36,7 +39,8 @@ export function chamberCam(
   const p = nodeWorld[id];
   if (!p) return false;
   const r = nodeRadius[id] ?? 0.16;
-  const dist = r * 5.4;
+  const portrait = camera.aspect < 0.9;
+  const dist = r * (portrait ? 7.2 : DIST_K[id] ?? 5.4);
   _out.copy(p).sub(_core);
   _out.z = 0;
   if (_out.lengthSq() < 1e-6) _out.set(1, 0, 0);
@@ -45,11 +49,17 @@ export function chamberCam(
     .copy(p)
     .addScaledVector(_out, -dist * 0.42)
     .add(_mid.set(0, dist * 0.16, dist * 0.92));
-  /* push the look right of the planet → planet lands at NDC x ≈ −0.38: the limb
-     tucks under the content column so headlines physically cross it (M1) */
   const tanH = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * camera.aspect;
   const tanV = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
   _fwd.copy(p).sub(outPos).normalize();
+  if (portrait) {
+    /* M7 mobile — the planet is a ~30vh header medallion: top-center */
+    outLook.copy(p);
+    outLook.y -= tanV * dist * 0.55;
+    return true;
+  }
+  /* push the look right of the planet → planet lands at NDC x ≈ −0.38: the limb
+     tucks under the content column so headlines physically cross it (M1) */
   _mid.crossVectors(_fwd, _out.set(0, 1, 0)).normalize(); /* camera-right */
   outLook
     .copy(p)

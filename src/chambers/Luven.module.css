@@ -1,10 +1,11 @@
-/* Luven — a business one-pager with editorial weight:
-   letterhead rule, marginal section labels, ledger rows set like a term sheet.
-   One grid governs everything: 148px gutter · column gap · shared vertical rhythm. */
+/* Luven — "ledger": an editorial spread on a 12-column grid.
+   Pull-stat high upper right · narrow prose hanging lower left · one hairline
+   table set like a term sheet. Letterhead rules top and bottom; the reveal
+   engine draws every [data-rule] in from the left. */
 
 .root {
-  --gutter: 148px;
-  --col-gap: clamp(24px, 4vw, 56px);
+  --cols: repeat(12, minmax(0, 1fr));
+  --col-gap: clamp(16px, 2.2vw, 28px);
   --rhythm: clamp(56px, 8.5vh, 84px);
   display: flex;
   flex-direction: column;
@@ -53,33 +54,10 @@
 /* ---------- headline ---------- */
 .head {
   margin-top: clamp(44px, 7vh, 72px);
-  /* M1 scale courage: the headline fills the column and breaks naturally —
-     18ch resolved against the DIV's 16px base (≈288px), strangling the h2 */
 }
 
-/* ---------- hero band — atmosphere art on the section grid, letterboxed ---------- */
-.heroBand {
-  margin-top: clamp(40px, 6.5vh, 64px);
-  display: grid;
-  grid-template-columns: var(--gutter) minmax(0, 1fr);
-  column-gap: var(--col-gap);
-  align-items: start;
-}
-
-.heroBand img {
-  aspect-ratio: 21 / 9;
-}
-
-/* ---------- numbered sections — label hangs in the left margin ---------- */
-.section {
-  margin-top: var(--rhythm);
-  display: grid;
-  grid-template-columns: var(--gutter) minmax(0, 1fr);
-  column-gap: var(--col-gap);
-  align-items: start;
-}
-
-.secLabel {
+/* ---------- marginal marks — mono labels with amber index ---------- */
+.mark {
   font-family: var(--font-mono);
   font-size: 10.5px;
   letter-spacing: 0.16em;
@@ -89,91 +67,123 @@
   padding-top: 8px;
 }
 
-.secIndex {
+.markIndex {
   color: var(--amber);
   margin-right: 10px;
 }
 
-.secBody {
-  min-width: 0;
+/* ---------- opening spread — asymmetric by design ---------- */
+.spread {
+  margin-top: clamp(48px, 7vh, 76px);
+  display: grid;
+  grid-template-columns: var(--cols);
+  column-gap: var(--col-gap);
 }
 
-/* ---------- 01 · the product, one sentence ---------- */
-.lede p {
-  font-size: clamp(19px, 2.4vw, 23px);
-  line-height: 1.55;
-  max-width: 38ch;
+.spreadStat {
+  grid-column: 6 / -1;
+  grid-row: 1;
 }
 
-/* ---------- 02 · the ledger ---------- */
-.ledger {
-  border-top: 1px solid var(--hairline);
+/* the global pull-stat scales on vh alone; in a 7-column cell it needs a
+   width-aware ceiling so tall narrow windows never clip the nowrap numeral */
+.spreadStat :global(.ch-pull-value) {
+  font-size: clamp(96px, min(16vh, 11vw), 210px);
 }
 
-.row {
+.spreadProse {
+  grid-column: 1 / 6;
+  grid-row: 1;
+  /* starts well below the pull-stat's top edge — the hang is the point */
+  margin-top: clamp(120px, 18vh, 200px);
+}
+
+.spreadCopy {
+  margin-top: 14px;
+}
+
+/* ---------- sections — marks hang in cols 1–3, bodies sit right ---------- */
+.section {
+  margin-top: var(--rhythm);
+  display: grid;
+  grid-template-columns: var(--cols);
+  column-gap: var(--col-gap);
+  row-gap: 16px;
+  align-items: start;
+}
+
+.section > .mark {
+  grid-column: 1 / 4;
+}
+
+.heroBody {
+  grid-column: 4 / -1;
+}
+
+.heroBody img {
+  aspect-ratio: 21 / 9;
+}
+
+.workBody {
+  grid-column: 4 / 10;
+}
+
+.galleryBody {
+  grid-column: 4 / -1;
+}
+
+/* ---------- the ledger table — full-bleed across the grid ---------- */
+.table {
+  grid-column: 1 / -1;
+  grid-row: 2;
   display: flex;
-  align-items: baseline;
-  gap: 14px;
-  padding: 16px 0;
-  border-bottom: 1px solid var(--hairline);
-  animation: row-rise 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+  flex-direction: column;
 }
 
-@keyframes row-rise {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
+.cols {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, 1fr);
+  column-gap: var(--col-gap);
+  padding: 16px 0 20px;
 }
 
-.rowLabel {
+.col {
+  display: flex;
+  flex-direction: column;
+}
+
+.th {
   font-family: var(--font-mono);
   font-size: 11px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--dim);
+  padding-bottom: 10px;
 }
 
-.leader {
-  flex: 1 1 24px;
-  min-width: 24px;
-  border-bottom: 1px dotted var(--dim);
-  opacity: 0.35;
-  align-self: center;
-}
-
-.rowEnd {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 5px;
-}
-
-.rowValue {
+.td {
+  margin-top: 14px;
   font-family: var(--font-display);
   font-weight: 300;
   font-style: italic;
   font-variation-settings: 'opsz' 144;
-  font-size: clamp(1.45rem, 2.4vw, 2rem);
-  line-height: 1.05;
+  font-size: clamp(1.35rem, 1.9vw, 1.8rem);
+  line-height: 1.15;
   color: var(--bone);
 }
 
-.starValue {
-  color: var(--amber);
-  font-size: clamp(1.8rem, 3.2vw, 2.6rem);
-}
-
-.rowNote {
+.tdNote {
+  margin-top: 7px;
   font-family: var(--font-mono);
   font-size: 10px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--dim);
+  line-height: 1.5;
+}
+
+.tdNote + .tdNote {
+  margin-top: 3px;
 }
 
 /* ---------- signature ---------- */
@@ -196,22 +206,40 @@
   gap: 8px 16px;
 }
 
-/* ---------- mobile ---------- */
-@media (max-width: 760px) {
-  .section,
-  .heroBand {
+/* ---------- mobile — single column, clean stack ---------- */
+@media (max-width: 900px) {
+  .spread,
+  .section {
     grid-template-columns: 1fr;
-    row-gap: 18px;
   }
 
-  .heroBand img {
+  .spreadStat,
+  .spreadProse,
+  .section > .mark,
+  .heroBody,
+  .workBody,
+  .galleryBody,
+  .table {
+    grid-column: auto;
+    grid-row: auto;
+  }
+
+  .spreadProse {
+    margin-top: 28px;
+  }
+
+  .cols {
+    grid-template-columns: 1fr;
+    row-gap: 24px;
+  }
+
+  .heroBody img {
     aspect-ratio: 16 / 10;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .tick,
-  .row {
+  .tick {
     animation: none;
   }
 }

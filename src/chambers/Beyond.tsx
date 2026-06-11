@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
-import { ChamberTitle, Marginalia, Stat, Gallery, HeroArt } from './shared';
+import { ChamberTitle, Marginalia, Stat, Gallery, HeroArt, PullStat } from './shared';
 import { useStore } from '../state/store';
 import { CONTACT, isPending } from '../content/nodes';
 import s from './Beyond.module.css';
@@ -205,8 +205,11 @@ function ThreadHead({ num, label }: { num: string; label: string }) {
 export default function Beyond() {
   return (
     <div className={s.root}>
-      <header className={s.head}>
-        <ChamberTitle kicker="NODE 08 — THE PERSON">The coordinates keep changing.</ChamberTitle>
+      <header className={`${s.head} ch-head-overlap`}>
+        {/* M1/M7 — the one WONK-axis headline: the human chamber gets the personality */}
+        <ChamberTitle kicker="NODE 08 — THE PERSON" wonk>
+          The coordinates keep changing.
+        </ChamberTitle>
         <Marginalia className={s.tagline}>athlete · the route · everything else</Marginalia>
       </header>
 
@@ -226,6 +229,7 @@ export default function Beyond() {
             sprint distance is done. The 70.3 is next.
           </p>
         </div>
+        <PullStat value={70.3} decimals={1} caption="half-iron miles — in training" />
         <ol className={s.races}>
           {RACES.map(([tag, name, note]) => (
             <li key={name} className={s.race}>
@@ -246,18 +250,20 @@ export default function Beyond() {
 
       <section className={s.thread}>
         <ThreadHead num="02" label="THE ROUTE" />
-        <div className="prose">
-          <p>
-            I started in Rochester, New York. Monroe Community College, then Semester at Sea, then
-            Colorado State — B.S. in Business Administration, Marketing, December 2025. Boulder
-            holds the pin now. The dashed legs — Costa Rica, Crete, Valencia — are under
-            evaluation, not decoration.
-          </p>
+        {/* M7 atlas — the route is a full-width band the text sits inside; warmest light */}
+        <div className={s.atlasBand}>
+          <div className={s.atlasMap}>
+            <RouteMap />
+          </div>
+          <div className={`prose ${s.atlasText}`}>
+            <p>
+              I started in Rochester, New York. Monroe Community College, then Semester at Sea, then
+              Colorado State — B.S. in Business Administration, Marketing, December 2025. Boulder
+              holds the pin now. The dashed legs — Costa Rica, Crete, Valencia — are under
+              evaluation, not decoration.
+            </p>
+          </div>
         </div>
-        <div className={s.heroCrop}>
-          <HeroArt id="beyond" alt="A ridgeline at night, one jade route tracing it" />
-        </div>
-        <RouteMap />
         <ol className={s.manifest}>
           {MANIFEST.map(([n, place, note]) => (
             <li key={n} className={s.mRow}>
@@ -267,6 +273,9 @@ export default function Beyond() {
             </li>
           ))}
         </ol>
+        <div className={s.heroCrop}>
+          <HeroArt id="beyond" alt="A ridgeline at night, one jade route tracing it" />
+        </div>
       </section>
 
       <section className={s.thread}>

@@ -1,16 +1,32 @@
+/* ============================================================
+   EVERCLASH — arcade character-select on a 12-col editorial grid.
+   The roster carries the visual mass; the headline lands on its
+   top edge. Type, hairlines, and corner marks — no neon.
+   ============================================================ */
 .root {
-  display: flex;
-  flex-direction: column;
-  gap: 48px;
+  --rowgap: clamp(64px, 9.5vh, 112px);
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: clamp(16px, 2vw, 28px);
+  row-gap: var(--rowgap);
 }
 
-/* ---------- header: title left, cabinet readout right ---------- */
+/* ---------- head: kicker + headline left, cabinet readout top-right.
+   ch-head-overlap (global) lifts it to z2; the negative margin on
+   .rosterSec pulls the grid up under the headline's descenders. ---------- */
 .head {
+  grid-column: 1 / 13;
   display: flex;
   justify-content: space-between;
-  align-items: flex-end;
+  align-items: flex-start;
   gap: 24px;
-  flex-wrap: wrap;
+  /* the headline lies on top of the roster — let hovers reach the slots beneath */
+  pointer-events: none;
+}
+
+.headTitle {
+  flex: 1;
+  min-width: 0;
 }
 
 .lobby {
@@ -19,6 +35,7 @@
   gap: 8px;
   align-items: flex-end;
   text-align: right;
+  padding-top: 4px;
 }
 
 .lobbyLive {
@@ -58,15 +75,29 @@
   color: var(--dim);
 }
 
-/* ---------- section scaffold: numbered mono markers on a shared hairline ---------- */
+/* ---------- section scaffold: numbered mono markers over animated hairlines ---------- */
 .secBar {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.secRow {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
   gap: 16px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid var(--hairline);
-  margin-bottom: 20px;
+}
+
+/* roster variant — marker cluster right, clear of the overlapping headline */
+.secBarEnd {
+  margin-bottom: 12px;
+}
+
+.secBarEnd .secRow {
+  justify-content: flex-end;
+  gap: 18px;
 }
 
 .secMark {
@@ -95,36 +126,46 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* ---------- roster: the character-select grid ---------- */
+/* ---------- roster: the character-select grid — the mass of the spread.
+   Pulled up through the row gap so the headline physically crosses its
+   top rule and the first row of slots. ---------- */
+.rosterSec {
+  grid-column: 1 / 13;
+  position: relative;
+  z-index: 1;
+  margin-top: calc(-1 * var(--rowgap) - clamp(48px, 7vh, 72px));
+}
+
 .rosterGrid {
   list-style: none;
   margin: 0;
   padding: 0;
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 14px;
+  gap: clamp(10px, 1.1vw, 16px);
 }
 
 .slot {
   position: relative;
-  aspect-ratio: 4 / 5;
-  border: 1px solid rgba(232, 162, 61, 0.2);
-  background:
-    repeating-linear-gradient(
-      -45deg,
-      rgba(237, 232, 223, 0.025) 0,
-      rgba(237, 232, 223, 0.025) 1px,
-      transparent 1px,
-      transparent 7px
-    ),
-    var(--ink-2);
-  padding: 12px;
+  aspect-ratio: 3 / 4;
+  min-height: clamp(168px, 24vh, 264px);
+  border: 1px solid rgba(232, 162, 61, 0.22);
+  background-color: var(--ink-2);
+  background-image: repeating-linear-gradient(
+    -45deg,
+    rgba(237, 232, 223, 0.025) 0,
+    rgba(237, 232, 223, 0.025) 1px,
+    transparent 1px,
+    transparent 7px
+  );
+  padding: clamp(12px, 1.3vw, 18px);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   overflow: hidden;
   transition:
     border-color 200ms cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 200ms cubic-bezier(0.22, 1, 0.36, 1),
     transform 200ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
@@ -135,12 +176,13 @@
 .slot:hover,
 .live {
   border-color: rgba(232, 162, 61, 0.8);
+  background-color: var(--ink-3);
 }
 
 .corner {
   position: absolute;
-  width: 12px;
-  height: 12px;
+  width: 14px;
+  height: 14px;
   border: 1px solid rgba(232, 162, 61, 0.45);
   transition: border-color 200ms cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -200,7 +242,32 @@
   }
 }
 
+/* portrait pending — the fighter's initial, Fraunces ghost behind the labels */
+.slotGlyph {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 300;
+  font-variation-settings: 'opsz' 144;
+  font-size: clamp(56px, 6.5vw, 104px);
+  line-height: 1;
+  color: rgba(237, 232, 223, 0.05);
+  pointer-events: none;
+  user-select: none;
+  transition: color 200ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.slot:hover .slotGlyph,
+.live .slotGlyph {
+  color: rgba(232, 162, 61, 0.13);
+}
+
 .slotTop {
+  position: relative;
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
@@ -209,7 +276,7 @@
 
 .slotNum {
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: 0.12em;
   color: var(--dim);
 }
@@ -227,20 +294,22 @@
     transform 180ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.slot:hover .slotTag {
+.slot:hover .slotTag,
+.live .slotTag {
   opacity: 1;
   transform: none;
 }
 
 .slotFoot {
+  position: relative;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 5px;
 }
 
 .slotName {
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 13px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--bone);
@@ -259,8 +328,14 @@
   color: var(--dim);
 }
 
+/* ---------- pull-stat: right of center, its own band of air ---------- */
+.pull {
+  grid-column: 7 / 13;
+}
+
 /* ---------- impact study: caption rail hangs in the left margin, art letterboxed ---------- */
 .heroBand {
+  grid-column: 1 / 13;
   display: grid;
   grid-template-columns: minmax(120px, 0.26fr) minmax(0, 1fr);
   gap: 24px;
@@ -282,7 +357,11 @@
   aspect-ratio: 21 / 9;
 }
 
-/* ---------- stack readout ---------- */
+/* ---------- stack readout + write-up ---------- */
+.runs {
+  grid-column: 1 / 13;
+}
+
 .specBar {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -333,7 +412,16 @@
   padding-left: 32px;
 }
 
-/* ---------- lab line ---------- */
+/* ---------- evidence ---------- */
+.root > :global(.ch-gallery) {
+  grid-column: 1 / 13;
+}
+
+/* ---------- lab line: indented, the spread exhales ---------- */
+.lab {
+  grid-column: 5 / 13;
+}
+
 .labLine {
   max-width: 62ch;
 }
@@ -345,8 +433,55 @@
   color: var(--amber);
 }
 
-/* ---------- responsive ---------- */
-@media (max-width: 860px) {
+/* ---------- mid: narrow desktop — readout above, headline takes the full measure ---------- */
+@media (max-width: 1100px) and (min-width: 901px) {
+  .head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 18px;
+  }
+  .lobby {
+    order: -1;
+    align-self: flex-end;
+    padding-top: 0;
+  }
+}
+
+/* ---------- mobile: single column, overlap stands down ---------- */
+@media (max-width: 900px) {
+  .root {
+    row-gap: 56px;
+  }
+  .head,
+  .rosterSec,
+  .pull,
+  .heroBand,
+  .runs,
+  .lab,
+  .root > :global(.ch-gallery) {
+    grid-column: 1 / -1;
+  }
+  .rosterSec {
+    margin-top: 0;
+  }
+  .head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 18px;
+    pointer-events: auto;
+  }
+  .lobby {
+    align-items: flex-start;
+    text-align: left;
+    padding-top: 0;
+  }
+  .rosterGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .slot {
+    aspect-ratio: auto;
+    min-height: 132px;
+  }
   .band {
     grid-template-columns: 1fr;
     gap: 28px;
@@ -356,23 +491,6 @@
     padding-left: 0;
     border-top: 1px solid var(--hairline);
     padding-top: 24px;
-  }
-}
-
-@media (max-width: 760px) {
-  .head {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  .lobby {
-    align-items: flex-start;
-    text-align: left;
-  }
-  .rosterGrid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-  .slot {
-    aspect-ratio: 3 / 2;
   }
   .heroBand {
     grid-template-columns: 1fr;

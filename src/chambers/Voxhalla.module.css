@@ -36,53 +36,43 @@
   }
 }
 
-/* ---------- the sheet: one bordered document, hairline-ruled throughout ---------- */
+/* ---------- the sheet: one heavy-framed document — brutalist datasheet ----------
+   2px structural rules divide the major sections; 1px hairlines rule the cells. */
 .sheet {
-  border: 1px solid var(--hairline);
+  border: 2px solid var(--hairline-2);
   background: var(--ink-2);
 }
 
 .sheet > * + * {
-  border-top: 1px solid var(--hairline);
+  border-top: 2px solid var(--hairline-2);
+}
+
+/* ---------- oversized section numerals — the design language of this sheet ---------- */
+.secNum {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 300;
+  font-variation-settings: 'opsz' 144;
+  font-size: clamp(2rem, 3vw, 3rem);
+  line-height: 0.9;
+  letter-spacing: -0.01em;
+  color: var(--amber);
 }
 
 .secHead {
   display: flex;
   align-items: baseline;
-  gap: 14px;
+  gap: 16px;
   margin: 0;
-  padding: 12px 16px;
+  padding: 14px 20px 12px;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.secLabel {
   font-family: var(--font-mono);
   font-weight: 400;
   font-size: 10px;
   letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--dim);
-  border-bottom: 1px solid var(--hairline);
-}
-
-.secHead span {
-  color: var(--amber);
-}
-
-/* ---------- plate: atmosphere hero art, full-bleed inside the sheet ----------
-   "plate", not "figure" — figures (5.0) are evidence; the plate is atmosphere. */
-.plate :global(.ch-hero) {
-  border: none; /* the sheet's hairlines frame it */
-}
-
-.plate :global(.ch-hero) img {
-  aspect-ratio: auto;
-  height: clamp(160px, 24vh, 240px); /* cinematic strip, not a billboard */
-}
-
-.plateCap {
-  margin: 0;
-  padding: 10px 16px;
-  border-top: 1px solid var(--hairline);
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--dim);
 }
@@ -90,17 +80,13 @@
 /* ---------- 1.0 status band ---------- */
 .statusBand {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   gap: 18px;
-  padding: 14px 16px;
+  padding: 16px 20px 14px;
   font-family: var(--font-mono);
   font-size: 11px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-}
-
-.statusSec {
-  color: var(--amber);
 }
 
 .statusKey {
@@ -109,7 +95,7 @@
 
 .statusVal {
   display: inline-flex;
-  align-items: center;
+  align-items: baseline; /* the band aligns on baselines; the text donates this box's */
   gap: 10px;
   color: var(--bone);
 }
@@ -117,6 +103,7 @@
 .tick {
   width: 7px;
   height: 7px;
+  align-self: center; /* opt out of baseline alignment — empty box has no real baseline */
   background: var(--amber); /* parked, not live — static amber, no pulse */
   flex-shrink: 0;
 }
@@ -137,111 +124,168 @@
   }
 }
 
-/* ---------- 2.0 specification table ---------- */
-.table {
-  display: flex;
-  flex-direction: column;
+/* ---------- pull-stat: the sheet's dominant moment ----------
+   the global .ch-pull brings its own hairlines; the sheet's 2px rules frame it instead */
+.pullRow {
+  padding: 0 20px;
 }
 
-.row {
-  display: grid;
-  /* 56px index column: 16px insets put "01" flush with the secHead text above it */
-  grid-template-columns: 56px 150px minmax(0, 0.85fr) minmax(0, 1.15fr);
+.pullRow :global(.ch-pull) {
+  border-top: none;
+  border-bottom: none;
+}
+
+/* ---------- plate: atmosphere hero art, full-bleed inside the sheet ----------
+   "plate", not "figure" — figures (5.0) are evidence; the plate is atmosphere. */
+.plate :global(.ch-hero) {
+  border: none; /* the sheet's rules frame it */
+}
+
+.plate :global(.ch-hero) img {
+  aspect-ratio: auto;
+  height: clamp(160px, 24vh, 240px); /* cinematic strip, not a billboard */
+}
+
+.plateCap {
+  margin: 0;
+  padding: 10px 20px;
+  border-top: 1px solid var(--hairline);
   font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.08em;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+
+/* ---------- 2.0 specification: two fat columns on the 12-col grid ----------
+   each cell: mono field label, drawn-in hairline, OVERSIZED Fraunces value, dim note */
+.specGrid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+}
+
+.spec {
+  grid-column: span 6;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    'field idx'
+    'rule  rule'
+    'value value'
+    'note  note';
+  row-gap: 10px;
+  align-content: start;
+  padding: 18px 20px 22px;
   transition: background-color 180ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.row + .row {
-  border-top: 1px solid var(--hairline);
-}
-
-.row:hover {
-  background-color: rgba(237, 232, 223, 0.03);
-}
-
-.rowStatus {
-  background-color: rgba(232, 162, 61, 0.05);
-}
-
-.row > span {
-  padding: 12px 16px; /* matches the 16px sheet inset everywhere else */
+.spec > * {
   min-width: 0;
 }
 
-.row > span + span {
+.spec:hover {
+  background-color: rgba(237, 232, 223, 0.03);
+}
+
+.spec:nth-child(even) {
   border-left: 1px solid var(--hairline);
 }
 
-.cellIdx {
+.spec:nth-child(n + 3) {
+  border-top: 1px solid var(--hairline);
+}
+
+.specStatus {
+  background-color: rgba(232, 162, 61, 0.05);
+}
+
+.specField {
+  grid-area: field;
+  align-self: end;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+
+.specIdx {
+  grid-area: idx;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
   color: rgba(237, 232, 223, 0.32);
 }
 
-.cellField {
-  color: var(--dim);
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
+.specRule {
+  grid-area: rule;
+  display: block;
+  height: 1px;
+  background: var(--hairline-2);
 }
 
-.cellSpec {
+/* nested for specificity over the global .ch-stat-value (amber, smaller clamp) */
+.spec .specValue {
+  grid-area: value;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 300;
+  font-variation-settings: 'opsz' 144;
+  font-size: clamp(2rem, 3.6vw, 3.6rem);
+  line-height: 1.02;
+  letter-spacing: -0.01em;
+  color: var(--bone);
+}
+
+.specStatus .specValue {
   color: var(--amber);
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
 }
 
-.cellNote {
+.specNote {
+  grid-area: note;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
   color: var(--dim);
-  letter-spacing: 0.03em;
 }
 
-@media (max-width: 720px) {
-  .row {
-    grid-template-columns: 48px minmax(0, 1fr);
+@media (max-width: 900px) {
+  .spec {
+    grid-column: span 12;
   }
-  .row > span + span {
+  .spec:nth-child(even) {
     border-left: none;
   }
-  .cellIdx {
-    grid-row: 1 / 4;
-    border-right: 1px solid var(--hairline);
-  }
-  .cellField,
-  .cellSpec,
-  .cellNote {
-    grid-column: 2;
-  }
-  .cellField {
-    padding-bottom: 2px;
-  }
-  .cellSpec {
-    padding-top: 0;
-    padding-bottom: 2px;
-  }
-  .cellNote {
-    padding-top: 0;
+  .spec:nth-child(2) {
+    border-top: 1px solid var(--hairline);
   }
 }
 
 /* ---------- 3.0 roster + 4.0 notes ---------- */
 .split {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+  grid-template-columns: repeat(12, minmax(0, 1fr));
 }
 
 .rosterSec {
+  grid-column: span 6;
   display: flex;
   flex-direction: column;
-  border-right: 1px solid var(--hairline);
 }
 
-@media (max-width: 860px) {
-  .split {
-    grid-template-columns: 1fr;
+.notesSec {
+  grid-column: span 6;
+  border-left: 1px solid var(--hairline);
+}
+
+@media (max-width: 900px) {
+  .rosterSec,
+  .notesSec {
+    grid-column: span 12;
   }
-  .rosterSec {
-    border-right: none;
-    border-bottom: 1px solid var(--hairline);
+  .notesSec {
+    border-left: none;
+    border-top: 2px solid var(--hairline-2);
   }
 }
 
@@ -264,7 +308,7 @@
   flex-direction: column;
   justify-content: space-between;
   gap: 12px;
-  padding: 14px 16px; /* first column aligns with the 16px sheet inset */
+  padding: 14px 16px;
   background: var(--ink-2);
   transition: background-color 180ms cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -273,10 +317,14 @@
   background-color: rgba(237, 232, 223, 0.03);
 }
 
+/* roster numerals join the sheet's oversized-numeral language */
 .champIdx {
-  font-family: var(--font-mono);
-  font-size: 19px;
-  letter-spacing: 0.04em;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 300;
+  font-variation-settings: 'opsz' 144;
+  font-size: clamp(1.5rem, 2.2vw, 2.1rem);
+  line-height: 1;
   color: var(--bone);
 }
 
@@ -300,7 +348,7 @@
 
 .legend {
   margin: 0;
-  padding: 10px 16px;
+  padding: 10px 20px;
   border-top: 1px solid var(--hairline);
   font-family: var(--font-mono);
   font-size: 10px;
@@ -310,22 +358,22 @@
 }
 
 .notes {
-  padding: 16px 16px 20px; /* same 16px inset as every other body cell */
+  padding: 18px 20px 24px;
 }
 
 /* ---------- 5.0 figures ---------- */
 .figuresBody {
-  padding: 16px;
+  padding: 20px;
 }
 
 /* ---------- end of sheet ---------- */
 .endRow {
-  padding: 10px 16px;
+  padding: 12px 20px;
   text-align: center;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .row,
+  .spec,
   .champ {
     transition: none;
   }

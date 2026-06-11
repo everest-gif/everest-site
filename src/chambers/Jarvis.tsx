@@ -3,7 +3,9 @@ import { ChamberTitle, Marginalia, Stat, Gallery, HeroArt, PullStat } from './sh
 import { useStore } from '../state/store';
 import s from './Jarvis.module.css';
 
-/* Layout language: a live system console (§3). */
+/* M7 — JARVIS / console: content cantilevered right of a tall mono activity
+   column; ghost numeral far left (global.css). The console runs the full
+   height of the spread like an instrument rail. */
 
 const LOG_LINES = [
   ['23:41:07', 'evolver', 'nightly chain started · missions queued'],
@@ -52,6 +54,10 @@ function Console() {
         <p className={s.logCursor} aria-hidden="true">
           ▮
         </p>
+      </div>
+      <div className={s.consoleFoot}>
+        <Marginalia>chain · nightly</Marginalia>
+        <Marginalia>intervention · zero</Marginalia>
       </div>
     </div>
   );
@@ -111,53 +117,71 @@ export default function Jarvis() {
         <Marginalia className={s.tagline}>It builds while I sleep.</Marginalia>
       </header>
 
-      <PullStat value={220} caption="tests green at merge — every nightly chain" />
-
-      <section className={s.section}>
-        <Marginalia className={s.marker}>01 / telemetry</Marginalia>
-        <div className={s.grid}>
+      {/* tall mono activity rail on the left; everything else cantilevers right */}
+      <div className={s.spread}>
+        <aside className={s.rail}>
           <Console />
-          <div className={s.side}>
-            <Diagram />
-            <div className={s.stats}>
-              <Stat value="4" label="agents, one core" />
-              <Stat value="220" label="tests green at merge" />
-              <Stat value="nightly" label="autonomous build chains" />
-              <Stat value="~90%" label="inference cost cut" />
+        </aside>
+
+        <div className={s.cantilever}>
+          <PullStat value={220} caption="tests green at merge — every nightly chain" />
+
+          <section className={s.section}>
+            <div className={s.marker}>
+              <Marginalia>01 / how it runs</Marginalia>
+              <span className="ch-rule" data-rule aria-hidden="true" />
             </div>
-          </div>
-        </div>
-      </section>
+            <div className="prose">
+              <p>
+                Jarvis is my personal AI orchestrator, running locally on Apple Silicon. Four agents
+                — Researcher, Builder, Content, Evolver — work under one core. Nightly build chains
+                run without me. An Electron dashboard is mission control. The voice loop closes it:
+                wake word, speech-to-text, tools, speech back.
+              </p>
+              <p>
+                Routing is two-tier — small models take the routine work, hard reasoning goes to the
+                large ones. That cut inference cost about ninety percent. At merge, 220 tests were
+                green.
+              </p>
+            </div>
+          </section>
 
-      <section className={s.section}>
-        <Marginalia className={s.marker}>02 / how it runs</Marginalia>
-        <div className={s.grid}>
-          <div className="prose">
-            <p>
-              Jarvis is my personal AI orchestrator, running locally on Apple Silicon. Four agents
-              — Researcher, Builder, Content, Evolver — work under one core. Nightly build chains
-              run without me. An Electron dashboard is mission control. The voice loop closes it:
-              wake word, speech-to-text, tools, speech back.
-            </p>
-            <p>
-              Routing is two-tier — small models take the routine work, hard reasoning goes to the
-              large ones. That cut inference cost about ninety percent. At merge, 220 tests were
-              green.
-            </p>
-          </div>
-          <div className={s.heroWrap}>
+          <section className={s.section}>
+            <div className={s.marker}>
+              <Marginalia>02 / architecture</Marginalia>
+              <span className="ch-rule" data-rule aria-hidden="true" />
+            </div>
+            <div className={s.archRow}>
+              <Diagram />
+              <div className={s.stats}>
+                <Stat value="4" label="agents, one core" />
+                <Stat value="220" label="tests green at merge" />
+                <Stat value="nightly" label="autonomous build chains" />
+                <Stat value="~90%" label="inference cost cut" />
+              </div>
+            </div>
+          </section>
+
+          <section className={s.section}>
+            <div className={s.marker}>
+              <Marginalia>03 / atmosphere</Marginalia>
+              <span className="ch-rule" data-rule aria-hidden="true" />
+            </div>
             <HeroArt id="jarvis" alt="Long-exposure light study — a dark control room, one amber monitor glow" />
-          </div>
-        </div>
-      </section>
+          </section>
 
-      <section className={s.section}>
-        <Marginalia className={s.marker}>03 / evidence</Marginalia>
-        <Gallery
-          id="jarvis"
-          captions={['mission control — dashboard', 'voice loop — live session', 'nightly chain — run log']}
-        />
-      </section>
+          <section className={s.section}>
+            <div className={s.marker}>
+              <Marginalia>04 / evidence</Marginalia>
+              <span className="ch-rule" data-rule aria-hidden="true" />
+            </div>
+            <Gallery
+              id="jarvis"
+              captions={['mission control — dashboard', 'voice loop — live session', 'nightly chain — run log']}
+            />
+          </section>
+        </div>
+      </div>
     </div>
   );
 }
