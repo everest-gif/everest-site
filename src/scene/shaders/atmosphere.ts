@@ -63,6 +63,7 @@ attribute float aSeed;
 uniform float uTime;
 uniform float uSharp;
 uniform float uHorizon;
+uniform float uFade; /* S1 — star fields hand off mid-climb: threshold out, cosmos in */
 varying float vA;
 
 float hash(float p) {
@@ -75,7 +76,7 @@ float hash(float p) {
 void main() {
   float amp = mix(0.45, 0.14, uSharp);
   float tw = (1.0 - amp) + amp * sin(uTime * (0.4 + hash(aSeed) * 1.6) + aSeed * 17.0);
-  vA = tw * (0.35 + 0.65 * hash(aSeed * 3.3)) * mix(1.0, 1.4, uSharp);
+  vA = tw * (0.35 + 0.65 * hash(aSeed * 3.3)) * mix(1.0, 1.4, uSharp) * uFade;
   vA *= 1.0 - uHorizon * (1.0 - smoothstep(6.0, 28.0, position.y)) * 0.75;
   vec4 mv = modelViewMatrix * vec4(position, 1.0);
   gl_PointSize = (1.0 + 1.4 * hash(aSeed * 9.1) * tw) * (1.0 + 0.45 * uSharp);

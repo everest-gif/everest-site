@@ -101,7 +101,7 @@ class AudioEngine {
     }, 900);
   }
 
-  /* rising whoosh synthesized for the breach */
+  /* rising whoosh synthesized for the ascent (reversed and falling for the descent) */
   whoosh(duration: number, reverse = false): void {
     if (!useStore.getState().soundOn) return;
     const ctx = this.ensure();
@@ -173,8 +173,8 @@ export function initAudio(): void {
     if (s.soundOn !== prev.soundOn) audio.setEnabled(s.soundOn);
     if (!s.soundOn) return;
     if (s.act !== prev.act) {
-      if (s.act === 'breach') audio.whoosh(2.2);
-      if (s.act === 'reverse-breach') audio.whoosh(1.4, true);
+      if (s.act === 'breach') audio.whoosh(1.8);
+      if (s.act === 'reverse-breach') audio.whoosh(1.2, true);
       if (prev.act === 'chamber' && s.act === 'hub') audio.closeWhoosh();
       if (s.act === 'hub' || s.act === 'chamber') audio.startHum();
       else audio.stopHum();

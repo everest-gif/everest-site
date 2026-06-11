@@ -8,6 +8,7 @@ import { terrainVert, terrainFrag, pulseVert, pulseFrag, seamVert, seamFrag } fr
 import { fogVert, fogFrag, starVert, starFrag, skyVert, skyFrag } from './shaders/atmosphere';
 import { seasonU, seasonGlobals, mixSeasonGlobals, SEASON_IDX } from './season';
 import SeasonParticles from './SeasonParticles';
+import AscentField from './AscentField';
 
 /* Layer recipe: 4 depth planes, each its own seed/amplitude/brightness — far layers dimmer, taller.
    The front layer runs past the camera's bottom ray (M3 full-bleed: no dead band). */
@@ -25,9 +26,7 @@ const seasonShaderU = () => ({
   uSeasonEdge: seasonU.edge,
 });
 
-/* middle sheet sits IN FRONT of the tunnel mouth (z −14.6 vs entrance −15.5) so drifting
-   haze veils the tube's dark disc at idle instead of being occluded behind it.
-   Drift speeds diverge strongly per depth (R6) — the parallax must be visible. */
+/* Drift speeds diverge strongly per depth (R6) — the parallax must be visible. */
 const FOGS = [
   { z: -10.5, y: 1.6, w: 64, h: 9, seed: 0.7, opacity: 0.14, drift: 0.024 },
   { z: -14.6, y: 3.2, w: 82, h: 11, seed: 1.9, opacity: 0.12, drift: -0.012 },
@@ -103,6 +102,7 @@ function PulsePoints({ cfg, count }: { cfg: (typeof LAYERS)[number]; count: numb
         uSeam: handles.seam,
         uTime: { value: 0 },
         uColor: { value: amberColor },
+        uFade: handles.thresholdFade,
         ...seasonShaderU(),
       },
     });
@@ -173,6 +173,7 @@ function Stars({ count = 700 }: { count?: number }) {
         uColor: { value: new THREE.Color('#EDE8DF') },
         uSharp: seasonGlobals.starSharp,
         uHorizon: seasonGlobals.starHorizon,
+        uFade: handles.starFade,
       },
     });
     return { geometry: g, material: m };
@@ -185,53 +186,8 @@ function Stars({ count = 700 }: { count?: number }) {
   return <points geometry={geometry} material={material} />;
 }
 
-/* Solid darkness behind the wound — the mountain's interior. Fades in with the split so
-   the parted halves reveal ink (and hide the tunnel mouth's hard rim), melts away as the
-   camera reaches it. Normal blending: it darkens, never glows. */
-const shroudFrag = /* glsl */ `
-uniform float uSeam;
-varying vec2 vUv;
-varying vec3 vWorld;
-
-void main() {
-  float edge = smoothstep(0.0, 0.18, vUv.x) * (1.0 - smoothstep(0.82, 1.0, vUv.x))
-             * smoothstep(0.0, 0.14, vUv.y) * (1.0 - smoothstep(0.8, 1.0, vUv.y));
-  float near = clamp((length(vWorld - cameraPosition) - 1.2) / 3.0, 0.0, 1.0);
-  float a = uSeam * edge * near * 0.96;
-  if (a < 0.01) discard;
-  gl_FragColor = vec4(0.039, 0.039, 0.047, a);
-}
-`;
-
-const shroudVert = /* glsl */ `
-varying vec2 vUv;
-varying vec3 vWorld;
-void main() {
-  vUv = uv;
-  vec4 world = modelMatrix * vec4(position, 1.0);
-  vWorld = world.xyz;
-  gl_Position = projectionMatrix * viewMatrix * world;
-}
-`;
-
-function SeamShroud() {
-  const material = useMemo(
-    () =>
-      new THREE.ShaderMaterial({
-        vertexShader: shroudVert,
-        fragmentShader: shroudFrag,
-        transparent: true,
-        depthWrite: false,
-        uniforms: { uSeam: handles.seam },
-      }),
-    [],
-  );
-  return (
-    <mesh material={material} position={[0, 3.4, -15.0]}>
-      <planeGeometry args={[15, 13, 1, 1]} />
-    </mesh>
-  );
-}
+/* S1 — no shroud behind the wound: the split opens onto SKY. Through the parted
+   halves you see stars — the system you are about to climb to was there all along. */
 
 /* Blade of light inside the fissure — dormant (uSeam=0) until the breach. */
 function SeamLight() {
@@ -354,8 +310,8 @@ export default function ThresholdWorld() {
       <SkyGlow />
       <SeasonParticles />
       <SeasonDriver />
-      <SeamShroud />
       <SeamLight />
+      <AscentField />
     </group>
   );
 }

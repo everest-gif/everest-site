@@ -164,3 +164,26 @@
 47. **Nebula is texture, not backdrop** — 6% additive over near-black ink reads as double the
     background luminance; shipped at 3% with high-threshold wisps and colors pulled half-way
     to ink. The directive's "≤6%" is honored as a ceiling, not a target.
+48. **S1 — the ascent: the hub moved from a y=600 pocket to y=64, directly above the
+    mountains in the same world space.** Metaphor: enter the mountains → reach the summit →
+    see the whole system. Because both worlds share one scene graph and the hub is within
+    real flying distance, the transition is one physically continuous camera move — no
+    teleport, no whiteout, no wrap, nothing to hide. The tunnel (scene, shaders, handles,
+    end-cap, ribbons, speed-lines) is deleted; the SeamShroud too: the split now opens onto
+    SKY, foreshadowing the destination. Forward 1.8s (open 0.7 / rise 0.8 / arrival 0.3),
+    descent 1.2s. The spline ends a breath short of the hub home pose with decaying
+    velocity; the camera rig's exponential settle absorbs the residue, so the dock reads
+    as a single ease-out. Reduced motion: a 250ms dip through an ink veil in the grade
+    pass (veil up 120ms → act swap → down 130ms) — one code path, no flight.
+49. **Star fields hand off mid-climb.** Threshold stars carry the first half of the rise,
+    the AscentField streak shaft carries the middle, and the hub's cosmos (gated by
+    coreReveal — sun, rings, backdrop stars all ride it) fades up as the climb tops out;
+    a faint hubPreGlow at t≈1.0 puts the destination in the sky the moment the peaks are
+    cleared. The range itself dims to 45% as the gaze sweeps up the corridor — four
+    additive wireframe layers viewed edge-on would otherwise flood the lens (same fix,
+    held at 40%, protects the descent dive).
+50. **Recording tooling: deviceScaleFactor pinned to 1.** A PerformanceMonitor dpr step
+    mid-flight resizes the canvas and stalls Chromium's screencast — the page stays
+    healthy (rAF sampler + live probe proved it) while the video freezes on its last
+    frame. Pinning dsf=1 sidesteps the decline. Perf evidence comes from the rAF
+    sampler and NOVIDEO runs, never from recorded-run hitch counts.

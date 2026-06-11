@@ -4,9 +4,8 @@ import { PerformanceMonitor } from '@react-three/drei';
 import { useStore } from '../state/store';
 import CameraRig from './CameraRig';
 import ThresholdWorld from './ThresholdWorld';
-import TunnelWorld from './TunnelWorld';
 import HubWorld from './HubWorld';
-import BreachTimeline from './BreachTimeline';
+import AscentTimeline from './AscentTimeline';
 import PostFX from './PostFX';
 
 /* Compile every shader during Act 0 so the breach plays with zero first-frame jank. */
@@ -85,9 +84,8 @@ export default function Scene() {
           onIncline={() => setDpr((d) => Math.min(Math.min(window.devicePixelRatio || 1, 2), +(d + 0.25).toFixed(2)))}
         />
         <CameraRig />
-        <BreachTimeline />
+        <AscentTimeline />
         <ThresholdWorld />
-        <TunnelWorld />
         <HubWorld />
         <PostFX />
         <Precompiler />

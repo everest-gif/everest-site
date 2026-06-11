@@ -1,8 +1,33 @@
 # PLAN — everest-site build state
 
-> Source spec: `ENTER_THE_MOUNTAINS.md` + `ENTER_THE_MOUNTAINS_R2.md` + `GORGEOUS_PASS.md` (latest overrides on conflict).
+> Source spec: `ENTER_THE_MOUNTAINS.md` + `ENTER_THE_MOUNTAINS_R2.md` + `GORGEOUS_PASS.md` + `SUMMIT_PASS.md` (latest overrides on conflict).
 > This file always reflects exact current state.
 > A fresh session resumes from here: read CLAUDE.md → this file → DECISIONS.md, then continue at the first unchecked item.
+
+## SUMMIT PASS (sequence: S1 → S5 → S6 → S4 → S7 → S2 → S3 → S8)
+- [x] S1 The Ascent: tunnel fully deleted (TunnelWorld + shaders/tunnel + handles + SeamShroud);
+      hub lowered y=600→64 — one continuous camera move, zero teleports/whiteouts (DECISIONS
+      #48–50). Forward 1.8s, descent 1.2s, rm = 250ms ink veil. AscentField (800 streaks +
+      18 fog veils, lens-proximity faded), hubPreGlow destination point, star-field handoff,
+      range dims to 45%/40% in transit (additive-stack flood fix), pressure-wave shimmer +
+      ripple chroma in grade pass. Motion evidence recorded fwd+rev (motion/), arrival probe
+      clean, check-paths 7/7 (rm veil, abort mid-ascent, re-entry), console silent.
+      Recorder pins deviceScaleFactor=1 (dpr-step screencast stall).
+- [ ] S5 Chamber grid: gutter law (planet left 33–38vw + ≥6vw gutter), Everclash rebuilt,
+      automated collision audit at 1440/1280/mobile — zero intersections
+- [ ] S6 Planet LOD: hero variants for all 8 (atmosphere rim + per-identity micro-detail),
+      chamber-only mounting, hub perf untouched
+- [ ] S4 Direct planet-to-planet flight: single dolly arc 1.0–1.2s, de-rez in first 0.3s,
+      materialize final 0.4s; chips + INDEX + arrows; reduced-motion 200ms crossfade
+- [ ] S7 Orbital rail: bottom-center, 8 glyphs in orbit order, amber ring + 0n/NAME,
+      hover names, keyboard, ≥44px mobile targets
+- [ ] S2 Threshold lives: season-aware instanced treeline (shader-welded to terrain heightAt)
+      + ambient life events (8–20s cadence, season-matched silhouettes, rare ridgeline elk);
+      reduced-motion disabled
+- [ ] S3 Cosmos: milky-way band behind hub, deep-space violet-indigo allowance 6–12%
+      (sky only), drift + parallax; DECISIONS entry
+- [ ] S8 Verification & ship: motion evidence ×5 + poster tests, no-cut audits, collision logs,
+      §9 protocol re-run, tunnel-remnant grep = zero, deploy + production smoke
 
 ## GORGEOUS PASS (sequence: M1 → M3 → M2+M7 → M4+M5 → M6 → M8+M9 → M10)
 - [x] M1 Typography: Newsreader prose (17–19px/1.65/38ch), Geist retired, Fraunces full-italic

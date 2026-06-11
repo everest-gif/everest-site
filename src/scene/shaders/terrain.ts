@@ -131,7 +131,7 @@ void main() {
   col += vec3(0.93, 0.91, 0.875) * shim * 0.5; /* frontline shimmer */
   col += uColor * vSeamGlow * 1.6; /* wound edges glow amber — edges, not a fireball */
   /* gap-straddling segments read as tearing threads mid-split, then snap away once open
-     (they'd otherwise streak across the tunnel corridor) */
+     (they'd otherwise streak across the climb corridor) */
   float snap = smoothstep(0.55, 0.9, vSeamK);
   float bridge = 1.0 - snap * (1.0 - smoothstep(1.0, 3.2, abs(vWorld.x)));
   /* AdditiveBlending uses SrcAlpha — do NOT premultiply or brightness goes alpha² */
@@ -167,6 +167,7 @@ void main() {
 export const pulseFrag = /* glsl */ `
 ${GLSL_SEASON}
 uniform vec3 uColor;
+uniform float uFade; /* S1 — network pulses die with the terrain as altitude builds */
 varying float vA;
 varying float vX;
 
@@ -182,7 +183,7 @@ void main() {
   vec2 c = gl_PointCoord - 0.5;
   float r = length(c);
   float disc = 1.0 - smoothstep(0.18, 0.5, r);
-  float a = vA * disc;
+  float a = vA * disc * uFade;
   if (a < 0.01) discard;
   vec3 col = mix(pulseCol(uSeasonFrom), pulseCol(uSeasonTo), seasonCoverage(vX));
   gl_FragColor = vec4(col, a);

@@ -54,6 +54,37 @@ const MIN_HIT_SEP = 0.5;
 /* per-node reveal handles — staggered on hub arrival */
 const reveals = NODES.map(() => ({ value: 0 }));
 const coreReveal = { value: 0 };
+let revealStarted = false;
+
+/* S1 — the system resolves DURING the ascent's arrival beat: the timeline calls this
+   as the climb eases (sun fades up ahead, planets stagger into their orbits). The
+   component's own effect calls it too (deep links, skip-intro) — idempotent. */
+export function beginHubReveal(): void {
+  if (revealStarted) return;
+  revealStarted = true;
+  if (useStore.getState().reducedMotion) {
+    coreReveal.value = 1;
+    reveals.forEach((r) => (r.value = 1));
+    return;
+  }
+  gsap.to(coreReveal, { value: 1, duration: 0.35, ease: 'power2.out' });
+  gsap.to(reveals, { value: 1, duration: 0.4, ease: 'power2.out', stagger: 0.055, delay: 0.12 });
+}
+
+function resetHubReveal(): void {
+  revealStarted = false;
+  gsap.killTweensOf(coreReveal);
+  reveals.forEach((r) => gsap.killTweensOf(r));
+  coreReveal.value = 0;
+  reveals.forEach((r) => (r.value = 0));
+}
+
+/* S1 — mid-climb the sun is already a faint warm point far overhead: the destination
+   exists before it resolves. beginHubReveal later completes the fade from here. */
+export function hubPreGlow(value: number, duration: number): void {
+  if (revealStarted) return;
+  gsap.to(coreReveal, { value, duration, ease: 'power1.inOut', overwrite: true });
+}
 
 /* preallocated scratch */
 const _v = new THREE.Vector3();
@@ -99,6 +130,7 @@ export default function HubWorld() {
   }, [size]);
 
   /* ---------- core sun + billboard corona (M5 — zero banding) ---------- */
+  const coreMeshRef = useRef<THREE.Mesh>(null);
   const core = useMemo(() => {
     const geo = new THREE.SphereGeometry(0.85, 48, 32);
     const mat = new THREE.ShaderMaterial({
@@ -158,6 +190,8 @@ export default function HubWorld() {
         uColor: { value: new THREE.Color('#EDE8DF') },
         uSharp: { value: 0 },
         uHorizon: { value: 0 },
+        /* S1 — the cosmos fades in with the system as the climb tops out */
+        uFade: coreReveal,
       },
     });
     const nebMat = new THREE.ShaderMaterial({
@@ -284,24 +318,12 @@ export default function HubWorld() {
     return { g, m, positions, alphas, kinds, slots, nextFire };
   }, []);
 
-  /* reveal stagger on hub arrival — nodes materialize outward from the core in 0.6s (§2 Act II.4) */
-  const revealed = useRef(false);
+  /* reveal stagger on arrival — nodes materialize outward from the core (§2 Act II.4).
+     During the ascent the timeline starts this early (the system resolves up ahead);
+     this effect covers deep links and skip-intro, and resets once back on the ground. */
   useEffect(() => {
-    if (onStage && !revealed.current) {
-      revealed.current = true;
-      const reduced = useStore.getState().reducedMotion;
-      if (reduced) {
-        coreReveal.value = 1;
-        reveals.forEach((r) => (r.value = 1));
-        return;
-      }
-      gsap.to(coreReveal, { value: 1, duration: 0.35, ease: 'power2.out' });
-      gsap.to(reveals, { value: 1, duration: 0.4, ease: 'power2.out', stagger: 0.055, delay: 0.12 });
-    } else if (!onStage && act === 'threshold') {
-      revealed.current = false;
-      coreReveal.value = 0;
-      reveals.forEach((r) => (r.value = 0));
-    }
+    if (onStage) beginHubReveal();
+    else if (act === 'threshold') resetHubReveal();
   }, [onStage, act]);
 
   /* M5 anti-overlap — the solver owns the angles; offsets ease apart on close passes */
@@ -328,6 +350,10 @@ export default function HubWorld() {
     backdrop.nebMat.uniforms.uTime.value = t;
     /* billboard corona — always faces the lens (no shell geometry to band) */
     if (coronaRef.current) coronaRef.current.quaternion.copy(camera.quaternion);
+    /* S1 — pre-reveal the opaque sun would read as a black disc occluding stars
+       during the climb; rings ride the same reveal */
+    if (coreMeshRef.current) coreMeshRef.current.visible = coreReveal.value > 0.002;
+    for (const r of rings) r.m.opacity = 0.07 * coreReveal.value;
 
     /* hover targets the hovered node; an open chamber keeps its planet fully lit + lively */
     const focusId = actNow === 'chamber' ? chamber : hovered;
@@ -499,7 +525,7 @@ export default function HubWorld() {
       <mesh material={backdrop.nebMat} position={[0, 0, -34]} renderOrder={-1}>
         <planeGeometry args={[150, 90, 1, 1]} />
       </mesh>
-      <mesh geometry={core.geo} material={core.mat} scale={fit.core} />
+      <mesh ref={coreMeshRef} geometry={core.geo} material={core.mat} scale={fit.core} />
       <mesh ref={coronaRef} geometry={core.coronaGeo} material={core.coronaMat} scale={fit.core} renderOrder={5} />
       {planets.map((p, i) => (
         <primitive key={NODES[i].id} object={p.group} />
