@@ -168,7 +168,6 @@ const CONTACT_ROWS: ReadonlyArray<{ label: string; value: string; href: string }
   { label: 'EMAIL', value: CONTACT.email, href: `mailto:${CONTACT.email}` },
   { label: 'GITHUB', value: CONTACT.github, href: CONTACT.github },
   { label: 'LINKEDIN', value: CONTACT.linkedin, href: CONTACT.linkedin },
-  { label: 'X', value: CONTACT.x, href: CONTACT.x },
 ];
 
 function ContactRow({ label, value, href }: { label: string; value: string; href: string }) {

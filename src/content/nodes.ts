@@ -113,10 +113,9 @@ export const SECTORS = { inner: 'SYSTEMS / VENTURES', outer: 'GAMES / LIFE' } as
 /* §7 — content placeholders. Values still REPLACE_ME render dimmed with `· pending`. */
 export const CONTACT = {
   name: 'Everest Egenhofer',
-  email: 'REPLACE_ME@example.com',
-  github: 'https://github.com/REPLACE_ME',
-  linkedin: 'https://linkedin.com/in/REPLACE_ME',
-  x: 'https://x.com/REPLACE_ME',
+  email: 'everest@luven.ai',
+  github: 'https://github.com/everest-gif',
+  linkedin: 'https://www.linkedin.com/in/everest-egenhofer-53a02a234/',
 } as const;
 
 export const isPending = (v: string) => v.includes('REPLACE_ME');

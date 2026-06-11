@@ -79,3 +79,10 @@
 - [x] Fresh-subagent review vs §11 → 2 gaps found (chamber opsz sweep hidden behind clip; magnetic hover missing on node labels) → both fixed + probe-verified → full §9 re-run 47/47 PASS → final commit
 
 ## BUILD COMPLETE — all phases done, all §11 criteria met, evidence in VERIFICATION_REPORT.md
+
+## P7 — Launch  [IN PROGRESS]
+- [x] §7 contact values filled: email everest@luven.ai · github.com/everest-gif · linkedin (X entry dropped — key removed from CONTACT, row removed in Beyond.tsx)
+- [ ] GitHub repo everest-gif/everest-site (public): created, origin added, main pushed
+- [ ] Vercel production deploy (`npx vercel --prod`)
+- [ ] og:image + og:url absolute on production URL → rebuild, commit, push, redeploy
+- [ ] Playwright smoke vs LIVE production URL: boot → breach → hub → 2 chambers → console gate
