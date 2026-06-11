@@ -1,0 +1,14 @@
+M5 anti-overlap drift audit — official run (shipped solver via window.__driftAudit)
+Date: 2026-06-11 · viewport 1440×900 · camera rest dist 8.4 · hit floor 0.5 world (≈56px)
+
+300s @ 60Hz (18000 samples):
+  minDiscGap   = +0.2273 world units  (planet discs NEVER intersect; 0 occlusions)
+  minCenterSep =  0.6348 world units  (≈73px ≥ 56px hit floor)
+  worst pair   = everclash·voxhalla @ t=287.7s
+
+headroom 900s @ 60Hz (54000 samples):
+  minDiscGap   = +0.1188 · minCenterSep = 0.5354 (≈61px) · worst everclash·beyond @ 637.7s
+
+Solver: co-rotating orbits + per-ring angular spacing controller (minor-axis metric)
++ cross-ring projected-proximity time-shift backstop + rate-bounded spring-back.
+See DECISIONS.md and src/scene/orbits.ts.

@@ -150,7 +150,7 @@ export function initAudio(): void {
     if (s.soundOn !== prev.soundOn) audio.setEnabled(s.soundOn);
     if (!s.soundOn) return;
     if (s.act !== prev.act) {
-      if (s.act === 'breach') audio.whoosh(3.2);
+      if (s.act === 'breach') audio.whoosh(2.2);
       if (s.act === 'reverse-breach') audio.whoosh(1.4, true);
       if (s.act === 'hub' || s.act === 'chamber') audio.startHum();
       else audio.stopHum();

@@ -42,7 +42,8 @@ void main() {
   float hex = hexGhost(vec2(angle * 40.0, z * 80.0));
   float flow = z * 7.0 - uProgress * 9.0 - uTime * 0.22;
   float pool = smoothstep(0.6, 0.97, fbm(vec2(angle * 12.566371, flow)) * 0.5 + 0.5);
-  vec3 col = uAmber * hex * pool * (0.05 * uLight);
+  /* M4 — ghost hex lifted to ~7% so the shorter flight never reads empty */
+  vec3 col = uAmber * hex * pool * (0.07 * uLight);
   gl_FragColor = vec4(col, 1.0); /* opaque ink — the mountain's interior swallows the sky */
 }
 `;

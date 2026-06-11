@@ -67,7 +67,8 @@ function EndCap() {
   );
 }
 
-/* 7 streak ribbons — amber dominant, exactly one jade (R1.3). */
+/* 10 streak ribbons — amber dominant, exactly one jade (R1.3; densified for the
+   shorter M4 flight so 1.1s in the dark never reads empty). */
 const RIBBONS = [
   { angle: 0.6, radius: 2.2, width: 0.1, len: 16, speed: 30, phase: 5, jade: 0, bright: 1.0 },
   { angle: 1.9, radius: 2.38, width: 0.06, len: 22, speed: 38, phase: 30, jade: 0, bright: 0.8 },
@@ -76,6 +77,9 @@ const RIBBONS = [
   { angle: 4.4, radius: 2.42, width: 0.09, len: 14, speed: 33, phase: 70, jade: 0, bright: 0.9 },
   { angle: 5.3, radius: 2.15, width: 0.07, len: 24, speed: 50, phase: 42, jade: 0, bright: 0.7 },
   { angle: 0.15, radius: 2.34, width: 0.11, len: 9, speed: 22, phase: 82, jade: 0, bright: 0.55 },
+  { angle: 1.25, radius: 2.26, width: 0.08, len: 18, speed: 36, phase: 64, jade: 0, bright: 0.85 },
+  { angle: 3.1, radius: 2.45, width: 0.05, len: 26, speed: 47, phase: 22, jade: 0, bright: 0.6 },
+  { angle: 4.9, radius: 2.1, width: 0.12, len: 12, speed: 28, phase: 90, jade: 0, bright: 0.95 },
 ];
 
 function Ribbons() {

@@ -84,10 +84,10 @@ export default function ThresholdLockup() {
           scaleY: 1.18,
           scaleX: 1.02,
           autoAlpha: 0,
-          duration: 0.85,
+          duration: 0.5, /* M4 — matched to the 0.42s approach of the 2.2s breach */
           ease: 'power3.in',
         });
-        gsap.to(root, { autoAlpha: 0, duration: 0.2, delay: 0.75 });
+        gsap.to(root, { autoAlpha: 0, duration: 0.15, delay: 0.42 });
       } else {
         gsap.to(root, { autoAlpha: 0, duration: 0.45, ease: 'power2.in' });
       }

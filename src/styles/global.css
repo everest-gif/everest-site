@@ -605,8 +605,8 @@ a {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 48px;
-  height: 48px;
+  width: 56px; /* M5 — hit areas ≥56px */
+  height: 56px;
   transform: translate(-50%, -100%);
 }
 .hub-node-label {

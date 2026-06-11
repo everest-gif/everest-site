@@ -52,10 +52,12 @@ function monotoneCubic(xs: number[], ys: number[]): (x: number) => number {
   };
 }
 
-/* forward flight: home → through the seam → down the tunnel (teleport at 3.94 inside the wrap) */
-const fwdZ = monotoneCubic([0, 0.9, 1.2, 1.7, 2.05, 3.55, 3.94], [10.5, 5.6, 3.4, -1.5, -17, -66, -74]);
-const fwdY = monotoneCubic([0, 0.9, 1.7, 2.05, 3.94], [2.9, 3.3, 3.55, TUNNEL_CY, TUNNEL_CY]);
-const fwdF = monotoneCubic([0, 0.9, 1.2, 1.7, 2.05, 3.3, 3.94], [45, 50, 52, 62, 70, 95, 95]);
+/* forward flight (M4 — total 2.2s: open 0.8 → tunnel 1.1 → arrival 0.3):
+   home → through the seam → down the tunnel (teleport at 2.2 inside the wrap).
+   Same waypoints as the verified R1 path, remapped onto the compressed clock. */
+const fwdZ = monotoneCubic([0, 0.42, 0.56, 0.8, 1.01, 1.9, 2.2], [10.5, 5.6, 3.4, -1.5, -17, -66, -74]);
+const fwdY = monotoneCubic([0, 0.42, 0.8, 1.01, 2.2], [2.9, 3.3, 3.55, TUNNEL_CY, TUNNEL_CY]);
+const fwdF = monotoneCubic([0, 0.42, 0.56, 0.8, 1.01, 1.75, 2.2], [45, 50, 52, 62, 70, 95, 95]);
 
 /* reverse: light-wrap out of the hub → backing out of the tunnel → seam closes */
 const revZ = monotoneCubic([0.16, 1.0, 1.45, 1.7], [-58, -8, 7, 10.5]);
@@ -125,30 +127,30 @@ export default function BreachTimeline() {
     const tl = gsap.timeline({ onUpdate: apply, paused: false });
 
     if (fwd) {
-      /* A — approach (0–0.9): drift toward the ridge, gaze lifts to the crest */
-      tl.to(look, { y: SEAM.y, z: SEAM.z, duration: 0.9, ease: 'power2.out' }, 0)
-        .to(handles.nearBright, { value: 0.35, duration: 0.9, ease: 'power2.inOut' }, 0)
-        /* B — the blade (0.9–1.2): a bone hairline draws down the crest */
-        .to(handles.blade, { value: 1, duration: 0.3, ease: 'power2.in' }, 0.9)
-        /* C — the split (1.2–1.7): the mountain opens; strata part, wound burns amber */
-        .to(handles.seam, { value: 1, duration: 0.5, ease: 'power2.inOut' }, 1.2)
-        .to(handles.blade, { value: 0, duration: 0.35, ease: 'power1.out' }, 1.55)
-        .to(handles.bloomIntensity, { value: 0.75, duration: 0.45, ease: 'power2.in' }, 1.2)
-        /* D — threading the gap (1.7–2.05): into the wound while it is still opening */
-        .to(look, { y: TUNNEL_CY, z: -70, duration: 0.6, ease: 'power2.inOut' }, 1.5)
-        .to(handles.chromaOffset, { value: 0.0035, duration: 0.25, ease: 'power2.in' }, 1.75)
-        .to(handles.chromaOffset, { value: 0, duration: 0.3, ease: 'power2.out' }, 2.05)
-        .to(handles.tunnelLight, { value: 1, duration: 0.4, ease: 'power1.inOut' }, 1.8)
-        .to(handles.thresholdFade, { value: 0, duration: 0.5, ease: 'power1.inOut' }, 1.7)
-        .to(handles.bloomIntensity, { value: 0.6, duration: 0.5, ease: 'power1.out' }, 1.9)
-        /* E — the flight (2.05–3.55): darkness with ribbons; speed from streaks + FOV */
-        .to(handles.tunnelProgress, { value: 1, duration: 1.55, ease: 'power1.inOut' }, 2.0)
-        .to(rig, { roll: ROLL_MAX, duration: 1.5, ease: 'sine.inOut' }, 1.9)
-        /* F — arrival (3.45–3.94): ribbons converge → 120ms amber wrap → hub */
-        .to(handles.converge, { value: 1, duration: 0.4, ease: 'power2.in' }, 3.45)
-        .to(handles.chromaOffset, { value: 0.003, duration: 0.3, ease: 'power2.in' }, 3.5)
-        .set(handles.wrapRadius, { value: 1.1 }, 3.8)
-        .to(handles.whiteout, { value: 1, duration: 0.12, ease: 'power2.in' }, 3.82)
+      /* A — approach (0–0.42): drift toward the ridge, gaze lifts to the crest */
+      tl.to(look, { y: SEAM.y, z: SEAM.z, duration: 0.42, ease: 'power2.out' }, 0)
+        .to(handles.nearBright, { value: 0.35, duration: 0.42, ease: 'power2.inOut' }, 0)
+        /* B — the blade (0.42–0.56): a bone hairline draws down the crest */
+        .to(handles.blade, { value: 1, duration: 0.14, ease: 'power2.in' }, 0.42)
+        /* C — the split (0.56–0.8): the mountain opens; strata part, wound burns amber */
+        .to(handles.seam, { value: 1, duration: 0.24, ease: 'power2.inOut' }, 0.56)
+        .to(handles.blade, { value: 0, duration: 0.16, ease: 'power1.out' }, 0.73)
+        .to(handles.bloomIntensity, { value: 0.75, duration: 0.21, ease: 'power2.in' }, 0.56)
+        /* D — threading the gap (0.71–1.04): into the wound while it is still opening */
+        .to(look, { y: TUNNEL_CY, z: -70, duration: 0.31, ease: 'power2.inOut' }, 0.71)
+        .to(handles.chromaOffset, { value: 0.0035, duration: 0.13, ease: 'power2.in' }, 0.83)
+        .to(handles.chromaOffset, { value: 0, duration: 0.18, ease: 'power2.out' }, 1.01)
+        .to(handles.tunnelLight, { value: 1, duration: 0.21, ease: 'power1.inOut' }, 0.86)
+        .to(handles.thresholdFade, { value: 0, duration: 0.26, ease: 'power1.inOut' }, 0.8)
+        .to(handles.bloomIntensity, { value: 0.6, duration: 0.27, ease: 'power1.out' }, 0.92)
+        /* E — the flight (1.0–1.9): darkness with ribbons; speed from streaks + FOV */
+        .to(handles.tunnelProgress, { value: 1, duration: 0.92, ease: 'power1.inOut' }, 0.98)
+        .to(rig, { roll: ROLL_MAX, duration: 0.9, ease: 'sine.inOut' }, 0.92)
+        /* F — arrival (1.84–2.2): ribbons converge → 120ms amber wrap → hub */
+        .to(handles.converge, { value: 1, duration: 0.29, ease: 'power2.in' }, 1.84)
+        .to(handles.chromaOffset, { value: 0.003, duration: 0.25, ease: 'power2.in' }, 1.87)
+        .set(handles.wrapRadius, { value: 1.1 }, 2.06)
+        .to(handles.whiteout, { value: 1, duration: 0.12, ease: 'power2.in' }, 2.08)
         .call(
           () => {
             arrivedRef.current = true;
@@ -167,7 +169,7 @@ export default function BreachTimeline() {
             useStore.getState().arriveHub();
           },
           [],
-          3.94,
+          2.2,
         );
     } else {
       /* reverse — the wrap blooms OUT of the core, then we back out of the mountain */

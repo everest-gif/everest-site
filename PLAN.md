@@ -31,7 +31,18 @@
       back (agent) · beyond atlas band w/ WONK headline (main session). Pull-stats in all 8
       (220 · $994 · 4 · 7 · 10 · 6v6 · 1 · 70.3). Mobile medallion framing (portrait
       chamberCam top-center + 30vh scrim window). All copy preserved verbatim.
-- [ ] M4+M5 Breach ≤2.2s denser + hub (nebula, corona, planet materials, pulses, anti-overlap, arc-text deleted)
+- [x] M4+M5 Breach: same R1 spline waypoints remapped to 2.2s (open 0.8 / tunnel 1.1 /
+      arrival 0.3, measured 2.26s wall incl. input latency), 10 ribbons (1 jade), ghost hex
+      7%, lockup fall 0.5s, whoosh 2.2s. Hub: starfield shell + desaturated FBM nebula
+      wisps ≤3%; corona rebuilt as camera-facing billboard w/ exp falloff + IGN dither
+      (zero banding); core limb-darkened molten ramp; planets +19% (NODE_R 0.19) w/
+      per-planet sunward rim shells; threads vertex-color gradient (bright at core) +
+      pulse-warming; pulses 1.4–2.2s ease-in-out, 9-sample tight comet trails, 3px heads;
+      arc-text DELETED. Anti-overlap: orbits rebuilt co-rotating w/ annular ring
+      separation (nodes.ts), per-ring angular-spacing controller + cross-ring time-shift
+      backstop + rate-bounded spring (orbits.ts); hit areas 56px. OFFICIAL drift audit
+      (shipped solver, 300s@60Hz): minDiscGap +0.227, minCenterSep 0.635 (≈73px) — zero
+      overlaps; 900s headroom +0.119/0.535 (verification/gorgeous/drift-audit.log)
 - [ ] M6 INDEX overlay + EXPLORE chips + arrow-key hops
 - [ ] M8+M9 Twelve jewelry details + sound pass
 - [ ] M10 Verification, evidence in verification/gorgeous/, deploy, production smoke

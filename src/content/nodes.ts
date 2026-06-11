@@ -6,7 +6,10 @@ export interface NodeDef {
   ring: 'inner' | 'outer';
   chip: string;
   role: string;
-  /* orbit parameters — unique per node so the system never looks static or symmetric */
+  /* orbit parameters — unique per node so the system never looks static or symmetric.
+     M5: all prograde (co-rotating) with annular ring separation — counter-rotating
+     bodies on nested ellipses MUST eventually co-locate, which no soft repulsion can
+     prevent (see DECISIONS). Speeds vary so the system still drifts organically. */
   radius: number;
   speed: number;
   phase: number;
@@ -20,10 +23,10 @@ export const NODES: NodeDef[] = [
     ring: 'inner',
     chip: '4 AGENTS · 220 TESTS GREEN · RUNS NIGHTLY',
     role: 'Personal AI Orchestrator',
-    radius: 2.3,
+    radius: 2.2,
     speed: 0.072,
     phase: 0.4,
-    incline: 0.10,
+    incline: 0.05,
   },
   {
     id: 'luven',
@@ -31,10 +34,10 @@ export const NODES: NodeDef[] = [
     ring: 'inner',
     chip: 'FIRST SALE $994 · 770+ WORKFLOW NODES',
     role: 'Founder — AI voice receptionist for the trades',
-    radius: 2.55,
-    speed: -0.058,
+    radius: 2.4,
+    speed: 0.058,
     phase: 1.9,
-    incline: -0.14,
+    incline: -0.04,
   },
   {
     id: 'emerge',
@@ -42,10 +45,10 @@ export const NODES: NodeDef[] = [
     ring: 'inner',
     chip: '4 PRODUCTION AGENTS · A SEMINAR FOR 15 CEOS',
     role: 'APM & Solutions Engineer',
-    radius: 2.42,
+    radius: 2.62,
     speed: 0.064,
     phase: 3.5,
-    incline: 0.07,
+    incline: 0.04,
   },
   {
     id: 'dolomite',
@@ -53,10 +56,10 @@ export const NODES: NodeDef[] = [
     ring: 'inner',
     chip: 'ALL PROJECTS · ONE COMMAND PLANE',
     role: 'Mission Control',
-    radius: 2.68,
-    speed: -0.080,
+    radius: 2.85,
+    speed: 0.08,
     phase: 5.1,
-    incline: -0.09,
+    incline: -0.04,
   },
   {
     id: 'everclash',
@@ -64,10 +67,10 @@ export const NODES: NodeDef[] = [
     ring: 'outer',
     chip: '10 FIGHTERS · 8-PLAYER FFA · IN BROWSER',
     role: '2D PvP Fighter',
-    radius: 4.05,
+    radius: 4.1,
     speed: 0.042,
     phase: 0.9,
-    incline: 0.16,
+    incline: 0.07,
   },
   {
     id: 'voxhalla',
@@ -75,10 +78,10 @@ export const NODES: NodeDef[] = [
     ring: 'outer',
     chip: '6V6 · 10 CHAMPIONS · NO ENGINE',
     role: 'Voxel Hero Shooter',
-    radius: 4.35,
-    speed: -0.035,
+    radius: 4.42,
+    speed: 0.035,
     phase: 2.4,
-    incline: -0.12,
+    incline: -0.06,
   },
   {
     id: 'bigback',
@@ -86,10 +89,10 @@ export const NODES: NodeDef[] = [
     ring: 'outer',
     chip: 'CHAT-FIRST · TRADEMARK FILED · bigback.fit',
     role: 'AI Fitness',
-    radius: 3.85,
-    speed: 0.050,
+    radius: 4.14,
+    speed: 0.05,
     phase: 4.0,
-    incline: 0.08,
+    incline: 0.05,
   },
   {
     id: 'beyond',
@@ -97,10 +100,10 @@ export const NODES: NodeDef[] = [
     ring: 'outer',
     chip: 'SPRINT TRI DONE · 70.3 IN TRAINING · 1 BETTA FISH',
     role: 'The Person',
-    radius: 4.2,
-    speed: -0.046,
+    radius: 4.28,
+    speed: 0.046,
     phase: 5.6,
-    incline: -0.06,
+    incline: -0.045,
   },
 ];
 

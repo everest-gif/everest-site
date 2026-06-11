@@ -148,3 +148,19 @@
 44. **Skip-intro returned to bottom-right; the season control owns bottom-left.** GORGEOUS_PASS
     M3 sites the seasons "bottom-left opposite skip-intro"; smoke screenshots show no cursor
     collision at br (the R6 worry) now that the control there is plain text.
+45. **Hub orbits rebuilt co-rotating with annular ring separation (M5).** The old mix of
+    prograde/retrograde planets on nested ellipses is geometrically un-fixable: counter-rotating
+    bodies whose projected orbits sit closer than the required separation at EVERY angle must
+    eventually co-locate — no soft repulsion can manufacture radial room from angular offsets
+    (jarvis·luven hit disc-gap −0.43 in the first audit). New data: all speeds prograde, inner
+    ring 2.2–2.85 / outer 4.1–4.42 with small inclines so the projected annuli clear each other,
+    plus a solver (orbits.ts): per-ring minimum ANGULAR spacing on the ellipse's minor-axis
+    metric, cross-ring projected-proximity time-shift backstop, and a rate-capped spring-back —
+    a proportional decay grew with the offsets until it dragged planets back through each other
+    at t≈800s (the "snowplow" failure). Audit: 300s/60Hz minDiscGap +0.227, 900s +0.119.
+46. **Drag-orbit z-parallax now comes mostly from the backdrop starfield** — the flatter
+    inclines that guarantee ring separation reduced planet z-spread; the new 26–70-unit star
+    shell restores depth on the lean.
+47. **Nebula is texture, not backdrop** — 6% additive over near-black ink reads as double the
+    background luminance; shipped at 3% with high-threshold wisps and colors pulled half-way
+    to ink. The directive's "≤6%" is honored as a ceiling, not a target.
