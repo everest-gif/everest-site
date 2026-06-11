@@ -34,7 +34,7 @@ void main() {
   vec3 l = normalize(vec3(0.55, 0.62, 0.56));
   float w = clamp(dot(n, l) * 0.62 + 0.38, 0.0, 1.0); /* soft wrap lambert */
   float hot = w * w;
-  vec3 lit = mix(AMBER * 0.92, mix(AMBER, BONE, 0.30) * 1.16, hot);
+  vec3 lit = mix(AMBER * 0.92, mix(AMBER, BONE, 0.22) * 0.98, hot); /* warm, never white-hot at chamber range */
   vec3 col = mix(AMBER * 0.05, lit, w);
   float f = 1.0 - clamp(dot(n, v), 0.0, 1.0);
   col += AMBER * (f * f * 0.42); /* gentle fresnel rim */

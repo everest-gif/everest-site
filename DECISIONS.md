@@ -96,3 +96,15 @@
     builds; the scrub stepper runs INSIDE the page on a fixed clock (post-Enter CDP evaluates
     proved flaky) and node screenshots on absolute deadlines (relative waits drifted a full step
     by stop 4). Occluded headed windows throttle the compositor — bringToFront before captures.
+33. **R3 chamber camera approaches from core-side + viewer-side, looking OUTWARD** — the rest
+    of the system ends up behind the lens, so the content column sits over empty space and the
+    sun can never glow behind text. The camera TRACKS the planet live (it keeps orbiting);
+    chamber framing is therefore a moving target the rig chases, not a fixed pose.
+34. **Mini-orchestrator widget deleted (R3 judgment call).** Its job was keeping the system
+    visibly alive while the canvas was paused under an opaque chamber. The chamber now renders
+    the live planet + system the whole visit, so the widget was a competing, redundant
+    miniature. With it goes the §8 RAF pause: canvasCovered is no longer set by chambers
+    (hub held ~145fps, the budget survives).
+35. **Chamber content legibility comes from a clean ink gradient, not blur** — the banned
+    blurred-hub backdrop is fully deleted; `.chamber-panel::before` darkens the right column
+    only (transparent over the planet's left third).

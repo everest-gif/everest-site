@@ -50,6 +50,11 @@ export interface ScreenAnchor {
 export const nodeScreens: Record<string, ScreenAnchor> = {};
 export const coreScreen: ScreenAnchor = { x: 0, y: 0, scale: 1, visible: false, reveal: 0 };
 
+/* Live planet world positions + visual radii (R3 flight targets) — written by HubWorld
+   every frame, read by the camera rig. Mutated in place, never reallocated. */
+export const nodeWorld: Record<string, THREE.Vector3> = {};
+export const nodeRadius: Record<string, number> = {};
+
 /* World layout. The tunnel lives in THRESHOLD space, bored into the mountain behind the
    ridge seam — the breach camera physically flies into it (R1.1: one unbroken shot).
    Only the hub remains a separate pocket, reached inside the 120ms arrival light-wrap. */

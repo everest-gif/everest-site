@@ -18,6 +18,20 @@
 - [x] Phase exit ritual (typecheck ✓ build ✓ recordings clean ✓ commit)
 - NOTE: arrival teleport carries a ~30–50ms task (lockup unmount + HubOverlay mount) fully inside the amber wrap — invisible; in-flight is 0 frames over budget.
 
+## R2 — Hub solar system  [DONE]
+- [x] Core sun: domain-warped churn + granulation + sunspots + limb corona (54bpm kept)
+- [x] 8 planet identity modules (src/scene/planets/, shared PlanetBuild contract) — 6 by parallel agents, everclash+beyond by main session (agents died on spend limit); bigback arc tube was sub-pixel → 0.05
+- [x] Pulse traffic heads+trails; labels alternate above/below (lab-above); arc-text hemisphere flip (no mirrored text); drag-orbit ±12° w/ slow spring-back (z-spread deepened or the lean read as nothing)
+- [x] Identity check ≥6/8 from visuals (verification/r2/after/close-*.png)
+
+## R3 — Fly to the planet  [DONE]
+- [x] Click → 0.95s curved flight (scene/flight.ts quad-bezier, live target — planet keeps orbiting; camera then TRACKS it); content scan-line reveal after landing
+- [x] Planet = live chamber hero, left third; content right 2/3 over clean ink gradient; .chamber-scrim (blurred-hub backdrop) DELETED
+- [x] Planet-to-planet rail (← prev · next →): de-rez → 1.15s arc past the core (FOV widens — whole-system glimpse) → materialize; both directions; hash stays synced via router
+- [x] Esc / [← hub] flies back out (settle path); Esc mid-flight aborts clean; deep links open at the planet (no flight)
+- [x] Mini-orchestrator DELETED (judgment call → DECISIONS #34); canvasCovered no longer set (planet renders all visit)
+- [x] Reduced motion: no flights, instant swaps, static planets
+
 ## P0 — Scaffold  [IN PROGRESS]
 - [x] git init (branch `main`)
 - [x] package.json — locked stack, versions verified against registry (fiber 8.18 / drei 9.122 / three 0.170 / gsap 3.15)

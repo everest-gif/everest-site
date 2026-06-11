@@ -56,6 +56,7 @@ interface AppState {
   beginReverseBreach: () => void;
   arriveThreshold: () => void;
   openChamber: (id: NodeId) => void;
+  hopChamber: (id: NodeId) => void;
   closeChamber: () => void;
   skipToHub: () => void;
   gotoThreshold: () => void;
@@ -119,6 +120,10 @@ export const useStore = create<AppState>((set, get) => ({
   openChamber: (id) => {
     if (get().act !== 'hub') return;
     set({ act: 'chamber', chamber: id, hovered: null });
+  },
+  hopChamber: (id) => {
+    if (get().act !== 'chamber' || get().chamber === id) return;
+    set({ chamber: id, hovered: null });
   },
   closeChamber: () => {
     if (get().act !== 'chamber') return;

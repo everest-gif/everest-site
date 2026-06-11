@@ -594,26 +594,80 @@ a {
   inset: 0;
   z-index: var(--z-chamber);
 }
-.chamber-scrim {
-  position: absolute;
-  inset: 0;
-  background: rgba(10, 10, 12, 0.55);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  opacity: 0;
-}
 .chamber-panel {
   position: absolute;
   inset: 0;
   visibility: hidden; /* gsap reveals via clip + autoAlpha */
   outline: none;
 }
-.chamber-scroll {
+/* R3/R4 — the blurred-hub backdrop is deleted; the live planet owns the left third.
+   A clean ink gradient (no blur) keeps the content column legible over the canvas. */
+.chamber-panel::before {
+  content: '';
   position: absolute;
   inset: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(10, 10, 12, 0) 0%,
+    rgba(10, 10, 12, 0.12) 30vw,
+    rgba(10, 10, 12, 0.86) 44vw,
+    rgba(10, 10, 12, 0.92) 100%
+  );
+  pointer-events: none;
+}
+.chamber-scroll {
+  position: absolute;
+  inset: 0 0 0 33vw;
   overflow-y: auto;
   overflow-x: hidden;
   scrollbar-width: none;
+}
+/* planet-to-planet rail (R3) */
+.chamber-rail {
+  position: absolute;
+  left: 16.5vw;
+  bottom: 26px;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  color: var(--dim);
+  white-space: nowrap;
+}
+.chamber-rail button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--dim);
+  transition: color var(--t-micro) var(--ease-out);
+}
+.chamber-rail button:hover,
+.chamber-rail button:focus-visible {
+  color: var(--amber);
+}
+.chamber-rail .rail-glyph {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  border: 1px solid currentColor;
+  display: inline-block;
+}
+.rail-sep {
+  opacity: 0.5;
+}
+@media (max-width: 900px) {
+  .chamber-scroll {
+    inset: 0;
+  }
+  .chamber-panel::before {
+    background: rgba(10, 10, 12, 0.78);
+  }
+  .chamber-rail {
+    left: 50%;
+  }
 }
 .chamber-scroll::-webkit-scrollbar {
   display: none;
@@ -843,39 +897,6 @@ a {
   .ch-ph,
   .ch-ph-scan {
     animation: none;
-  }
-}
-
-/* ---------- mini orchestrator widget ---------- */
-.mini-orch {
-  position: absolute;
-  left: 24px;
-  bottom: 52px;
-  width: 148px;
-  height: 148px;
-  border: 1px solid var(--hairline);
-  background: rgba(17, 17, 20, 0.85);
-  opacity: 0;
-  pointer-events: auto;
-}
-.mini-orch canvas {
-  display: block;
-}
-.mini-orch-label {
-  position: absolute;
-  right: 6px;
-  bottom: 4px;
-  font-family: var(--font-mono);
-  font-size: 9px;
-  letter-spacing: 0.18em;
-  color: var(--dim);
-}
-.mini-orch:hover {
-  border-color: rgba(232, 162, 61, 0.5);
-}
-@media (max-width: 640px) {
-  .mini-orch {
-    display: none;
   }
 }
 

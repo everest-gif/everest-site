@@ -4,7 +4,7 @@ import { useFrame, useThree } from '@react-three/fiber';
 import gsap from 'gsap';
 import { useStore, type NodeId } from '../state/store';
 import { NODES, SECTORS } from '../content/nodes';
-import { nodeScreens, coreScreen, HUB_Y, AMBER, JADE } from './handles';
+import { nodeScreens, coreScreen, nodeWorld, nodeRadius, HUB_Y, AMBER, JADE } from './handles';
 import { coreVert, coreFrag, coronaVert, coronaFrag, pulseTrafficVert, pulseTrafficFrag } from './shaders/hub';
 import type { PlanetBuild } from './planets/types';
 import { makePlanet as makeJarvis } from './planets/jarvis';
@@ -251,13 +251,15 @@ export default function HubWorld() {
 
   /* ---------- per-frame simulation ---------- */
   useFrame((state, dt) => {
-    const { hovered, reducedMotion } = useStore.getState();
+    const { hovered, reducedMotion, chamber, act: actNow } = useStore.getState();
     /* reduced motion: planets render static (R3) — freeze the clock they see */
     const t = reducedMotion ? 7.3 : state.clock.elapsedTime;
     core.mat.uniforms.uTime.value = t;
     core.coronaMat.uniforms.uTime.value = t;
 
-    const hoveredIdx = hovered ? NODES.findIndex((n) => n.id === hovered) : -1;
+    /* hover targets the hovered node; an open chamber keeps its planet fully lit + lively */
+    const focusId = actNow === 'chamber' ? chamber : hovered;
+    const hoveredIdx = focusId ? NODES.findIndex((n) => n.id === focusId) : -1;
 
     /* orbits */
     for (let i = 0; i < NODES.length; i++) {
@@ -272,21 +274,32 @@ export default function HubWorld() {
       _nodePos[i].set(x, y, z);
 
       const ease = hoverEase.current[i];
-      ease.active += ((hoveredIdx === i ? 1 : 0) - ease.active) * 0.15;
+      /* chamber hero stays lively but not maxed — close range amplifies everything */
+      const activeTarget = hoveredIdx === i ? (actNow === 'chamber' ? 0.7 : 1) : 0;
+      ease.active += (activeTarget - ease.active) * 0.15;
       ease.dim += ((hoveredIdx !== -1 && hoveredIdx !== i ? 1 : 0) - ease.dim) * 0.15;
 
       const p = planets[i];
       p.group.position.copy(_nodePos[i]);
-      /* hover: planet scales 1.15× (R2.3) */
-      const sc = Math.max(0.0001, reveals[i].value) * NODE_R * p.baseScale * (1 + ease.active * 0.15);
+      /* hover: planet scales 1.15× (R2.3) — not while it is the chamber hero */
+      const hoverScale = actNow === 'chamber' ? 1 : 1 + ease.active * 0.15;
+      const sc = Math.max(0.0001, reveals[i].value) * NODE_R * p.baseScale * hoverScale;
       p.group.scale.setScalar(sc);
       p.update(t, dt, ease.active, ease.dim, reveals[i].value);
+      /* live world position for the flight rig (R3) */
+      const nw = nodeWorld[NODES[i].id];
+      if (nw && groupRef.current) {
+        nw.copy(_nodePos[i]);
+        groupRef.current.localToWorld(nw);
+      }
 
       /* thread endpoint */
       const tp = threads[i].g.getAttribute('position') as THREE.BufferAttribute;
       tp.setXYZ(1, x, y, z);
       tp.needsUpdate = true;
-      const baseOp = hoveredIdx === i ? 0.85 : hoveredIdx !== -1 ? 0.07 : 0.16;
+      /* in a chamber the bright thread would slice the hero shot — keep it a whisper */
+      const hotOp = actNow === 'chamber' ? 0.22 : 0.85;
+      const baseOp = hoveredIdx === i ? hotOp : hoveredIdx !== -1 ? 0.07 : 0.16;
       threads[i].m.opacity += (baseOp * reveals[i].value - threads[i].m.opacity) * 0.18;
     }
 
@@ -374,12 +387,15 @@ export default function HubWorld() {
     }
   });
 
-  /* register anchors once */
+  /* register anchors + flight bridges once */
   useEffect(() => {
-    for (const n of NODES) {
+    for (let i = 0; i < NODES.length; i++) {
+      const n = NODES[i];
       nodeScreens[n.id] = nodeScreens[n.id] ?? { x: 0, y: 0, scale: 1, visible: false, reveal: 0 };
+      nodeWorld[n.id] = nodeWorld[n.id] ?? new THREE.Vector3();
+      nodeRadius[n.id] = NODE_R * planets[i].baseScale;
     }
-  }, []);
+  }, [planets]);
 
   return (
     <group ref={groupRef} position={[0, HUB_Y, 0]} visible={visible}>

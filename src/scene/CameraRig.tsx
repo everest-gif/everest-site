@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import { useFrame, useThree } from '@react-three/fiber';
 import { useStore } from '../state/store';
 import { handles, HUB_Y } from './handles';
-import { chamberFocus } from '../chambers/control';
+import { flightState, chamberCam, quadBez } from './flight';
 
 /* Camera homes per stable act. The breach timelines own the camera during transit. */
 const HOMES = {
@@ -23,6 +23,9 @@ const _offset = new THREE.Vector3();
 const _center = new THREE.Vector3();
 const _yAxis = new THREE.Vector3(0, 1, 0);
 const _xAxis = new THREE.Vector3(1, 0, 0);
+const _cPos = new THREE.Vector3();
+const _cLook = new THREE.Vector3();
+const _curLook = new THREE.Vector3(0, HUB_Y, 0);
 
 export default function CameraRig() {
   const camera = useThree((s) => s.camera) as THREE.PerspectiveCamera;
@@ -96,8 +99,29 @@ export default function CameraRig() {
   }, []);
 
   useFrame((_, dt) => {
-    const { act, reducedMotion } = useStore.getState();
+    const { act, chamber, reducedMotion } = useStore.getState();
     if (act === 'breach' || act === 'reverse-breach') return; // timeline owns the camera
+
+    /* R3 — chamber: the camera flies to and then tracks the live planet */
+    if (act === 'chamber' && chamber && chamberCam(chamber, camera, _cPos, _cLook)) {
+      if (flightState.mode === 'fly' && !reducedMotion) {
+        quadBez(flightState.from, flightState.ctrl, _cPos, flightState.u, _pos);
+        _look.lerpVectors(flightState.fromLook, _cLook, flightState.u);
+        /* hops widen the lens mid-arc — glimpse the whole system */
+        const widen = flightState.kind === 'hop' ? 13 : 4;
+        camera.fov = HOMES.hub.fov + Math.sin(flightState.u * Math.PI) * widen;
+      } else {
+        const k = reducedMotion ? 1 : 1 - Math.exp(-dt * 6);
+        _pos.copy(camera.position).lerp(_cPos, k);
+        _look.copy(_curLook).lerp(_cLook, k);
+        camera.fov += (HOMES.hub.fov - camera.fov) * k;
+      }
+      camera.position.copy(_pos);
+      _curLook.copy(_look);
+      camera.lookAt(_look);
+      camera.updateProjectionMatrix();
+      return;
+    }
 
     const home = act === 'hub' || act === 'chamber' ? HOMES.hub : HOMES.threshold;
 
@@ -137,21 +161,14 @@ export default function CameraRig() {
       _pos.sub(_center).applyAxisAngle(_yAxis, o.yaw).applyAxisAngle(_xAxis, o.pitch).add(_center);
     }
 
-    /* chamber handoff (§2 Act IV.2): camera pushes toward the opened node */
-    if (act === 'chamber' && chamberFocus.id) {
-      _pos.x += chamberFocus.localX * 0.16;
-      _pos.y += chamberFocus.localY * 0.16;
-      _pos.z -= 1.1;
-      _look.x += chamberFocus.localX * 0.3;
-      _look.y += chamberFocus.localY * 0.3;
-    }
-
-    /* settle toward home (covers act switches without a timeline, e.g. skip intro) */
+    /* settle toward home (covers act switches without a timeline, e.g. skip intro,
+       and the fly-back-out after a chamber closes) */
     const settle = 1 - Math.exp(-dt * 4.5);
     camera.position.lerp(_pos, settle);
     camera.fov += (home.fov - camera.fov) * settle;
     camera.updateProjectionMatrix();
-    camera.lookAt(_look);
+    _curLook.lerp(_look, settle);
+    camera.lookAt(act === 'hub' ? _curLook : _look);
   });
 
   return null;

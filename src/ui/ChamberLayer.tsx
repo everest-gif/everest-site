@@ -2,10 +2,10 @@ import { useEffect, useMemo, useRef, useState, type ComponentType } from 'react'
 import gsap from 'gsap';
 import Lenis from 'lenis';
 import { useStore, type NodeId } from '../state/store';
-import { NODE_MAP } from '../content/nodes';
-import { nodeScreens } from '../scene/handles';
-import { chamberControl, chamberFocus } from '../chambers/control';
-import MiniOrchestrator from './MiniOrchestrator';
+import { NODES, NODE_MAP } from '../content/nodes';
+import { nodeScreens, handles } from '../scene/handles';
+import { beginFlight, endFlight, FLY_IN_S, FLY_HOP_S } from '../scene/flight';
+import { chamberControl } from '../chambers/control';
 import Jarvis from '../chambers/Jarvis';
 import Luven from '../chambers/Luven';
 import Emerge from '../chambers/Emerge';
@@ -26,11 +26,89 @@ const CHAMBERS: Record<NodeId, ComponentType> = {
   beyond: Beyond,
 };
 
+/* R3 — travel, not page swaps. Click → camera flight (~0.95s) → content materializes
+   beside the live planet. Hops de-rez the content, arc the camera across the system
+   (~1.15s, past the core), then materialize the next chamber. The planet IS the hero:
+   the canvas keeps rendering for the whole visit — no scrim, no blurred backdrop. */
 export default function ChamberLayer() {
   const act = useStore((s) => s.act);
   const chamber = useStore((s) => s.chamber);
-  if (act !== 'chamber' || !chamber) return null;
-  return <ChamberStage key={chamber} id={chamber} />;
+  const [shown, setShown] = useState<NodeId | null>(null);
+  const [open, setOpen] = useState(false);
+  const lastAct = useRef(act);
+  const busy = useRef(false);
+  /* persists across setShown re-renders — effect cleanup must NOT clear it mid-flight */
+  const timer = useRef<number | null>(null);
+
+  useEffect(() => {
+    const prevAct = lastAct.current;
+    lastAct.current = act;
+
+    if (act !== 'chamber' || !chamber) {
+      if (timer.current !== null) {
+        window.clearTimeout(timer.current);
+        timer.current = null;
+      }
+      setShown(null);
+      setOpen(false);
+      busy.current = false;
+      endFlight();
+      return;
+    }
+
+    const reduced = useStore.getState().reducedMotion;
+    const land = () => {
+      timer.current = null;
+      setOpen(true);
+      busy.current = false;
+    };
+
+    if (!shown) {
+      /* entering — from the hub (fly) or a deep link (camera is already being homed) */
+      setShown(chamber);
+      if (reduced || prevAct !== 'hub' || !handles.camera) {
+        setOpen(true);
+        return;
+      }
+      busy.current = true;
+      beginFlight('in', handles.camera);
+      timer.current = window.setTimeout(land, FLY_IN_S * 1000 + 40);
+      return;
+    }
+
+    if (chamber !== shown && !busy.current) {
+      /* planet-to-planet hop */
+      busy.current = true;
+      const fly = () => {
+        setOpen(false);
+        setShown(chamber);
+        if (reduced || !handles.camera) {
+          setOpen(true);
+          busy.current = false;
+          return;
+        }
+        beginFlight('hop', handles.camera);
+        timer.current = window.setTimeout(land, FLY_HOP_S * 1000 + 40);
+      };
+      if (!reduced && chamberControl.derez) chamberControl.derez(fly);
+      else fly();
+    }
+  }, [act, chamber, shown]);
+
+  /* Esc mid-flight (no stage mounted yet) aborts to the hub */
+  useEffect(() => {
+    if (act !== 'chamber' || open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return;
+      endFlight();
+      useStore.getState().closeChamber();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [act, open]);
+
+  if (act !== 'chamber' || !shown || !open) return null;
+  return <ChamberStage key={shown} id={shown} />;
 }
 
 function ChamberStage({ id }: { id: NodeId }) {
@@ -40,83 +118,52 @@ function ChamberStage({ id }: { id: NodeId }) {
   const [closing, setClosing] = useState(false);
   const Content = CHAMBERS[id];
 
-  /* snapshot the node's screen position once — the scan-line origin (§2 Act IV.3) */
+  /* the scan-line reveal originates at the planet's limb — it sits at the left third now */
   const origin = useMemo(() => {
     const a = nodeScreens[id];
     const valid = a && a.visible && a.reveal > 0.2;
-    const x = valid ? a.x : window.innerWidth / 2;
     const y = valid ? a.y : window.innerHeight / 2;
-    const n = NODE_MAP[id];
-    chamberFocus.id = id;
-    chamberFocus.screenX = x;
-    chamberFocus.screenY = y;
-    chamberFocus.localX = Math.cos(n.phase) * n.radius;
-    chamberFocus.localY = Math.sin(n.phase) * n.radius * 0.6;
-    chamberFocus.localZ = 0;
-    return { x, y, pct: (y / window.innerHeight) * 100 };
+    return { pct: (y / window.innerHeight) * 100 };
   }, [id]);
 
-  /* open sequence: isolation (0.3) → handoff (0.4) → materialization (0.4) */
   useEffect(() => {
     const st = useStore.getState();
-    st.setHovered(id); /* isolation: chosen node + thread surge, others dim */
     const root = rootRef.current;
     const panel = panelRef.current;
     if (!root || !panel) return;
     const reduced = st.reducedMotion;
     const beams = root.querySelectorAll<HTMLElement>('.chamber-beam');
     const scan = root.querySelector<HTMLElement>('.chamber-scanlines');
-    const widget = root.querySelector<HTMLElement>('.mini-orch');
 
     if (reduced) {
       gsap.set(panel, { clipPath: 'inset(0% 0 0% 0)', autoAlpha: 1 });
-      gsap.set(root.querySelector('.chamber-scrim'), { autoAlpha: 1 });
-      if (widget) gsap.set(widget, { autoAlpha: 1, scale: 1, x: 0, y: 0 });
-      useStore.getState().setCanvasCovered(true);
       panel.focus({ preventScroll: true });
-      return () => {
-        useStore.getState().setCanvasCovered(false);
-        useStore.getState().setHovered(null);
-      };
+      return;
     }
 
     const topPct = origin.pct;
     const tl = gsap.timeline();
-    /* phase 1 — isolation: the scene itself dims via hub hover logic; scrim eases in */
-    tl.fromTo(root.querySelector('.chamber-scrim'), { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.42, ease: 'power2.inOut' }, 0)
-      /* phase 2 — handoff: orchestrator collapses into the dock widget */
-      .fromTo(
-        widget,
-        { autoAlpha: 0, scale: 2.6, x: () => window.innerWidth / 2 - 100, y: () => -window.innerHeight / 2 + 130 },
-        { autoAlpha: 1, scale: 1, x: 0, y: 0, duration: 0.45, ease: 'power3.inOut' },
-        0.28,
-      )
-      /* phase 3 — materialization: CRT scan from the node's y — never a slide-up fade */
-      .set(panel, { autoAlpha: 1 }, 0.68)
+    tl.set(panel, { autoAlpha: 1 }, 0.04)
       .fromTo(
         panel,
         { clipPath: `inset(${topPct}% 0 ${100 - topPct}% 0)` },
         { clipPath: 'inset(0% 0 0% 0)', duration: 0.42, ease: 'power3.out' },
-        0.7,
+        0.06,
       )
-      .fromTo(beams[0], { top: `${topPct}%`, autoAlpha: 1 }, { top: '0%', duration: 0.42, ease: 'power3.out' }, 0.7)
-      .fromTo(beams[1], { top: `${topPct}%`, autoAlpha: 1 }, { top: '100%', duration: 0.42, ease: 'power3.out' }, 0.7)
-      .to(beams, { autoAlpha: 0, duration: 0.18 }, 1.12)
-      .fromTo(scan, { autoAlpha: 0.45 }, { autoAlpha: 0, duration: 0.5, ease: 'power1.out' }, 1.0)
+      .fromTo(beams[0], { top: `${topPct}%`, autoAlpha: 1 }, { top: '0%', duration: 0.42, ease: 'power3.out' }, 0.06)
+      .fromTo(beams[1], { top: `${topPct}%`, autoAlpha: 1 }, { top: '100%', duration: 0.42, ease: 'power3.out' }, 0.06)
+      .to(beams, { autoAlpha: 0, duration: 0.18 }, 0.48)
+      .fromTo(scan, { autoAlpha: 0.45 }, { autoAlpha: 0, duration: 0.5, ease: 'power1.out' }, 0.36)
       .add(() => {
-        /* single RGB-split flicker on the marginalia as the chamber locks in (≤80ms) */
         panel.classList.add('is-flick');
         gsap.delayedCall(0.08, () => panel.classList.remove('is-flick'));
-      }, 1.08)
+      }, 0.44)
       .add(() => {
-        useStore.getState().setCanvasCovered(true);
         panel.focus({ preventScroll: true });
-      }, 1.12);
+      }, 0.5);
 
     return () => {
       tl.kill();
-      useStore.getState().setCanvasCovered(false);
-      useStore.getState().setHovered(null);
     };
   }, [id, origin]);
 
@@ -135,33 +182,36 @@ function ChamberStage({ id }: { id: NodeId }) {
     };
   }, [id]);
 
-  /* close = de-rez back into the node, then hand the act back to the hub */
+  /* de-rez (shared by close and hop): content collapses back toward the planet's limb */
   useEffect(() => {
-    const close = () => {
-      if (closing) return;
-      setClosing(true);
+    const derez = (onDone: () => void) => {
       const st = useStore.getState();
-      st.setCanvasCovered(false); /* hub resumes behind the de-rez */
       const panel = panelRef.current;
       const root = rootRef.current;
       if (st.reducedMotion || !panel || !root) {
-        st.closeChamber();
+        onDone();
         return;
       }
       const topPct = origin.pct;
       const beams = root.querySelectorAll<HTMLElement>('.chamber-beam');
       gsap
-        .timeline({ onComplete: () => useStore.getState().closeChamber() })
+        .timeline({ onComplete: onDone })
         .set(beams, { autoAlpha: 1 }, 0)
-        .to(beams[0], { top: `${topPct}%`, duration: 0.34, ease: 'power3.in' }, 0)
-        .to(beams[1], { top: `${topPct}%`, duration: 0.34, ease: 'power3.in' }, 0)
-        .to(panel, { clipPath: `inset(${topPct}% 0 ${100 - topPct}% 0)`, duration: 0.34, ease: 'power3.in' }, 0)
-        .to(panel, { autoAlpha: 0, duration: 0.08 }, 0.34)
-        .to(beams, { autoAlpha: 0, duration: 0.12 }, 0.36)
-        .to(root.querySelector('.chamber-scrim'), { autoAlpha: 0, duration: 0.3, ease: 'power2.out' }, 0.3)
-        .to(root.querySelector('.mini-orch'), { autoAlpha: 0, scale: 1.6, duration: 0.3, ease: 'power2.in' }, 0.2);
+        .to(beams[0], { top: `${topPct}%`, duration: 0.32, ease: 'power3.in' }, 0)
+        .to(beams[1], { top: `${topPct}%`, duration: 0.32, ease: 'power3.in' }, 0)
+        .to(panel, { clipPath: `inset(${topPct}% 0 ${100 - topPct}% 0)`, duration: 0.32, ease: 'power3.in' }, 0)
+        .to(panel, { autoAlpha: 0, duration: 0.08 }, 0.32)
+        .to(beams, { autoAlpha: 0, duration: 0.12 }, 0.34);
     };
+
+    const close = () => {
+      if (closing) return;
+      setClosing(true);
+      derez(() => useStore.getState().closeChamber());
+    };
+
     chamberControl.close = close;
+    chamberControl.derez = derez;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') close();
     };
@@ -169,15 +219,17 @@ function ChamberStage({ id }: { id: NodeId }) {
     return () => {
       window.removeEventListener('keydown', onKey);
       chamberControl.close = null;
-      chamberFocus.id = null;
+      chamberControl.derez = null;
     };
   }, [closing, origin]);
 
   const node = NODE_MAP[id];
+  const idx = NODES.findIndex((n) => n.id === id);
+  const prev = NODES[(idx + NODES.length - 1) % NODES.length];
+  const next = NODES[(idx + 1) % NODES.length];
 
   return (
     <div className="chamber" ref={rootRef} data-chamber={id}>
-      <div className="chamber-scrim" aria-hidden="true" />
       <div
         className="chamber-panel"
         ref={panelRef}
@@ -197,10 +249,31 @@ function ChamberStage({ id }: { id: NodeId }) {
           </div>
         </div>
         <div className="chamber-scanlines" aria-hidden="true" />
+        {/* planet-to-planet rail — exploration without returning to the overview (R3) */}
+        <nav className="chamber-rail" aria-label="Neighbouring chambers">
+          <button
+            type="button"
+            data-cursor="node"
+            onClick={() => useStore.getState().hopChamber(prev.id)}
+            aria-label={`Travel to ${prev.label}`}
+          >
+            ← <span className="rail-glyph" aria-hidden="true" /> {prev.label}
+          </button>
+          <span className="rail-sep" aria-hidden="true">
+            ·
+          </span>
+          <button
+            type="button"
+            data-cursor="node"
+            onClick={() => useStore.getState().hopChamber(next.id)}
+            aria-label={`Travel to ${next.label}`}
+          >
+            {next.label} <span className="rail-glyph" aria-hidden="true" /> →
+          </button>
+        </nav>
       </div>
       <div className="chamber-beam" aria-hidden="true" />
       <div className="chamber-beam" aria-hidden="true" />
-      <MiniOrchestrator active={id} />
     </div>
   );
 }

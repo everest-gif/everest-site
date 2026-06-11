@@ -1,0 +1,103 @@
+import * as THREE from 'three';
+import gsap from 'gsap';
+import type { NodeId } from '../state/store';
+import { nodeWorld, nodeRadius, HUB_Y } from './handles';
+
+/* R3 — travel. Click flies the camera to the planet (~0.95s curved path); hops fly
+   ACROSS the system past the core (~1.15s). After landing the rig tracks the planet
+   live ('track'), so it keeps orbiting and breathing as the chamber hero. */
+
+export const flightState = {
+  mode: 'idle' as 'idle' | 'fly' | 'track',
+  kind: 'in' as 'in' | 'hop',
+  u: 0,
+  from: new THREE.Vector3(),
+  fromLook: new THREE.Vector3(),
+  ctrl: new THREE.Vector3(),
+};
+
+export const FLY_IN_S = 0.95;
+export const FLY_HOP_S = 1.15;
+
+const _core = new THREE.Vector3(0, HUB_Y, 0);
+const _out = new THREE.Vector3();
+const _mid = new THREE.Vector3();
+const _fwd = new THREE.Vector3();
+
+/* chamber framing: camera core-side + viewer-side of the planet looking outward, so the
+   system stays behind the lens and the right two-thirds is clean space for content.
+   The look target is pushed right so the planet anchors the LEFT third. */
+export function chamberCam(
+  id: NodeId,
+  camera: THREE.PerspectiveCamera,
+  outPos: THREE.Vector3,
+  outLook: THREE.Vector3,
+): boolean {
+  const p = nodeWorld[id];
+  if (!p) return false;
+  const r = nodeRadius[id] ?? 0.16;
+  const dist = r * 5.4;
+  _out.copy(p).sub(_core);
+  _out.z = 0;
+  if (_out.lengthSq() < 1e-6) _out.set(1, 0, 0);
+  _out.normalize();
+  outPos
+    .copy(p)
+    .addScaledVector(_out, -dist * 0.42)
+    .add(_mid.set(0, dist * 0.16, dist * 0.92));
+  /* push the look right of the planet → planet lands at NDC x ≈ −0.5 */
+  const tanH = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * camera.aspect;
+  const tanV = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
+  _fwd.copy(p).sub(outPos).normalize();
+  _mid.crossVectors(_fwd, _out.set(0, 1, 0)).normalize(); /* camera-right */
+  outLook
+    .copy(p)
+    .addScaledVector(_mid, tanH * dist * 0.44)
+    .y -= tanV * dist * 0.07;
+  return true;
+}
+
+let tween: gsap.core.Tween | null = null;
+
+export function beginFlight(kind: 'in' | 'hop', camera: THREE.PerspectiveCamera) {
+  tween?.kill();
+  const f = flightState;
+  f.kind = kind;
+  f.mode = 'fly';
+  f.u = 0;
+  f.from.copy(camera.position);
+  camera.getWorldDirection(_fwd);
+  f.fromLook.copy(camera.position).addScaledVector(_fwd, 8);
+  if (kind === 'hop') {
+    /* arc past the core — you glimpse the whole system mid-flight */
+    f.ctrl.copy(_core).add(_mid.set(0, 0.4, 3.1));
+  } else {
+    f.ctrl.copy(f.from).lerp(_core, 0.45).add(_mid.set(0, 0.5, 1.6));
+  }
+  tween = gsap.to(f, {
+    u: 1,
+    duration: kind === 'hop' ? FLY_HOP_S : FLY_IN_S,
+    ease: 'power2.inOut',
+    onComplete: () => {
+      f.mode = 'track';
+    },
+  });
+}
+
+export function endFlight() {
+  tween?.kill();
+  tween = null;
+  flightState.mode = 'idle';
+  flightState.u = 0;
+}
+
+/* quadratic bezier into out */
+export function quadBez(a: THREE.Vector3, c: THREE.Vector3, b: THREE.Vector3, u: number, out: THREE.Vector3) {
+  const w = 1 - u;
+  out.set(
+    w * w * a.x + 2 * w * u * c.x + u * u * b.x,
+    w * w * a.y + 2 * w * u * c.y + u * u * b.y,
+    w * w * a.z + 2 * w * u * c.z + u * u * b.z,
+  );
+  return out;
+}
