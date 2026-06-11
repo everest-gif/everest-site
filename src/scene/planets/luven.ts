@@ -1,32 +1,41 @@
 import * as THREE from 'three';
 import type { PlanetBuild } from './types';
+import { makeAtmosphere, gateHero } from './hero';
 
 /* LUVEN AI — "a line that always answers."
    Warm amber sphere (soft wrap-lambert + gentle fresnel) — the warmest body in
    the system — with one slowly sweeping radar ring in the equatorial plane and
    a periodic tick-pulse: a thin ring expanding from the surface, a call answered.
 
-   Budget: sphere 32×20 (1280 tris) + annulus 96×1 (192 tris) = 2 draw calls. */
+   Budget: sphere 32×20 (1280 tris) + annulus 96×1 (192 tris) = 2 draw calls.
+   Hero adds the atmosphere shell only (+1). */
 
 const TWO_PI = Math.PI * 2;
 
 const SPHERE_VERT = /* glsl */ `
 varying vec3 vN;
 varying vec3 vV;
+varying vec3 vP;
 void main() {
   vec4 mv = modelViewMatrix * vec4(position, 1.0);
   vN = normalize(normalMatrix * normal);
   vV = normalize(-mv.xyz);
+  vP = position; /* object space — the hero grain and sweep trace live here */
   gl_Position = projectionMatrix * mv;
 }
 `;
 
 const SPHERE_FRAG = /* glsl */ `
 uniform float uBright;
+uniform float uHero;
+uniform float uSweep;
+uniform float uTraceK;
 varying vec3 vN;
 varying vec3 vV;
+varying vec3 vP;
 const vec3 AMBER = vec3(0.910, 0.635, 0.239);
 const vec3 BONE  = vec3(0.929, 0.910, 0.875);
+const float TWO_PI = 6.28318530718;
 void main() {
   vec3 n = normalize(vN);
   vec3 v = normalize(vV);
@@ -38,6 +47,28 @@ void main() {
   vec3 col = mix(AMBER * 0.05, lit, w);
   float f = 1.0 - clamp(dot(n, v), 0.0, 1.0);
   col += AMBER * (f * f * 0.42); /* gentle fresnel rim */
+
+  /* S6 hero — brushed warm metal + the radar sweep's afterglow */
+  if (uHero > 0.001) {
+    vec3 p = normalize(vP);
+    /* longitude in the ring's frame: ring rotation.x = -PI/2 maps its
+       atan(y,x) sweep onto atan(-z,x) here — the trace lands under the line */
+    float lon = atan(-p.z, p.x + 1e-6); /* epsilon: atan(0,0) undefined at poles */
+    /* micro-grain: 96 longitude streaks, per-band brightness hash */
+    float s = (lon / TWO_PI + 0.5) * 96.0;
+    float tb = fract(s) - 0.5;
+    float streak = exp(-tb * tb * 90.0);
+    float hash = fract(sin(floor(s) * 127.1) * 43758.5453);
+    float pole = 1.0 - p.y * p.y; /* grain dies where longitudes pinch */
+    col += mix(AMBER, BONE, 0.3) * streak * (0.55 + 0.45 * hash) * pole * w * 0.09 * uHero;
+    /* afterglow: warmth decaying behind the sweep line over ~1.5s of angle;
+       mod wraps the difference into [0, TWO_PI) — exp keeps it NaN-proof */
+    float delta = mod(uSweep - lon, TWO_PI);
+    float trace = exp(-delta * uTraceK);
+    float belt = exp(-p.y * p.y * 5.0); /* strongest along the equator it rides */
+    col += AMBER * trace * belt * (0.75 + 0.5 * streak) * 0.16 * uHero;
+  }
+
   col *= uBright;
   gl_FragColor = vec4(col, 1.0);
 }
@@ -97,6 +128,9 @@ export function makePlanet(): PlanetBuild {
 
   const sphereUniforms = {
     uBright: { value: 1 },
+    uHero: { value: 0 },
+    uSweep: { value: 0 },
+    uTraceK: { value: 1.2 },
   };
   const sphereGeo = new THREE.SphereGeometry(0.62, 32, 20);
   const sphereMat = new THREE.ShaderMaterial({
@@ -106,6 +140,10 @@ export function makePlanet(): PlanetBuild {
   });
   const sphere = new THREE.Mesh(sphereGeo, sphereMat);
   tilt.add(sphere);
+
+  /* S6 hero — the warmest halo of the system */
+  const atmo = makeAtmosphere(0.62, '#E0B27A', 0.85);
+  group.add(atmo.mesh);
 
   const ringUniforms = {
     uSweep: { value: 0 },
@@ -130,6 +168,8 @@ export function makePlanet(): PlanetBuild {
 
   let sweep = 0;
   let tickTimer = 0;
+  const heroObjs = [atmo.mesh];
+  const heroMats = [atmo.mat];
 
   const update = (
     _t: number,
@@ -137,11 +177,14 @@ export function makePlanet(): PlanetBuild {
     active: number,
     dim: number,
     reveal: number,
+    hero: number,
   ): void => {
     const step = Math.min(Math.max(dt, 0), 0.1); /* guard tab-switch spikes */
 
-    /* sweep: slow at rest, x3 when active */
-    sweep += step * 0.55 * (1 + 2 * active);
+    /* sweep: slow at rest, x3 when active; hero eases it slower still so the
+       trace reads as a deliberate pass */
+    const spd = 0.55 * (1 + 2 * active) * (1 - 0.45 * hero);
+    sweep += step * spd;
     if (sweep > TWO_PI) sweep -= TWO_PI;
     ringUniforms.uSweep.value = sweep;
 
@@ -161,6 +204,12 @@ export function makePlanet(): PlanetBuild {
     ringUniforms.uEnergy.value = energy;
     ringUniforms.uBeam.value = 0.8 + 0.35 * active;
     sphereUniforms.uBright.value = (1 + 0.16 * active) * energy;
+
+    /* hero: surface trace follows the same sweep; falloff = 1.5s of angle */
+    sphereUniforms.uHero.value = hero;
+    sphereUniforms.uSweep.value = sweep;
+    sphereUniforms.uTraceK.value = 1 / (1.5 * spd); /* spd >= 0.3 — never /0 */
+    gateHero(heroObjs, heroMats, hero);
   };
 
   const dispose = (): void => {
@@ -168,6 +217,7 @@ export function makePlanet(): PlanetBuild {
     sphereMat.dispose();
     ringGeo.dispose();
     ringMat.dispose();
+    atmo.dispose();
   };
 
   return { group, update, baseScale: 1, dispose };

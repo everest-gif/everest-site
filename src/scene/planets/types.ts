@@ -7,8 +7,11 @@ export interface PlanetBuild {
   /* origin-centered; OUTER VISUAL RADIUS ≈ 1.0 in local units (rings included) */
   group: THREE.Group;
   /* t seconds, dt seconds, active 0..1 (hover eases in — intensify identity motion),
-     dim 0..1 (another node hovered — drop emission toward 40%), reveal 0..1 (arrival fade) */
-  update: (t: number, dt: number, active: number, dim: number, reveal: number) => void;
+     dim 0..1 (another node hovered — drop emission toward 40%), reveal 0..1 (arrival fade),
+     hero 0..1 (S6 — eased in while this planet is the chamber hero: the high-detail
+     LOD layer lives behind it; build hero content at factory time so the boot
+     precompiler compiles it, gate visibility so the hub pays nothing) */
+  update: (t: number, dt: number, active: number, dim: number, reveal: number, hero: number) => void;
   /* 0.7–1.3, applied against the shared NODE_R by HubWorld */
   baseScale: number;
   dispose: () => void;

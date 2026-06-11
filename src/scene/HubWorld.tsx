@@ -212,7 +212,7 @@ export default function HubWorld() {
 
   /* ---------- eight planets (R2.2) ---------- */
   const planets = useMemo(() => NODES.map((n) => PLANET_FACTORY[n.id]()), []);
-  const hoverEase = useRef(NODES.map(() => ({ active: 0, dim: 0 })));
+  const hoverEase = useRef(NODES.map(() => ({ active: 0, dim: 0, hero: 0 })));
   useEffect(() => () => planets.forEach((p) => p.dispose()), [planets]);
 
   /* M5 — sunward rim light: one additive shell per planet, child of its group */
@@ -387,6 +387,9 @@ export default function HubWorld() {
       const activeTarget = hoveredIdx === i ? (actNow === 'chamber' ? 0.7 : 1) : 0;
       ease.active += (activeTarget - ease.active) * 0.15;
       ease.dim += ((hoveredIdx !== -1 && hoveredIdx !== i ? 1 : 0) - ease.dim) * 0.15;
+      /* S6 — hero LOD eases in as the chamber dolly lands (≈0.4s), out on leave */
+      const heroTarget = actNow === 'chamber' && chamber === NODES[i].id ? 1 : 0;
+      ease.hero += (heroTarget - ease.hero) * Math.min(1, dt * 6);
 
       const p = planets[i];
       p.group.position.copy(_nodePos[i]);
@@ -394,7 +397,7 @@ export default function HubWorld() {
       const hoverScale = actNow === 'chamber' ? 1 : 1 + ease.active * 0.15;
       const sc = Math.max(0.0001, reveals[i].value) * NODE_R * p.baseScale * hoverScale;
       p.group.scale.setScalar(sc);
-      p.update(t, dt, ease.active, ease.dim, reveals[i].value);
+      p.update(t, dt, ease.active, ease.dim, reveals[i].value, ease.hero);
       /* M5 — sunward rim: light arrives from the core (local origin) */
       const rim = rims[i];
       (rim.m.uniforms.uSunDir.value as THREE.Vector3).copy(_nodePos[i]).multiplyScalar(-1).normalize();

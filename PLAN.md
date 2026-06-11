@@ -20,8 +20,17 @@
       (padding-top blocks the negative-mask collapse). collision-audit.mjs (text-block
       model, decorative exempt, floating layer separate): ALL CLEAN ×24 (8 chambers ×
       1440/1280/390). Logs in verification/summit/.
-- [ ] S6 Planet LOD: hero variants for all 8 (atmosphere rim + per-identity micro-detail),
-      chamber-only mounting, hub perf untouched
+- [x] S6 Planet LOD: PlanetBuild gains hero param (eased dt·6 by HubWorld); shared
+      makeAtmosphere/gateHero (planets/hero.ts); all content factory-built (precompiler
+      owns shader compile — no dolly hitch), visible-gated → 0 hub draw calls. All 8 per
+      identity: jarvis circuit glints + legible slowed glyph rings · luven brushed grain
+      + sweep afterglow · emerge raking-light relief grid (painted grid yields ×0.22 at
+      hero) · dolomite internal caustics + facet pops · everclash gap motes + hairline
+      tooling · voxhalla per-voxel AO + seam ticks · bigback carbon twill + arc heat
+      shimmer · beyond living earth (continents/clouds/jade arcs). 7 by parallel agents
+      (waves ≤3), jarvis reference by main session; 2 tuning fixes from poster review
+      (emerge/everclash wireframe-ball reads). close-*.png poster-passed ×8; hub 120fps
+      (avg 8.35ms, worst 10.7ms) — LOD verified.
 - [ ] S4 Direct planet-to-planet flight: single dolly arc 1.0–1.2s, de-rez in first 0.3s,
       materialize final 0.4s; chips + INDEX + arrows; reduced-motion 200ms crossfade
 - [ ] S7 Orbital rail: bottom-center, 8 glyphs in orbit order, amber ring + 0n/NAME,

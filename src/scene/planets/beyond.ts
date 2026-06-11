@@ -1,31 +1,18 @@
 import * as THREE from 'three';
 import type { PlanetBuild } from './types';
 import { PALETTE } from './types';
+import { makeAtmosphere, gateHero } from './hero';
 
 /* BEYOND — a tiny dark earth: ink sphere with the faintest landmass mottling, and jade
    route polylines tracing journeys across it, each with a travelling bright head. The
-   only planet allowed jade. */
+   only planet allowed jade.
 
-const bodyVert = /* glsl */ `
-varying vec3 vNormal;
-varying vec3 vView;
-varying vec3 vPos;
-void main() {
-  vec4 world = modelMatrix * vec4(position, 1.0);
-  vNormal = normalize(mat3(modelMatrix) * normal);
-  vView = normalize(cameraPosition - world.xyz);
-  vPos = position;
-  gl_Position = projectionMatrix * viewMatrix * world;
-}
-`;
+   S6 hero — a miniature living earth: fbm-grown continents in the amber/bone register,
+   a drifting bone cloud shell, jade-bone atmosphere. 2 extra draw calls, hero-gated. */
 
-const bodyFrag = /* glsl */ `
-uniform float uMul;
-uniform vec3 uBone;
-varying vec3 vNormal;
-varying vec3 vView;
-varying vec3 vPos;
-
+/* 3D value noise shared by body + clouds — samples the sphere direction directly,
+   so no lat/lon seam (the repo's GLSL_NOISE is 2D simplex) */
+const NOISE3 = /* glsl */ `
 float hash3(vec3 p) {
   p = fract(p * 0.3183099 + 0.1);
   p *= 17.0;
@@ -46,7 +33,30 @@ float vnoise(vec3 p) {
   float k = hash3(i + vec3(1.0, 1.0, 1.0));
   return mix(mix(mix(a, b, f.x), mix(c, d, f.x), f.y), mix(mix(e, g, f.x), mix(h, k, f.x), f.y), f.z);
 }
+`;
 
+const bodyVert = /* glsl */ `
+varying vec3 vNormal;
+varying vec3 vView;
+varying vec3 vPos;
+void main() {
+  vec4 world = modelMatrix * vec4(position, 1.0);
+  vNormal = normalize(mat3(modelMatrix) * normal);
+  vView = normalize(cameraPosition - world.xyz);
+  vPos = position;
+  gl_Position = projectionMatrix * viewMatrix * world;
+}
+`;
+
+const bodyFrag = /* glsl */ `
+uniform float uMul;
+uniform float uHero;
+uniform vec3 uBone;
+uniform vec3 uAmber;
+varying vec3 vNormal;
+varying vec3 vView;
+varying vec3 vPos;
+${NOISE3}
 void main() {
   vec3 n = normalize(vNormal);
   vec3 v = normalize(vView);
@@ -57,7 +67,50 @@ void main() {
   vec3 col = vec3(0.045, 0.047, 0.055);
   col += uBone * masses * 0.05;
   col += uBone * fres * 0.07;
+
+  /* S6 hero — continents resolve from fbm of the sphere direction: warm desaturated
+     bone-amber land over an ink ocean lifted slightly cool, never a blue marble */
+  if (uHero > 0.001) {
+    vec3 dir = normalize(vPos);
+    float c = vnoise(dir * 2.3) * 0.5 + vnoise(dir * 4.7) * 0.26
+            + vnoise(dir * 9.8) * 0.15 + vnoise(dir * 20.5) * 0.09;
+    float landK = smoothstep(0.50, 0.56, c);
+    float shelf = smoothstep(0.45, 0.50, c) * (1.0 - landK);
+    float relief = vnoise(dir * 13.0);
+    vec3 ocean = vec3(0.050, 0.056, 0.074);
+    vec3 landCol = mix(uAmber, uBone, 0.55) * (0.13 + 0.07 * relief);
+    vec3 surf = mix(ocean, landCol, landK);
+    surf += uBone * shelf * 0.045;
+    /* fixed world key light — the spin carries the terminator across the continents */
+    float ndl = clamp(dot(n, normalize(vec3(0.55, 0.4, 0.73))), 0.0, 1.0);
+    surf *= 0.45 + 0.75 * ndl;
+    surf += uBone * fres * 0.09;
+    col = mix(col, surf, uHero);
+  }
+
   gl_FragColor = vec4(col * uMul, 1.0);
+}
+`;
+
+const cloudFrag = /* glsl */ `
+uniform float uTime;
+uniform float uHero;
+uniform float uMul;
+uniform vec3 uBone;
+varying vec3 vNormal;
+varying vec3 vView;
+varying vec3 vPos;
+${NOISE3}
+void main() {
+  vec3 dir = normalize(vPos);
+  float cl = vnoise(dir * 3.4 + vec3(uTime * 0.010, 0.0, -uTime * 0.006)) * 0.62
+           + vnoise(dir * 7.6 + vec3(-uTime * 0.014, uTime * 0.008, 0.0)) * 0.38;
+  float bank = smoothstep(0.52, 0.74, cl);
+  /* thin toward the limb so the atmosphere shell keeps a clean rim */
+  float ndv = clamp(dot(normalize(vNormal), normalize(vView)), 0.0, 1.0);
+  float alpha = bank * (0.18 + 0.82 * ndv) * 0.33 * uHero * uMul;
+  if (alpha < 0.004) discard;
+  gl_FragColor = vec4(mix(uBone * 0.7, uBone, bank), alpha);
 }
 `;
 
@@ -91,9 +144,37 @@ export function makePlanet(): PlanetBuild {
   const bodyMat = new THREE.ShaderMaterial({
     vertexShader: bodyVert,
     fragmentShader: bodyFrag,
-    uniforms: { uMul: { value: 1 }, uBone: { value: bone } },
+    uniforms: {
+      uMul: { value: 1 },
+      uHero: { value: 0 },
+      uBone: { value: bone },
+      uAmber: { value: new THREE.Color(PALETTE.amber) },
+    },
   });
   group.add(new THREE.Mesh(bodyGeo, bodyMat));
+
+  /* S6 hero — drifting cloud shell; renderOrder -1 keeps the jade routes readable on top */
+  const cloudGeo = new THREE.SphereGeometry(0.9 * 1.03, 48, 32);
+  const cloudMat = new THREE.ShaderMaterial({
+    vertexShader: bodyVert,
+    fragmentShader: cloudFrag,
+    transparent: true,
+    depthWrite: false,
+    uniforms: {
+      uTime: { value: 0 },
+      uHero: { value: 0 },
+      uMul: { value: 1 },
+      uBone: { value: bone },
+    },
+  });
+  const clouds = new THREE.Mesh(cloudGeo, cloudMat);
+  clouds.renderOrder = -1;
+  clouds.visible = false;
+  group.add(clouds);
+
+  /* S6 hero — jade-leaning bone atmosphere */
+  const atmo = makeAtmosphere(0.9, '#9FC4B4', 0.9);
+  group.add(atmo.mesh);
 
   const routeData = ROUTES.map((r) => buildRoute(r.axis.clone().normalize(), r.start.clone().normalize(), r.arc, PTS));
   const routeMats: THREE.LineBasicMaterial[] = [];
@@ -131,12 +212,14 @@ export function makePlanet(): PlanetBuild {
   const heads = new THREE.Points(headGeo, headMat);
   group.add(heads);
 
-  const update = (t: number, _dt: number, active: number, dim: number, reveal: number) => {
+  const update = (t: number, _dt: number, active: number, dim: number, reveal: number, hero: number) => {
     const mul = (1 - dim * 0.6) * reveal;
     bodyMat.uniforms.uMul.value = mul;
-    const routeOp = (0.35 + active * 0.25) * mul;
+    bodyMat.uniforms.uHero.value = hero;
+    /* hero range brightens the routes so they read animated across the surface */
+    const routeOp = (0.35 + active * 0.25) * mul * (1 + 0.4 * hero);
     for (const m of routeMats) m.opacity = routeOp;
-    headMat.opacity = 0.9 * mul;
+    headMat.opacity = Math.min(1, 0.9 * (1 + 0.4 * hero)) * mul;
     const speedK = 1 + active * 2;
     for (let r = 0; r < ROUTES.length; r++) {
       const rt = ROUTES[r];
@@ -151,6 +234,12 @@ export function makePlanet(): PlanetBuild {
     }
     (headGeo.getAttribute('position') as THREE.BufferAttribute).needsUpdate = true;
     group.rotation.y = t * 0.05;
+
+    cloudMat.uniforms.uTime.value = t;
+    cloudMat.uniforms.uMul.value = mul;
+    /* clouds drift against the spin — alive relative to the continents */
+    clouds.rotation.y = t * 0.02;
+    gateHero([clouds, atmo.mesh], [cloudMat, atmo.mat], hero);
   };
 
   return {
@@ -160,6 +249,9 @@ export function makePlanet(): PlanetBuild {
     dispose: () => {
       bodyGeo.dispose();
       bodyMat.dispose();
+      cloudGeo.dispose();
+      cloudMat.dispose();
+      atmo.dispose();
       routeGeos.forEach((g) => g.dispose());
       routeMats.forEach((m) => m.dispose());
       headGeo.dispose();

@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import type { PlanetBuild } from './types';
 import { PALETTE } from './types';
+import { makeAtmosphere, gateHero } from './hero';
 
 /* VOXHALLA — voxel hero shooter, no engine.
    Identity: a sphere voxelized into grid-snapped cubes — proudly blocky.
@@ -9,7 +10,11 @@ import { PALETTE } from './types';
    bone-bright. Face shading is baked into the box's vertex colors (no lights
    needed). Slow single-body rotation; a precomputed schedule fires single-cube
    glints that flash and gaussian-decay. active: rotation +60%, glint rate ×3,
-   amber cubes brighten toward full amber. */
+   amber cubes brighten toward full amber.
+
+   S6 hero — lightest touch of the eight: per-voxel AO + sparse seam glow ticks
+   injected into the same voxel shader (zero extra draw calls), one dusty
+   atmosphere shell. 2 draw calls at hero, 1 in the hub. */
 
 const CUBE = 0.165; //  cube edge, local units
 const STEP = 0.175; //  voxel grid pitch
@@ -25,6 +30,58 @@ const SCHED_N = 64;
 const FLASH_R = 1.5,
   FLASH_G = 1.42,
   FLASH_B = 1.22; // glint peak (×face shade ≤1 → ≤1.5, under bloom-smear ceiling)
+
+/* ---- S6 hero chunks, spliced into the voxel shader via onBeforeCompile ---- */
+
+const heroVertPars = /* glsl */ `
+varying vec3 vVox;
+varying vec3 vLoc;
+varying vec3 vNrm;
+varying float vAO;
+`;
+
+const heroVertMain = /* glsl */ `
+  vVox = vec3(instanceMatrix[3]);
+  vLoc = position;
+  vNrm = normal;
+  /* radial depth + orientation: deep voxels and inward/down faces sit in shadow */
+  float rad = length(vVox);
+  vec3 outv = vVox / max(rad, 1e-4);
+  float core = 1.0 - smoothstep(0.3, 1.0, rad * ${(1 / SHELL_R).toFixed(4)});
+  float facing = 0.5 - 0.5 * dot(normal, outv);
+  float down = 0.5 - 0.5 * normal.y;
+  vAO = clamp(core * 0.55 + facing * 0.3 + down * 0.2, 0.0, 1.0);
+`;
+
+const heroFragPars = /* glsl */ `
+uniform float uHero;
+uniform float uTime;
+uniform vec3 uAmber;
+varying vec3 vVox;
+varying vec3 vLoc;
+varying vec3 vNrm;
+varying float vAO;
+`;
+
+const heroFragMain = /* glsl */ `
+  if (uHero > 0.001) {
+    /* per-voxel AO — value only, ≤25% darkening */
+    outgoingLight *= 1.0 - 0.25 * vAO * uHero;
+    /* seam ticks: a hash off the voxel coords picks a sparse set; each glows up
+       and dies over ~2s of its own slow cycle — a few alight at once, no strobe */
+    float h = fract(sin(dot(vVox, vec3(127.1, 311.7, 74.7))) * 43758.5453);
+    if (h > 0.94) {
+      float cyc = fract(uTime * 0.107 + h * 23.7);
+      float gx = (cyc - 0.5) * 20.0;
+      float env = exp(-gx * gx);
+      vec3 q = abs(vLoc) * ${(2 / CUBE).toFixed(4)};
+      q *= 1.0 - abs(vNrm); /* drop the face-normal axis, keep the two seam axes */
+      float seam = smoothstep(0.82, 0.985, max(q.x, max(q.y, q.z)));
+      /* diffuse.r carries dim·reveal — seams obey the same fades */
+      outgoingLight += uAmber * (seam * env * 0.12 * uHero * diffuse.r);
+    }
+  }
+`;
 
 function mulberry32(seed: number): () => number {
   let a = seed >>> 0;
@@ -84,6 +141,24 @@ export function makePlanet(): PlanetBuild {
   }
 
   const material = new THREE.MeshBasicMaterial({ vertexColors: true });
+
+  /* S6 hero lives inside the one voxel shader — dead branch until uHero rises,
+     so the hub pays nothing and the boot precompiler owns the compile */
+  const heroU = {
+    uHero: { value: 0 },
+    uTime: { value: 0 },
+    uAmber: { value: new THREE.Color(PALETTE.amber) },
+  };
+  material.onBeforeCompile = (shader) => {
+    Object.assign(shader.uniforms, heroU);
+    shader.vertexShader = shader.vertexShader
+      .replace('#include <common>', '#include <common>' + heroVertPars)
+      .replace('#include <project_vertex>', '#include <project_vertex>' + heroVertMain);
+    shader.fragmentShader = shader.fragmentShader
+      .replace('#include <common>', '#include <common>' + heroFragPars)
+      .replace('#include <opaque_fragment>', heroFragMain + '#include <opaque_fragment>');
+  };
+
   const mesh = new THREE.InstancedMesh(geometry, material, count);
 
   /* ---- place + color instances ---- */
@@ -143,6 +218,12 @@ export function makePlanet(): PlanetBuild {
   spin.add(mesh);
   group.add(spin);
 
+  /* S6 hero — dusty bone atmosphere wrapping the blocky silhouette */
+  const atmo = makeAtmosphere(0.95, '#C8B894', 0.7);
+  group.add(atmo.mesh);
+  const heroObjs = [atmo.mesh];
+  const heroMats = [atmo.mat];
+
   /* ---- allocation-free update state ---- */
   let timer = 0;
   let schedPtr = 0;
@@ -161,7 +242,7 @@ export function makePlanet(): PlanetBuild {
     colorArr[i3 + 2] = b + (FLASH_B - b) * env;
   }
 
-  function update(_t: number, dt: number, active: number, dim: number, reveal: number): void {
+  function update(t: number, dt: number, active: number, dim: number, reveal: number, hero: number): void {
     const step = Math.min(dt, 0.1);
     activeCur = active;
 
@@ -214,12 +295,17 @@ export function makePlanet(): PlanetBuild {
     }
 
     if (touched) instColor.needsUpdate = true;
+
+    heroU.uTime.value = t;
+    heroU.uHero.value = hero;
+    gateHero(heroObjs, heroMats, hero);
   }
 
   function dispose(): void {
     geometry.dispose();
     material.dispose();
     mesh.dispose();
+    atmo.dispose();
   }
 
   return { group, update, baseScale: 1, dispose };

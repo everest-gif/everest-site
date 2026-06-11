@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import type { PlanetBuild } from './types';
 import { PALETTE } from './types';
+import { makeAtmosphere, gateHero } from './hero';
 
 /* JARVIS — personal AI orchestrator.
    A near-black obsidian sphere: polished volcanic glass revealed only by a cold
@@ -36,8 +37,10 @@ uniform float uTime;
 uniform float uActive;
 uniform float uDim;
 uniform float uReveal;
+uniform float uHero;
 uniform vec3 uInk;
 uniform vec3 uBone;
+uniform vec3 uAmber;
 varying vec3 vN;
 varying vec3 vV;
 void main() {
@@ -65,6 +68,20 @@ void main() {
   /* whisper of form light, kept inky so the body stays near-black */
   float ndl = clamp(dot(n, l), 0.0, 1.0);
   col += uInk * (ndl * ndl) * 1.1;
+
+  /* S6 hero — faint subsurface circuit glints: a rectilinear trace lattice under
+     the glass, only where the slow glint light grazes, only at chamber range */
+  if (uHero > 0.001) {
+    vec3 g = normalize(vN);
+    /* rectilinear traces from the surface direction — manhattan bands */
+    float tx = abs(fract(g.x * 9.0 + uTime * 0.015) - 0.5);
+    float ty = abs(fract(g.y * 9.0 - uTime * 0.011) - 0.5);
+    float trace = exp(-tx * tx * 340.0) + exp(-ty * ty * 340.0);
+    /* junction pulses travelling the lattice */
+    float pulse = 0.6 + 0.4 * sin(uTime * 1.7 + g.x * 21.0 + g.y * 17.0);
+    float depthMask = pow(ndv, 1.6); /* glints live under the face, die at the limb */
+    col += uAmber * trace * pulse * depthMask * 0.085 * uHero;
+  }
 
   col *= mix(1.0, 0.4, uDim) * uReveal;
   gl_FragColor = vec4(col, 1.0);
@@ -168,11 +185,17 @@ export function makePlanet(): PlanetBuild {
       uActive: { value: 0 },
       uDim: { value: 0 },
       uReveal: { value: 0 },
+      uHero: { value: 0 },
       uInk: { value: new THREE.Color(PALETTE.ink) },
       uBone: { value: new THREE.Color(PALETTE.bone) },
+      uAmber: { value: new THREE.Color(PALETTE.amber) },
     },
   });
   group.add(new THREE.Mesh(bodyGeo, bodyMat));
+
+  /* S6 hero — cold obsidian atmosphere, barely warm at the limb */
+  const atmo = makeAtmosphere(BODY_R, '#B49B72', 0.7);
+  group.add(atmo.mesh);
 
   /* glyph atlas — the one CanvasTexture the brief allows */
   const cv = document.createElement('canvas');
@@ -231,9 +254,10 @@ export function makePlanet(): PlanetBuild {
   let angA = Math.random() * Math.PI * 2;
   let angB = Math.random() * Math.PI * 2;
 
-  const update = (t: number, dt: number, active: number, dim: number, reveal: number): void => {
+  const update = (t: number, dt: number, active: number, dim: number, reveal: number, hero: number): void => {
     const d = Math.min(dt, 0.05);
-    const drive = 1 + ACTIVE_SPEED_GAIN * active;
+    /* hero: the rings slow to a readable drift — micro-glyphs resolve legible */
+    const drive = (1 + ACTIVE_SPEED_GAIN * active) * (1 - hero * 0.62);
     angA += d * RING_A.speed * drive;
     angB += d * RING_B.speed * drive;
     spinA.rotation.y = angA;
@@ -243,10 +267,14 @@ export function makePlanet(): PlanetBuild {
     bodyMat.uniforms.uActive.value = active;
     bodyMat.uniforms.uDim.value = dim;
     bodyMat.uniforms.uReveal.value = reveal;
+    bodyMat.uniforms.uHero.value = hero;
 
     glyphMat.uniforms.uTime.value = t;
-    /* base alpha 0.5 · ×1.5 brighter on active · toward 0.4 on dim · arrival fade */
-    glyphMat.uniforms.uGlow.value = 0.5 * (1 + 0.5 * active) * (1 - 0.6 * dim) * reveal;
+    /* base alpha 0.5 · ×1.5 brighter on active · toward 0.4 on dim · arrival fade;
+       hero range brightens the glyphs into legibility */
+    glyphMat.uniforms.uGlow.value = 0.5 * (1 + 0.5 * active + 0.5 * hero) * (1 - 0.6 * dim) * reveal;
+
+    gateHero([atmo.mesh], [atmo.mat], hero);
   };
 
   const dispose = (): void => {
@@ -257,6 +285,7 @@ export function makePlanet(): PlanetBuild {
     ringGeoB.dispose();
     glyphMat.dispose();
     atlas.dispose();
+    atmo.dispose();
   };
 
   return { group, update, baseScale: 1.15, dispose };
