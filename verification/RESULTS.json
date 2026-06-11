@@ -1,0 +1,237 @@
+[
+  {
+    "id": "9.1 boot completes, threshold renders",
+    "pass": true,
+    "detail": ""
+  },
+  {
+    "id": "9.1 ENTER via click → breach → hub",
+    "pass": true,
+    "detail": ""
+  },
+  {
+    "id": "9.1/9.6 breach no frame-long stalls",
+    "pass": true,
+    "detail": "{\"avgFps\":144,\"worstGapMs\":8}"
+  },
+  {
+    "id": "9.6 breach ≥50fps",
+    "pass": true,
+    "detail": "144fps"
+  },
+  {
+    "id": "9.6 hub ≥50fps",
+    "pass": true,
+    "detail": "{\"avgFps\":145,\"worstGapMs\":8}"
+  },
+  {
+    "id": "9.1 hover jarvis → chip",
+    "pass": true,
+    "detail": "4 AGENTS · 220 TESTS GREEN · RUNS NIGHTLY"
+  },
+  {
+    "id": "9.1 hover luven → chip",
+    "pass": true,
+    "detail": "FIRST SALE $994 · 770+ WORKFLOW NODES"
+  },
+  {
+    "id": "9.1 hover emerge → chip",
+    "pass": true,
+    "detail": "4 PRODUCTION AGENTS · AI DIVISION LEAD"
+  },
+  {
+    "id": "9.1 hover dolomite → chip",
+    "pass": true,
+    "detail": "ALL PROJECTS · ONE COMMAND PLANE"
+  },
+  {
+    "id": "9.1 hover everclash → chip",
+    "pass": true,
+    "detail": "10 FIGHTERS · 8-PLAYER FFA · IN BROWSER"
+  },
+  {
+    "id": "9.1 hover voxhalla → chip",
+    "pass": true,
+    "detail": "6V6 · 10 CHAMPIONS · NO ENGINE"
+  },
+  {
+    "id": "9.1 hover bigback → chip",
+    "pass": true,
+    "detail": "CHAT-FIRST · TRADEMARK FILED · bigback.fit"
+  },
+  {
+    "id": "9.1 hover beyond → chip",
+    "pass": true,
+    "detail": "70.3 IRONMAN · SEMESTER AT SEA · 1 BETTA FISH"
+  },
+  {
+    "id": "9.1 click jarvis → chamber opens",
+    "pass": true,
+    "detail": "Four agents. One operator."
+  },
+  {
+    "id": "9.1 click luven → chamber opens",
+    "pass": true,
+    "detail": "Every missed call is a missed job."
+  },
+  {
+    "id": "9.1 click emerge → chamber opens",
+    "pass": true,
+    "detail": "Matters of record."
+  },
+  {
+    "id": "9.1 click dolomite → chamber opens",
+    "pass": true,
+    "detail": "It runs the rest."
+  },
+  {
+    "id": "9.1 click everclash → chamber opens",
+    "pass": true,
+    "detail": "Choose your fighter."
+  },
+  {
+    "id": "9.1 click voxhalla → chamber opens",
+    "pass": true,
+    "detail": "Every triangle accounted for."
+  },
+  {
+    "id": "9.1 click bigback → chamber opens",
+    "pass": true,
+    "detail": "Next up on the bench."
+  },
+  {
+    "id": "9.1 click beyond → chamber opens",
+    "pass": true,
+    "detail": "The rest of the map."
+  },
+  {
+    "id": "9.1 scan-line beams visible during materialization",
+    "pass": true,
+    "detail": ""
+  },
+  {
+    "id": "9.1 Esc and [ ← return to hub ] both close chambers",
+    "pass": true,
+    "detail": "both paths exercised across 8 nodes"
+  },
+  {
+    "id": "9.1 Tab cycles all 8 nodes",
+    "pass": true,
+    "detail": "JARVIS,LUVEN AI,EMERGE AI,DOLOMITE,EVERCLASH,VOXHALLA,BIGBACK,BEYOND"
+  },
+  {
+    "id": "9.1 visible amber focus ring on focused node",
+    "pass": true,
+    "detail": ""
+  },
+  {
+    "id": "9.1 Enter opens focused node",
+    "pass": true,
+    "detail": "#/hub/beyond"
+  },
+  {
+    "id": "9.1 [ return to mountains ] reverse-breach",
+    "pass": true,
+    "detail": ""
+  },
+  {
+    "id": "9.1 re-enter works a second time (Space)",
+    "pass": true,
+    "detail": ""
+  },
+  {
+    "id": "9.1 back/forward sane",
+    "pass": true,
+    "detail": ""
+  },
+  {
+    "id": "9.1 ENTER via Enter key",
+    "pass": true,
+    "detail": ""
+  },
+  {
+    "id": "9.1 ENTER via Space key",
+    "pass": true,
+    "detail": ""
+  },
+  {
+    "id": "9.1 [ skip intro ] jumps to hub",
+    "pass": true,
+    "detail": ""
+  },
+  {
+    "id": "9.1 deep link /#/hub cold",
+    "pass": true,
+    "detail": ""
+  },
+  {
+    "id": "9.1 deep link /#/hub/everclash cold",
+    "pass": true,
+    "detail": "Choose your fighter."
+  },
+  {
+    "id": "9.4 reduced motion: no breach — instant crossfade",
+    "pass": true,
+    "detail": "19ms"
+  },
+  {
+    "id": "9.4 reduced motion: chamber opens instantly",
+    "pass": true,
+    "detail": ""
+  },
+  {
+    "id": "9.4 reduced motion: return to mountains instant",
+    "pass": true,
+    "detail": ""
+  },
+  {
+    "id": "9.5 ENTER tappable ≥44px",
+    "pass": true,
+    "detail": ""
+  },
+  {
+    "id": "9.5 threshold no horizontal overflow",
+    "pass": true,
+    "detail": ""
+  },
+  {
+    "id": "9.5 hub nodes tappable (≥44px hit areas)",
+    "pass": true,
+    "detail": ""
+  },
+  {
+    "id": "9.5 chamber no inner horizontal overflow",
+    "pass": true,
+    "detail": ""
+  },
+  {
+    "id": "9.7 double-click ENTER no double-fire + resize mid-breach",
+    "pass": true,
+    "detail": ""
+  },
+  {
+    "id": "9.7 context loss shows styled mono fallback",
+    "pass": true,
+    "detail": "true"
+  },
+  {
+    "id": "9.8 every control has an accessible name",
+    "pass": true,
+    "detail": "0 unnamed"
+  },
+  {
+    "id": "9.8 canvas aria-hidden with text equivalent",
+    "pass": true,
+    "detail": "nav links: 8"
+  },
+  {
+    "id": "9.8 --dim passes WCAG AA on --ink",
+    "pass": true,
+    "detail": "5.32:1"
+  },
+  {
+    "id": "9.2 console gate: zero errors & warnings across full flow",
+    "pass": true,
+    "detail": "clean"
+  }
+]

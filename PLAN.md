@@ -65,21 +65,15 @@
 - [x] Phase exit ritual (typecheck ✓ build ✓ all 8 chambers shot + inspected headed ✓ console clean ✓)
 - NOTE: verification runs use a controlled Playwright (devDep) headed browser — the MCP browser (user's Chrome) suffers 1fps rAF throttle when occluded; headless SwiftShader makes GSAP timelines crawl via lagSmoothing. Headed + GPU is the honest §9 environment.
 
-## P5 — Polish  [TODO]
-- [ ] Sound layer (Web Audio synth: hub hum, breach whoosh, hover tick; default OFF, lazy AudioContext)
-- [ ] Reduced-motion mode (§9.4): no breach (crossfade), static layout, opacity-tick pulses
-- [ ] Mobile pass (390×844): tap targets ≥44px, vertical constellation if needed, no horizontal overflow
-- [ ] Deep links cold-load; meta/OG tags + dark OG card asset; favicon final
-- [ ] Phase exit ritual
+## P5 — Polish  [DONE]
+- [x] Sound layer (`src/lib/audio.ts`): 54Hz detuned hum + noise bed on hub, bandpass whoosh on breach (reversed for return), hover tick. Default OFF, AudioContext lazy on first enable, master ≈ −19dB. Sound-check script clean.
+- [x] Reduced-motion mode wired through every act (verified in P6)
+- [x] Mobile pass (`verification/mobile-pass.mjs`): CLEAN — jarvis console overflow fixed (minmax(0,1fr)), HUD version label hidden ≤640px
+- [x] Deep links cold-load; meta/OG/twitter tags; og.png (1200×630, captured from the live threshold); favicon.svg + apple-touch-icon.png
+- [x] Phase exit ritual
 
-## P6 — Verification  [TODO]
-- [ ] §9.1 functional click-through (Playwright MCP, evidence recorded)
-- [ ] §9.2 console gate: zero errors, zero warnings
-- [ ] §9.3 screenshots 1440×900 + 390×844 → verification/ (threshold, hub, jarvis, beyond) — inspected
-- [ ] §9.4 reduced-motion full click-through
-- [ ] §9.5 mobile checks
-- [ ] §9.6 fps probe ≥50fps + bundle budget <900KB gzip
-- [ ] §9.7 resilience: double-fire, mid-breach resize, context-loss fallback
-- [ ] §9.8 accessibility audit
-- [ ] Fresh-subagent review vs §11 → fix gaps → re-verify
-- [ ] VERIFICATION_REPORT.md complete
+## P6 — Verification  [DONE]
+- [x] Full §9 protocol scripted: `node verification/verify.mjs` → **47/47 PASS** (results in verification/RESULTS.json)
+- [x] §9.1 click-through · §9.2 console gate (zero messages) · §9.3 screenshots inspected · §9.4 reduced motion · §9.5 mobile · §9.6 perf (144fps breach / 145fps hub / 328KB gzip) · §9.7 resilience · §9.8 a11y (5.32:1)
+- [x] VERIFICATION_REPORT.md complete
+- [ ] Fresh-subagent review vs §11 → fix gaps → re-verify → final commit
