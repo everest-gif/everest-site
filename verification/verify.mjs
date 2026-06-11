@@ -15,12 +15,12 @@ const check = (id, pass, detail = '') => {
 const NODES = {
   jarvis: '4 AGENTS · 220 TESTS GREEN · RUNS NIGHTLY',
   luven: 'FIRST SALE $994 · 770+ WORKFLOW NODES',
-  emerge: '4 PRODUCTION AGENTS · AI DIVISION LEAD',
+  emerge: '4 PRODUCTION AGENTS · A SEMINAR FOR 15 CEOS',
   dolomite: 'ALL PROJECTS · ONE COMMAND PLANE',
   everclash: '10 FIGHTERS · 8-PLAYER FFA · IN BROWSER',
   voxhalla: '6V6 · 10 CHAMPIONS · NO ENGINE',
   bigback: 'CHAT-FIRST · TRADEMARK FILED · bigback.fit',
-  beyond: '70.3 IRONMAN · SEMESTER AT SEA · 1 BETTA FISH',
+  beyond: 'SPRINT TRI DONE · 70.3 IN TRAINING · 1 BETTA FISH',
 };
 
 const browser = await chromium.launch({ headless: false });
@@ -110,7 +110,7 @@ const fpsProbe = (page, frames = 90) =>
       const b = [...document.querySelectorAll('.hub-node-btn')].find((x) => x.closest('[data-node]').dataset.node === nid);
       b.click();
     }, id);
-    await page.waitForTimeout(850); /* mid-materialization */
+    await page.waitForTimeout(1150); /* flight ≈0.95s, then mid-materialization (R3) */
     const mid = await page.evaluate(() => {
       const beams = [...document.querySelectorAll('.chamber-beam')];
       return beams.some((b) => parseFloat(getComputedStyle(b).opacity) > 0.05);
@@ -213,7 +213,7 @@ for (const key of ['Enter', ' ']) {
 {
   const { ctx, page } = await newPage();
   await page.goto(`${BASE}/?vskip`);
-  await page.waitForSelector('.hud-br button', { timeout: 15000 });
+  await page.waitForSelector('.hud-skip button', { timeout: 15000 });
   await page.evaluate(() => [...document.querySelectorAll('button')].find((b) => b.textContent.includes('skip intro'))?.click());
   const ok = await page.waitForFunction(() => location.hash === '#/hub', null, { timeout: 5000 }).then(() => true).catch(() => false);
   check('9.1 [ skip intro ] jumps to hub', ok);

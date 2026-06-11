@@ -12,17 +12,17 @@
   {
     "id": "9.1/9.6 breach no frame-long stalls",
     "pass": true,
-    "detail": "{\"avgFps\":121,\"worstGapMs\":12}"
+    "detail": "{\"avgFps\":144,\"worstGapMs\":8}"
   },
   {
     "id": "9.6 breach ≥50fps",
     "pass": true,
-    "detail": "121fps"
+    "detail": "144fps"
   },
   {
     "id": "9.6 hub ≥50fps",
     "pass": true,
-    "detail": "{\"avgFps\":121,\"worstGapMs\":9}"
+    "detail": "{\"avgFps\":145,\"worstGapMs\":11}"
   },
   {
     "id": "9.1 hover jarvis → chip",
@@ -37,7 +37,7 @@
   {
     "id": "9.1 hover emerge → chip",
     "pass": true,
-    "detail": "4 PRODUCTION AGENTS · AI DIVISION LEAD"
+    "detail": "4 PRODUCTION AGENTS · A SEMINAR FOR 15 CEOS"
   },
   {
     "id": "9.1 hover dolomite → chip",
@@ -62,7 +62,7 @@
   {
     "id": "9.1 hover beyond → chip",
     "pass": true,
-    "detail": "70.3 IRONMAN · SEMESTER AT SEA · 1 BETTA FISH"
+    "detail": "SPRINT TRI DONE · 70.3 IN TRAINING · 1 BETTA FISH"
   },
   {
     "id": "9.1 click jarvis → chamber opens",
@@ -77,32 +77,32 @@
   {
     "id": "9.1 click emerge → chamber opens",
     "pass": true,
-    "detail": "Matters of record."
+    "detail": "Four agents live. None of them mine."
   },
   {
     "id": "9.1 click dolomite → chamber opens",
     "pass": true,
-    "detail": "It runs the rest."
+    "detail": "Every project answers to one desk."
   },
   {
     "id": "9.1 click everclash → chamber opens",
     "pass": true,
-    "detail": "Choose your fighter."
+    "detail": "Ten fighters. Eight players. One browser"
   },
   {
     "id": "9.1 click voxhalla → chamber opens",
     "pass": true,
-    "detail": "Every triangle accounted for."
+    "detail": "Ten champions, no engine, parked on purp"
   },
   {
     "id": "9.1 click bigback → chamber opens",
     "pass": true,
-    "detail": "Next up on the bench."
+    "detail": "Log a meal by saying it."
   },
   {
     "id": "9.1 click beyond → chamber opens",
     "pass": true,
-    "detail": "The rest of the map."
+    "detail": "The coordinates keep changing."
   },
   {
     "id": "9.1 scan-line beams visible during materialization",
@@ -167,12 +167,12 @@
   {
     "id": "9.1 deep link /#/hub/everclash cold",
     "pass": true,
-    "detail": "Choose your fighter."
+    "detail": "Ten fighters. Eight players. One browser."
   },
   {
     "id": "9.4 reduced motion: no breach — instant crossfade",
     "pass": true,
-    "detail": "19ms"
+    "detail": "47ms"
   },
   {
     "id": "9.4 reduced motion: chamber opens instantly",

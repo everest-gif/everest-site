@@ -108,3 +108,9 @@
 35. **Chamber content legibility comes from a clean ink gradient, not blur** — the banned
     blurred-hub backdrop is fully deleted; `.chamber-panel::before` darkens the right column
     only (transparent over the planet's left third).
+36. **Chamber hero art is procedural, not diffusion-generated.** R4.2 assumed a Higgsfield MCP;
+    none was connected at execution time. Rather than skip (R8.5 requires art in all 8) the
+    heroes are WebGL fragment-shader compositions (tools/make-art.mjs) — palette-locked by
+    construction, deterministic, regenerable, graded with grain + duotone. The
+    public/art/<id>/hero.* convention means diffusion outputs can replace them later with
+    zero code changes. R4's own rule decided it: darkness is better than slop.

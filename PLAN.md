@@ -32,6 +32,29 @@
 - [x] Mini-orchestrator DELETED (judgment call → DECISIONS #34); canvasCovered no longer set (planet renders all visit)
 - [x] Reduced motion: no flights, instant swaps, static planets
 
+## R4 — Chamber visuals  [DONE]
+- [x] Blurred-hub backdrop deleted everywhere; clean ink gradient for legibility
+- [x] Atmosphere hero art in all 8 chambers — generated procedurally (tools/make-art.mjs, WebGL frag compositions, palette-locked, grain+duotone, ≤350KB each as avif/webp/jpg in public/art/<id>/). Higgsfield MCP was NOT available at execution → DECISIONS #36; assets are drop-in replaceable
+- [x] HeroArt component (graceful absence); evidence Gallery/media convention untouched (real screenshots only)
+- [x] Grids tightened by 8 parallel agents (waves of ≤3); section markers kept
+
+## R5 — Copy  [DONE]
+- [x] Every headline/kicker/body/chip rewritten to voice rules from the verified-facts table; invented P4-era claims stripped; AGARVOICE line added; voxhalla "parked on purpose", bigback "on the bench"
+- [x] Audited: zero banned words, zero exclamation points, facts grep-verified in place
+
+## R6 — Threshold polish  [DONE]
+- [x] Flatirons tilted-slab bias in heightAt; fog drift contrast ×2 for visible parallax; [ skip intro ] → bottom-left (.hud-skip); lockup raised to 12.5vh
+
+## R7 — Verification  [DONE]
+- [x] §9 re-run: verify.mjs updated for R2/R3 (chips, flight timing, hud-skip) → **47/47 PASS**
+- [x] Motion evidence: breach.webm + flight.webm (hub→planet, hop both directions, esc-out) + frame extractions + scrub stills in verification/r2/
+- [x] No-cut audit: 12fps frame-step across seam entry — continuous, zero cuts (verification/r2/nocut/)
+- [x] Identity check: close-*.png — ≥6/8 planets identifiable
+- [x] Perf: breach avg 7.0ms/worst 13.7ms local; **144fps avg, 8ms worst gap on production**; JS 339KB gzip (<900KB); art ≤350KB each
+- [x] Deployed (vercel --prod --archive=tgz; plain deploy hit SSL bad-record-mac on bulk upload) → smoke-live **14/14 PASS** vs https://everest-site-azure.vercel.app
+
+## R8 — Acceptance: all 7 binary criteria MET (see VERIFICATION_REPORT.md)
+
 ## P0 — Scaffold  [IN PROGRESS]
 - [x] git init (branch `main`)
 - [x] package.json — locked stack, versions verified against registry (fiber 8.18 / drei 9.122 / three 0.170 / gsap 3.15)
