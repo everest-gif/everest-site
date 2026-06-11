@@ -1,22 +1,23 @@
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
-import { ChamberTitle, Marginalia, Stat, Gallery } from './shared';
+import { ChamberTitle, Marginalia, Stat, Gallery, HeroArt } from './shared';
 import { useStore } from '../state/store';
 import { CONTACT, isPending } from '../content/nodes';
 import s from './Beyond.module.css';
 
 /* Layout language: an editorial timeline / map hybrid — the human chamber.
-   Warmest type, most whitespace, longest scroll. Three threads, then contact. */
+   Warmest type, most whitespace, longest scroll. One shared rail (--rail in the
+   module) aligns every list in the chamber. Three threads, then contact. */
 
 /* ---------- 01 · athlete ---------- */
 
 const RACES: ReadonlyArray<readonly [string, string, string]> = [
-  ['RUN', 'BOLDER BOULDER 10K', 'the Boulder rite of passage. finish line inside Folsom Field.'],
-  ['MAY 2026', 'SPRINT TRIATHLON', 'first start line with all three disciplines. crossed it a finisher.'],
-  ['AHEAD', 'IRONMAN 70.3', 'in training now. the splits below are the assignment.'],
+  ['DONE', 'BOLDER BOULDER 10K', 'The local 10K. I ran it.'],
+  ['MAY 2026', 'SPRINT TRIATHLON', 'Swim, bike, run, one morning. I finished.'],
+  ['IN TRAINING', 'IRONMAN 70.3', 'The splits below are the assignment.'],
 ];
 
-/* ---------- 02 · voyager — the route ---------- */
+/* ---------- 02 · the route ---------- */
 
 const BOULDER = { x: 488, y: 120 };
 
@@ -44,9 +45,9 @@ const FUTURE: Waypoint[] = [
 ];
 
 const MANIFEST: ReadonlyArray<readonly [string, string, string]> = [
-  ['01', 'ROCHESTER, NY', 'where it started.'],
-  ['02', 'MONROE CC', 'first miles of the degree.'],
-  ['03', 'SEMESTER AT SEA', 'one voyage, most of a world.'],
+  ['01', 'ROCHESTER, NY', 'where I started.'],
+  ['02', 'MONROE CC', 'first leg of the degree.'],
+  ['03', 'SEMESTER AT SEA', 'a campus that moved.'],
   ['04', 'COLORADO STATE', 'B.S. Business Administration, Marketing — December 2025.'],
   ['05', 'BOULDER, CO', 'current coordinates.'],
   ['06', 'COSTA RICA · CRETE · VALENCIA', 'next coordinates, under evaluation.'],
@@ -153,13 +154,13 @@ function RouteMap() {
   );
 }
 
-/* ---------- 03 · operator of small joys ---------- */
+/* ---------- 03 · everything else ---------- */
 
-const JOYS: ReadonlyArray<readonly [string, string]> = [
-  ['GUITAR', 'the one practice with no metrics attached. it has survived every move so far.'],
-  ["'19 IMPREZA", 'the current chapter of a long car habit — torque specs, careful washes, too many forum tabs.'],
-  ['SCORCHED SMP', 'a Minecraft server I run for friends, with custom raid and claims plugin systems I built myself.'],
-  ['ONE BETTA FISH', 'supervises the desk. remains unimpressed by all of the above.'],
+const REST: ReadonlyArray<readonly [string, string]> = [
+  ['GUITAR', 'No log, no splits. I just play.'],
+  ["'19 IMPREZA", 'My corner of car culture.'],
+  ['SCORCHED SMP', 'A custom Minecraft server I run for friends.'],
+  ['ONE BETTA FISH', 'Supervises the desk.'],
 ];
 
 /* ---------- contact ---------- */
@@ -191,7 +192,10 @@ function ContactRow({ label, value, href }: { label: string; value: string; href
 function ThreadHead({ num, label }: { num: string; label: string }) {
   return (
     <div className={s.threadHead}>
-      <span className={s.threadNum}>{num}</span>
+      <span className={s.threadNum}>
+        {num}
+        <span aria-hidden="true"> /</span>
+      </span>
       <span className={s.threadLabel}>{label}</span>
       <span className={s.threadRule} aria-hidden="true" />
     </div>
@@ -202,15 +206,15 @@ export default function Beyond() {
   return (
     <div className={s.root}>
       <header className={s.head}>
-        <ChamberTitle kicker="BEYOND — THE PERSON">The rest of the map.</ChamberTitle>
-        <Marginalia className={s.tagline}>athlete · voyager · operator of small joys</Marginalia>
+        <ChamberTitle kicker="NODE 08 — THE PERSON">The coordinates keep changing.</ChamberTitle>
+        <Marginalia className={s.tagline}>athlete · the route · everything else</Marginalia>
       </header>
 
       <div className={`prose ${s.intro}`}>
         <p>
-          Eight nodes in the system. Seven are work. This one is the operator — three threads
-          running underneath everything else: a body in training, a route still being drawn, and a
-          handful of small systems kept alive because they make the days better.
+          Seven nodes in this system are work. This one is me. Three threads run underneath: a
+          body in training, a route still being drawn, and a few small things I keep running
+          because they make the days better.
         </p>
       </div>
 
@@ -218,9 +222,8 @@ export default function Beyond() {
         <ThreadHead num="01" label="ATHLETE" />
         <div className="prose">
           <p>
-            Endurance sport is the cleanest feedback loop I know — log the work, race the proof.
-            The sprint triathlon settled whether I could stack three disciplines in one morning.
-            The 70.3 asks the same question at more than four times the distance.
+            Endurance is the simplest contract I keep — log the work, let race day grade it. The
+            sprint distance is done. The 70.3 is next.
           </p>
         </div>
         <ol className={s.races}>
@@ -235,21 +238,24 @@ export default function Beyond() {
           ))}
         </ol>
         <div className={s.stats}>
-          <Stat value="1.2" label="mi swim — 70.3 split" />
-          <Stat value="56" label="mi bike — 70.3 split" />
-          <Stat value="13.1" label="mi run — 70.3 split" />
+          <Stat value="1.2" label="mi swim / 70.3" />
+          <Stat value="56" label="mi bike / 70.3" />
+          <Stat value="13.1" label="mi run / 70.3" />
         </div>
       </section>
 
       <section className={s.thread}>
-        <ThreadHead num="02" label="VOYAGER" />
+        <ThreadHead num="02" label="THE ROUTE" />
         <div className="prose">
           <p>
-            No straight lines here. Rochester to Monroe Community College, a semester circling the
-            planet with Semester at Sea, then out to Colorado State — B.S. in Business
-            Administration, Marketing, December 2025. Boulder holds the current pin. The dashed
-            legs are live candidates, not decoration.
+            I started in Rochester, New York. Monroe Community College, then Semester at Sea, then
+            Colorado State — B.S. in Business Administration, Marketing, December 2025. Boulder
+            holds the pin now. The dashed legs — Costa Rica, Crete, Valencia — are under
+            evaluation, not decoration.
           </p>
+        </div>
+        <div className={s.heroCrop}>
+          <HeroArt id="beyond" alt="A ridgeline at night, one jade route tracing it" />
         </div>
         <RouteMap />
         <ol className={s.manifest}>
@@ -264,12 +270,12 @@ export default function Beyond() {
       </section>
 
       <section className={s.thread}>
-        <ThreadHead num="03" label="OPERATOR OF SMALL JOYS" />
+        <ThreadHead num="03" label="EVERYTHING ELSE" />
         <div className="prose">
-          <p>The third thread has no finish lines and no degrees. It runs anyway.</p>
+          <p>No finish lines in this thread, no degrees. I keep it running anyway.</p>
         </div>
         <ul className={s.joys}>
-          {JOYS.map(([key, note]) => (
+          {REST.map(([key, note]) => (
             <li key={key} className={s.joy}>
               <span className={s.joyKey}>{key}</span>
               <span className={s.joyNote}>{note}</span>
@@ -284,7 +290,7 @@ export default function Beyond() {
       />
 
       <footer className={s.contact}>
-        <Marginalia className={s.contactKicker}>final waypoint — say hello</Marginalia>
+        <Marginalia className={s.contactKicker}>last waypoint — write to me</Marginalia>
         <p className={s.cName}>{CONTACT.name}</p>
         <ul className={s.cRows}>
           {CONTACT_ROWS.map((r) => (

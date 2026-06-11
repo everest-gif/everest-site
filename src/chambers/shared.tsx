@@ -24,7 +24,8 @@ export function ChamberTitle({ children, kicker }: { children: ReactNode; kicker
     const tw = gsap.fromTo(
       h,
       { fontVariationSettings: "'opsz' 9", autoAlpha: 0, y: 18 },
-      { fontVariationSettings: "'opsz' 144", autoAlpha: 1, y: 0, duration: 0.95, ease: 'expo.out', delay: 0.78 },
+      /* R3 moved the panel reveal to ~0.06s — the sweep lands with the scan, on screen */
+      { fontVariationSettings: "'opsz' 144", autoAlpha: 1, y: 0, duration: 0.95, ease: 'expo.out', delay: 0.18 },
     );
     return () => {
       tw.kill();
@@ -88,6 +89,29 @@ export function Gallery({ id, captions, ratio = '16 / 10' }: { id: NodeId; capti
         ),
       )}
     </div>
+  );
+}
+
+/* R4.2 — atmosphere hero art: /public/art/<id>/hero.{avif,webp,jpg}. Palette-locked,
+   ATMOSPHERE ONLY — never screenshots, never anything mistakable for evidence.
+   Absent files render nothing; darkness is better than slop. */
+export function HeroArt({ id, alt }: { id: NodeId; alt: string }) {
+  const [missing, setMissing] = useState(false);
+  if (missing) return null;
+  return (
+    <figure className="ch-hero" aria-hidden={alt === '' || undefined}>
+      <picture>
+        <source srcSet={`/art/${id}/hero.avif`} type="image/avif" />
+        <source srcSet={`/art/${id}/hero.webp`} type="image/webp" />
+        <img
+          src={`/art/${id}/hero.jpg`}
+          alt={alt}
+          loading="lazy"
+          decoding="async"
+          onError={() => setMissing(true)}
+        />
+      </picture>
+    </figure>
   );
 }
 

@@ -65,6 +65,28 @@
   color: var(--amber);
 }
 
+/* ---------- plate: atmosphere hero art, full-bleed inside the sheet ----------
+   "plate", not "figure" — figures (5.0) are evidence; the plate is atmosphere. */
+.plate :global(.ch-hero) {
+  border: none; /* the sheet's hairlines frame it */
+}
+
+.plate :global(.ch-hero) img {
+  aspect-ratio: auto;
+  height: clamp(160px, 24vh, 240px); /* cinematic strip, not a billboard */
+}
+
+.plateCap {
+  margin: 0;
+  padding: 10px 16px;
+  border-top: 1px solid var(--hairline);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+
 /* ---------- 1.0 status band ---------- */
 .statusBand {
   display: flex;
@@ -123,7 +145,8 @@
 
 .row {
   display: grid;
-  grid-template-columns: 48px 150px minmax(0, 0.85fr) minmax(0, 1.15fr);
+  /* 56px index column: 16px insets put "01" flush with the secHead text above it */
+  grid-template-columns: 56px 150px minmax(0, 0.85fr) minmax(0, 1.15fr);
   font-family: var(--font-mono);
   font-size: 11px;
   letter-spacing: 0.08em;
@@ -143,7 +166,7 @@
 }
 
 .row > span {
-  padding: 12px 14px;
+  padding: 12px 16px; /* matches the 16px sheet inset everywhere else */
   min-width: 0;
 }
 
@@ -174,7 +197,7 @@
 
 @media (max-width: 720px) {
   .row {
-    grid-template-columns: 40px minmax(0, 1fr);
+    grid-template-columns: 48px minmax(0, 1fr);
   }
   .row > span + span {
     border-left: none;
@@ -240,8 +263,8 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: 10px;
-  padding: 12px;
+  gap: 12px;
+  padding: 14px 16px; /* first column aligns with the 16px sheet inset */
   background: var(--ink-2);
   transition: background-color 180ms cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -255,12 +278,6 @@
   font-size: 19px;
   letter-spacing: 0.04em;
   color: var(--bone);
-}
-
-.champTicks {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px 8px;
 }
 
 .tickDone {
@@ -293,7 +310,7 @@
 }
 
 .notes {
-  padding: 18px 20px 22px;
+  padding: 16px 16px 20px; /* same 16px inset as every other body cell */
 }
 
 /* ---------- 5.0 figures ---------- */

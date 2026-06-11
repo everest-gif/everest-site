@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { ChamberTitle, Marginalia, Stat, Gallery } from './shared';
+import { useEffect, useState, type ReactNode } from 'react';
+import { ChamberTitle, Marginalia, Stat, Gallery, HeroArt } from './shared';
 import { useStore } from '../state/store';
 import s from './Everclash.module.css';
 
@@ -17,6 +17,18 @@ const ROSTER = [
   { name: 'SABLE', style: 'all-rounder' },
   { name: 'ZENITH', style: 'anchor' },
 ] as const;
+
+/* Numbered mono marker on a shared hairline — every section hangs from the same rule. */
+function SecBar({ num, label, right }: { num: string; label: string; right?: ReactNode }) {
+  return (
+    <div className={s.secBar}>
+      <span className={s.secMark}>
+        <span className={s.secNum}>{num} /</span> {label}
+      </span>
+      {right}
+    </div>
+  );
+}
 
 function Roster() {
   const reduced = useStore((st) => st.reducedMotion);
@@ -44,12 +56,15 @@ function Roster() {
 
   return (
     <section aria-label="Fighter roster — ten slots, portraits pending">
-      <div className={s.rosterBar}>
-        <Marginalia>select your fighter — 10 slots</Marginalia>
-        <span className={s.timer} aria-hidden="true">
-          T-{String(timer).padStart(2, '0')}
-        </span>
-      </div>
+      <SecBar
+        num="01"
+        label="select your fighter"
+        right={
+          <span className={s.timer} aria-hidden="true">
+            T-{String(timer).padStart(2, '0')}
+          </span>
+        }
+      />
       <ul
         className={s.rosterGrid}
         onMouseEnter={() => setPaused(true)}
@@ -84,7 +99,7 @@ function Roster() {
 
 const STACK = [
   ['engine', 'Phaser 3'],
-  ['shell', 'React + Vite'],
+  ['shell', 'React'],
   ['netcode', 'Colyseus'],
   ['language', 'TypeScript'],
 ] as const;
@@ -93,48 +108,63 @@ export default function Everclash() {
   return (
     <div className={s.root}>
       <header className={s.head}>
-        <ChamberTitle kicker="EVERCLASH — 2D PVP FIGHTER">Choose your fighter.</ChamberTitle>
+        <ChamberTitle kicker="EVERCLASH — 2D PVP FIGHTER">
+          Ten fighters. Eight players. One browser.
+        </ChamberTitle>
         <div className={s.lobby}>
           <p className={s.lobbyLive}>
-            <span className={s.liveDot} aria-hidden="true" />
-            lobby open — 8-player free-for-all
+            <span className={s.tick} aria-hidden="true" />
+            8-player free-for-all · real-time netcode
           </p>
-          <p className={s.lobbyMeta}>runs in the tab · no install · no launcher</p>
+          <p className={s.lobbyMeta}>no install · no launcher · runs in the tab</p>
         </div>
       </header>
 
       <Roster />
 
-      <div className={s.specBar} role="list" aria-label="Stack">
-        {STACK.map(([k, v]) => (
-          <div key={k} className={s.specCell} role="listitem">
-            <span className={s.specKey}>{k}</span>
-            <span className={s.specVal}>{v}</span>
-          </div>
-        ))}
+      <div className={s.heroBand}>
+        <div className={s.heroRail}>
+          <span className={s.secMark}>
+            <span className={s.secNum}>02 /</span> impact
+          </span>
+          <Marginalia className={s.heroCap}>fig. 01 — two forms, mid-collision</Marginalia>
+        </div>
+        <HeroArt id="everclash" alt="Two energy forms mid-collision" />
       </div>
 
-      <div className={s.band}>
-        <div className="prose">
-          <p>
-            Everclash is a fighting game that lives in a browser tab. No install, no launcher —
-            open the URL, pick a fighter, and trade hits with up to seven other people in real
-            time. Colyseus rooms carry the netcode, Phaser 3 runs the fight, React and Vite wrap
-            the shell. TypeScript end to end.
-          </p>
-          <p>
-            Every fighter on the roster ships with a full animation suite — idle through victory —
-            built on a custom AI-assisted art pipeline. One system keeps ten characters visually
-            consistent where a studio would put an art team.
-          </p>
+      <section aria-label="Stack and write-up">
+        <SecBar num="03" label="how it runs" />
+        <div className={s.secBody}>
+          <div className={s.specBar} role="list" aria-label="Stack">
+            {STACK.map(([k, v]) => (
+              <div key={k} className={s.specCell} role="listitem">
+                <span className={s.specKey}>{k}</span>
+                <span className={s.specVal}>{v}</span>
+              </div>
+            ))}
+          </div>
+          <div className={s.band}>
+            <div className="prose">
+              <p>
+                Everclash is a 2D PvP fighter that lives in a browser tab. No install, no
+                launcher — open the URL, pick a fighter, and trade hits with up to seven other
+                people in real time. Phaser 3 runs the fight, Colyseus carries the netcode,
+                React wraps the shell. TypeScript end to end.
+              </p>
+              <p>
+                Ten fighters means ten sets of art. The roster comes out of a custom
+                AI-assisted pipeline I built — one system in place of an art team.
+              </p>
+            </div>
+            <div className={s.stats}>
+              <Stat value="10" label="fighters on the roster" />
+              <Stat value="8" label="players, one free-for-all" />
+              <Stat value="0" label="installs — browser only" />
+              <Stat value="100%" label="TypeScript" />
+            </div>
+          </div>
         </div>
-        <div className={s.stats}>
-          <Stat value="10" label="fighters on the roster" />
-          <Stat value="8" label="players, one arena" />
-          <Stat value="0" label="installs — browser only" />
-          <Stat value="100%" label="TypeScript" />
-        </div>
-      </div>
+      </section>
 
       <Gallery
         id="everclash"
@@ -144,6 +174,16 @@ export default function Everclash() {
           'victory pose — animation suite',
         ]}
       />
+
+      <section aria-label="Currently in the lab">
+        <SecBar num="04" label="meanwhile" />
+        <div className="prose">
+          <p className={s.labLine}>
+            Currently in the lab — <span className={s.labName}>AGARVOICE</span>, an Agar.io
+            rebuild with proximity voice chat and 22 tiered skins.
+          </p>
+        </div>
+      </section>
     </div>
   );
 }

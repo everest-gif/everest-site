@@ -1,23 +1,45 @@
 .root {
   display: flex;
   flex-direction: column;
-  gap: 44px;
+  gap: 56px;
 }
 
 .head {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
 }
 
 .tagline {
   color: rgba(232, 162, 61, 0.85);
 }
 
+/* ---------- section rhythm: mono marker + hairline rule, then content ---------- */
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.marker {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.marker::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--hairline);
+}
+
+/* Shared two-column seam — console/side in §01, prose/hero in §02.
+   Same template, so the column edge aligns down the page. */
 .grid {
   display: grid;
   grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
-  gap: 28px;
+  gap: 24px;
   align-items: stretch;
 }
 
@@ -137,9 +159,29 @@
 .stats {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 20px 24px;
+  gap: 24px;
 }
 
-.body {
-  margin-top: 4px;
+/* ---------- hero art (§02): stretches to the prose's height so the
+   row reads as one set baseline, not a tall image beside short text ---------- */
+.heroWrap {
+  display: flex;
+}
+
+.heroWrap :global(.ch-hero) {
+  flex: 1;
+}
+
+.heroWrap :global(.ch-hero) img {
+  height: 100%;
+  aspect-ratio: auto;
+  object-fit: cover;
+  object-position: 72% 60%; /* keep the monitor glow in frame when cropped */
+}
+
+@media (max-width: 860px) {
+  .heroWrap :global(.ch-hero) img {
+    height: auto;
+    aspect-ratio: 16 / 10;
+  }
 }

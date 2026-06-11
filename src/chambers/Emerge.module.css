@@ -64,7 +64,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: 12px 36px;
-  padding: 13px 0;
+  padding: 12px 0;
   border-top: 1px solid var(--hairline);
   border-bottom: 1px solid var(--hairline);
 }
@@ -106,15 +106,56 @@
   }
 }
 
-/* ---------- summary + tally ---------- */
+/* ---------- brief: summary + tally left, hero art right ---------- */
+.brief {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(220px, 30%, 300px);
+  gap: 32px 48px;
+  align-items: stretch;
+}
+
+.briefText {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 32px;
+}
+
 .summary {
   max-width: 58ch;
 }
 
 .tally {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 20px 28px;
+}
+
+/* hero art clipped portrait, captioned like an exhibit */
+.heroSlot {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.heroSlot :global(.ch-hero) {
+  flex: 1;
+  min-height: 0;
+}
+
+.heroSlot :global(.ch-hero img) {
+  aspect-ratio: auto;
+  height: 100%;
+  min-height: 260px;
+}
+
+.heroCap {
+  display: block;
+  text-align: right;
+}
+
+.animate .heroSlot {
+  animation: file-in 550ms var(--ease-out) 450ms both;
 }
 
 /* ---------- case-file grid (1px gaps over hairline = ruled cells) ---------- */
@@ -130,7 +171,7 @@
   display: flex;
   flex-direction: column;
   gap: 14px;
-  padding: 22px 24px 20px;
+  padding: 24px 24px 20px;
   background: var(--ink-2);
   min-height: 220px;
 }
@@ -269,6 +310,17 @@
     margin: 4px 0 0 6px;
   }
 
+  .brief {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  .heroSlot :global(.ch-hero img) {
+    aspect-ratio: 16 / 9;
+    height: auto;
+    min-height: 0;
+  }
+
   .files {
     grid-template-columns: 1fr;
   }
@@ -282,15 +334,12 @@
   .file {
     min-height: 0;
   }
-
-  .tally {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .animate .stamp,
   .animate .file,
+  .animate .heroSlot,
   .animate .tick {
     animation: none;
   }

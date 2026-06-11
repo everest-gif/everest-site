@@ -1,19 +1,18 @@
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
-import { ChamberTitle, Marginalia, Gallery } from './shared';
+import { ChamberTitle, Marginalia, Gallery, HeroArt } from './shared';
 import { useStore } from '../state/store';
 import s from './Voxhalla.module.css';
 
 /* Layout language: spec-sheet brutalism — the project rendered as an engineering datasheet. */
 
 const SPEC: ReadonlyArray<readonly [field: string, value: string, note: string]> = [
-  ['engine', 'none', 'raw three.js — scene graph, game loop, collision, all hand-rolled'],
-  ['renderer', 'three.js / webgl', 'voxel geometry in the browser — runs from a URL, zero installs'],
-  ['mode', '6v6', 'hero shooter — two teams, ability-driven fights'],
-  ['netcode', 'browser multiplayer', 'twelve clients, one arena'],
-  ['champions', '10', 'AI-generated 3D models · full ability kits, designed and legally vetted'],
-  ['post pipeline', 'bloom · fxaa · vignette', 'custom post-processing chain, composited every frame'],
-  ['status', 'parked', 'see 1.0 — parked on purpose, not abandoned'],
+  ['platform', 'browser', 'runs from a url — no install, no launcher'],
+  ['renderer', 'raw three.js', 'no unity, no unreal, no engine layer'],
+  ['mode', '6v6', 'hero shooter — two teams of six'],
+  ['champions', '10', 'full ability kits, all ten'],
+  ['post pipeline', 'custom', 'post-processing chain built for this game'],
+  ['status', 'parked', 'see 1.0 — deliberate, not abandoned'],
 ];
 
 const ROSTER = Array.from({ length: 10 }, (_, i) => i + 1);
@@ -39,7 +38,9 @@ export default function Voxhalla() {
   return (
     <div className={s.root}>
       <header className={s.head}>
-        <ChamberTitle kicker="VOXHALLA — VOXEL HERO SHOOTER">Every triangle accounted for.</ChamberTitle>
+        <ChamberTitle kicker="VOXHALLA — BROWSER VOXEL HERO SHOOTER">
+          Ten champions, no engine, parked on purpose.
+        </ChamberTitle>
         <div className={s.docMeta}>
           <Marginalia>datasheet vx-001</Marginalia>
           <Marginalia>rev 0 · sheet 1 of 1</Marginalia>
@@ -53,9 +54,14 @@ export default function Voxhalla() {
           <span className={s.statusKey}>status</span>
           <span className={s.statusVal}>
             <i className={s.tick} aria-hidden="true" />
-            parked — shipping discipline
+            parked — deliberate
           </span>
-          <span className={s.statusNote}>one project ships at a time · jarvis first</span>
+          <span className={s.statusNote}>jarvis ships first · voxhalla waits</span>
+        </div>
+
+        <div className={s.plate}>
+          <HeroArt id="voxhalla" alt="Voxel cloudscape" />
+          <p className={s.plateCap}>plate i — voxel cloudscape</p>
         </div>
 
         <section>
@@ -91,18 +97,15 @@ export default function Voxhalla() {
             <h3 className={s.secHead}>
               <span>3.0</span>champion roster — 10 / 10
             </h3>
-            <div className={s.roster} aria-label="Ten champions, all modeled, all kits complete">
+            <div className={s.roster} aria-label="Ten champions, each with a full ability kit">
               {ROSTER.map((n) => (
                 <div key={n} className={s.champ}>
                   <span className={s.champIdx}>{String(n).padStart(2, '0')}</span>
-                  <span className={s.champTicks}>
-                    <span className={s.tickDone}>mdl</span>
-                    <span className={s.tickDone}>kit</span>
-                  </span>
+                  <span className={s.tickDone}>kit</span>
                 </div>
               ))}
             </div>
-            <p className={s.legend}>mdl = 3d model, ai-generated · kit = ability kit, designed + legally vetted</p>
+            <p className={s.legend}>kit = full ability kit, complete</p>
           </section>
 
           <section className={s.notesSec}>
@@ -111,16 +114,14 @@ export default function Voxhalla() {
             </h3>
             <div className={`prose ${s.notes}`}>
               <p>
-                Voxhalla is a six-versus-six voxel hero shooter that runs in the browser on raw
-                three.js. No Unity, no Unreal, no engine layer at all — scene graph, game loop,
-                voxel meshing, and the post chain are hand-built, because the point was to know
-                exactly what every frame costs.
+                Voxhalla is a six-versus-six voxel hero shooter that runs in the browser. No
+                Unity, no Unreal, no engine — I wrote it on raw Three.js, with a custom
+                post-processing pipeline on top.
               </p>
               <p>
-                Ten champions exist: AI-generated 3D models carrying full ability kits, each one
-                designed and legally vetted. Then I parked the whole thing. Jarvis ships first —
-                one finished system is worth more than two ambitious branches. The repo waits,
-                intact, for its turn.
+                Ten champions exist, each with a full ability kit. Then I parked it,
+                deliberately: Jarvis ships first, and Voxhalla waits its turn. Parked is the
+                honest word, so it is the word on the sheet.
               </p>
             </div>
           </section>

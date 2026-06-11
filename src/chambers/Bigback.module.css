@@ -1,6 +1,9 @@
-/* Bigback — product teaser card with lots of air. The restraint is the design. */
+/* Bigback — a spec plate. One left-aligned column, one vertical rhythm,
+   registration ticks at the corners. The restraint is the design. */
 
 .root {
+  --rhythm-sm: clamp(20px, 3.5vh, 32px);
+  --rhythm-lg: clamp(36px, 6vh, 56px);
   display: grid;
   place-items: center;
   min-height: clamp(440px, 68vh, 760px);
@@ -9,11 +12,10 @@
 
 .card {
   position: relative;
-  width: min(640px, 100%);
+  width: min(660px, 100%);
   border: 1px solid var(--hairline);
   background: linear-gradient(rgba(10, 10, 12, 0), rgba(10, 10, 12, 0.4)), var(--ink-2);
-  padding: clamp(48px, 10vh, 96px) clamp(22px, 6vw, 68px);
-  text-align: center;
+  padding: clamp(44px, 8vh, 76px) clamp(24px, 6vw, 64px);
 }
 
 /* registration ticks — reads as a spec plate, not a box */
@@ -54,21 +56,31 @@
 
 /* ---------- the one statement ---------- */
 .statement {
-  max-width: 42ch;
-  margin: clamp(22px, 4vh, 34px) auto 0;
+  max-width: 44ch;
+  margin: var(--rhythm-sm) 0 0;
   opacity: 0;
   animation: rise 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.55s forwards;
 }
 
-/* ---------- supporting mono rows ---------- */
+/* ---------- atmosphere band — letterboxed, on the same column ---------- */
+.heroSlot {
+  margin-top: var(--rhythm-lg);
+  opacity: 0;
+  animation: rise 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.68s forwards;
+}
+
+.heroSlot img {
+  aspect-ratio: 21 / 9;
+}
+
+/* ---------- numbered spec rows ---------- */
 .rows {
-  margin: clamp(40px, 8vh, 72px) 0 0;
-  text-align: left;
+  margin: var(--rhythm-lg) 0 0;
 }
 
 .row {
   display: grid;
-  grid-template-columns: 88px minmax(0, 1fr);
+  grid-template-columns: 116px minmax(0, 1fr);
   gap: 16px;
   align-items: baseline;
   padding: 12px 0;
@@ -78,15 +90,19 @@
 }
 
 .row:nth-child(1) {
-  animation-delay: 0.75s;
+  animation-delay: 0.82s;
 }
 
 .row:nth-child(2) {
-  animation-delay: 0.87s;
+  animation-delay: 0.92s;
 }
 
 .row:nth-child(3) {
-  animation-delay: 0.99s;
+  animation-delay: 1.02s;
+}
+
+.row:nth-child(4) {
+  animation-delay: 1.12s;
 }
 
 .key {
@@ -95,6 +111,11 @@
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--dim);
+}
+
+.idx {
+  color: var(--amber);
+  margin-right: 10px;
 }
 
 .val {
@@ -107,7 +128,7 @@
   color: var(--bone);
 }
 
-/* the one permitted live-status tick — filing is in motion */
+/* the one permitted live-status tick — the filing is in motion */
 .tick {
   display: inline-block;
   width: 5px;
@@ -142,6 +163,7 @@
 
 /* reduced motion — store toggle (.still) and OS preference */
 .still .statement,
+.still .heroSlot,
 .still .row {
   animation: none;
   opacity: 1;
@@ -154,6 +176,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .statement,
+  .heroSlot,
   .row {
     animation: none;
     opacity: 1;
@@ -167,7 +190,11 @@
 
 @media (max-width: 480px) {
   .row {
-    grid-template-columns: 72px minmax(0, 1fr);
+    grid-template-columns: 96px minmax(0, 1fr);
     gap: 12px;
+  }
+
+  .heroSlot img {
+    aspect-ratio: 16 / 10;
   }
 }

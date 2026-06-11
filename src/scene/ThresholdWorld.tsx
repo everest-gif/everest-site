@@ -15,11 +15,12 @@ const LAYERS = [
 ];
 
 /* middle sheet sits IN FRONT of the tunnel mouth (z −14.6 vs entrance −15.5) so drifting
-   haze veils the tube's dark disc at idle instead of being occluded behind it */
+   haze veils the tube's dark disc at idle instead of being occluded behind it.
+   Drift speeds diverge strongly per depth (R6) — the parallax must be visible. */
 const FOGS = [
-  { z: -10.5, y: 1.6, w: 64, h: 9, seed: 0.7, opacity: 0.14, drift: 0.011 },
-  { z: -14.6, y: 3.2, w: 82, h: 11, seed: 1.9, opacity: 0.12, drift: -0.008 },
-  { z: -23.5, y: 3.8, w: 100, h: 13, seed: 3.2, opacity: 0.1, drift: 0.006 },
+  { z: -10.5, y: 1.6, w: 64, h: 9, seed: 0.7, opacity: 0.14, drift: 0.024 },
+  { z: -14.6, y: 3.2, w: 82, h: 11, seed: 1.9, opacity: 0.12, drift: -0.012 },
+  { z: -23.5, y: 3.8, w: 100, h: 13, seed: 3.2, opacity: 0.1, drift: 0.005 },
 ];
 
 const amberColor = new THREE.Color(AMBER);

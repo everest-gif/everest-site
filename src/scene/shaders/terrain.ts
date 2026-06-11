@@ -11,6 +11,10 @@ uniform float uSeam;
 float heightAt(vec2 p) {
   vec2 q = p * uFreq + vec2(uSeed * 13.7, uSeed * 7.3);
   float r = ridgedFbm(q);
+  /* Flatirons bias (R6): tilted slab strata along one grain — angled ridge planes,
+     not generic fractal peaks. Warped by the ridge field so slabs break naturally. */
+  float slab = 1.0 - abs(2.0 * fract((q.x * 0.82 + q.y * 0.57) * 1.35 + r * 0.4) - 1.0);
+  r = mix(r, r * (0.6 + 0.4 * slab) + slab * 0.18, 0.38);
   /* slab envelope — pointed flatiron masses rising off a long ridge.
      gaussians via t*t, never pow(): pow(x<0, y) is NaN on Metal/ANGLE and
      one NaN pixel poisons the whole bloom mip chain. */

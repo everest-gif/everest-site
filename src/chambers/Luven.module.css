@@ -1,7 +1,11 @@
 /* Luven — a business one-pager with editorial weight:
-   letterhead rule, marginal section labels, ledger rows set like a term sheet. */
+   letterhead rule, marginal section labels, ledger rows set like a term sheet.
+   One grid governs everything: 148px gutter · column gap · shared vertical rhythm. */
 
 .root {
+  --gutter: 148px;
+  --col-gap: clamp(24px, 4vw, 56px);
+  --rhythm: clamp(56px, 8.5vh, 84px);
   display: flex;
   flex-direction: column;
 }
@@ -48,16 +52,29 @@
 
 /* ---------- headline ---------- */
 .head {
-  margin-top: clamp(48px, 8vh, 84px);
+  margin-top: clamp(44px, 7vh, 72px);
   max-width: 18ch;
+}
+
+/* ---------- hero band — atmosphere art on the section grid, letterboxed ---------- */
+.heroBand {
+  margin-top: clamp(40px, 6.5vh, 64px);
+  display: grid;
+  grid-template-columns: var(--gutter) minmax(0, 1fr);
+  column-gap: var(--col-gap);
+  align-items: start;
+}
+
+.heroBand img {
+  aspect-ratio: 21 / 9;
 }
 
 /* ---------- numbered sections — label hangs in the left margin ---------- */
 .section {
-  margin-top: clamp(56px, 9vh, 88px);
+  margin-top: var(--rhythm);
   display: grid;
-  grid-template-columns: 148px minmax(0, 1fr);
-  column-gap: clamp(24px, 4vw, 56px);
+  grid-template-columns: var(--gutter) minmax(0, 1fr);
+  column-gap: var(--col-gap);
   align-items: start;
 }
 
@@ -84,7 +101,7 @@
 .lede p {
   font-size: clamp(19px, 2.4vw, 23px);
   line-height: 1.55;
-  max-width: 40ch;
+  max-width: 38ch;
 }
 
 /* ---------- 02 · the ledger ---------- */
@@ -160,7 +177,7 @@
 
 /* ---------- signature ---------- */
 .foot {
-  margin-top: clamp(64px, 10vh, 96px);
+  margin-top: calc(var(--rhythm) * 1.15);
 }
 
 .footRule {
@@ -180,9 +197,14 @@
 
 /* ---------- mobile ---------- */
 @media (max-width: 760px) {
-  .section {
+  .section,
+  .heroBand {
     grid-template-columns: 1fr;
-    row-gap: 20px;
+    row-gap: 18px;
+  }
+
+  .heroBand img {
+    aspect-ratio: 16 / 10;
   }
 }
 

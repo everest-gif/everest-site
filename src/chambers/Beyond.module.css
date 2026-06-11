@@ -1,9 +1,15 @@
-/* BEYOND — editorial timeline / map hybrid. Warmest chamber: bone-forward, generous air. */
+/* BEYOND — editorial timeline / map hybrid. Warmest chamber: bone-forward, generous air.
+   Grid: one shared rail (--rail) runs the full chamber. Thread numbers, race tags,
+   manifest indices, keys, and contact labels all sit on it; every second column
+   starts on the same vertical line. Row rhythm: 14px padding, hairline tops,
+   hairline bottom on the last row of each list. */
 
 .root {
+  --rail: 112px;
+  --rail-gap: 20px;
   display: flex;
   flex-direction: column;
-  gap: clamp(56px, 9vh, 96px);
+  gap: clamp(56px, 9vh, 88px);
   max-width: 880px;
   margin: 0 auto;
 }
@@ -21,19 +27,20 @@
 .intro {
   font-size: 17.5px;
   line-height: 1.85;
+  max-width: 62ch;
 }
 
 /* ---------- thread sections ---------- */
 .thread {
   display: flex;
   flex-direction: column;
-  gap: 30px;
+  gap: 28px;
 }
 
 .threadHead {
   display: flex;
   align-items: baseline;
-  gap: 14px;
+  gap: var(--rail-gap);
 }
 
 .threadNum {
@@ -41,6 +48,7 @@
   font-size: 11px;
   letter-spacing: 0.14em;
   color: var(--amber);
+  flex: 0 0 var(--rail);
 }
 
 .threadLabel {
@@ -66,9 +74,10 @@
 }
 
 .race {
-  display: flex;
-  gap: 22px;
-  padding: 16px 0;
+  display: grid;
+  grid-template-columns: var(--rail) 1fr;
+  gap: var(--rail-gap);
+  padding: 14px 0;
   border-top: 1px solid var(--hairline);
 }
 
@@ -81,7 +90,6 @@
   font-size: 10px;
   letter-spacing: 0.14em;
   color: var(--amber);
-  min-width: 86px;
   padding-top: 3px;
 }
 
@@ -105,14 +113,22 @@
   color: var(--dim);
 }
 
+/* splits indent to the content line — same vertical as race names above */
 .stats {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 24px;
   max-width: 560px;
+  margin-left: calc(var(--rail) + var(--rail-gap));
 }
 
-/* ---------- 02 · voyager — route map ---------- */
+/* ---------- 02 · the route ---------- */
+
+/* atmosphere hero — cinematic crop so the ridgeline reads as a band, not a poster */
+.heroCrop :global(.ch-hero) img {
+  aspect-ratio: 21 / 9;
+}
+
 .map {
   border: 1px solid var(--hairline);
   background: var(--ink-2);
@@ -209,11 +225,15 @@
 
 .mRow {
   display: grid;
-  grid-template-columns: 36px 250px 1fr;
-  gap: 14px;
-  padding: 11px 0;
+  grid-template-columns: var(--rail) 220px 1fr;
+  gap: var(--rail-gap);
+  padding: 14px 0;
   border-top: 1px solid var(--hairline);
   align-items: baseline;
+}
+
+.mRow:last-child {
+  border-bottom: 1px solid var(--hairline);
 }
 
 .mIdx {
@@ -236,16 +256,7 @@
   color: var(--dim);
 }
 
-@media (max-width: 700px) {
-  .mRow {
-    grid-template-columns: 28px 1fr;
-  }
-  .mNote {
-    grid-column: 2;
-  }
-}
-
-/* ---------- 03 · small joys ---------- */
+/* ---------- 03 · everything else ---------- */
 .joys {
   list-style: none;
   display: flex;
@@ -254,9 +265,9 @@
 
 .joy {
   display: grid;
-  grid-template-columns: 170px 1fr;
-  gap: 18px;
-  padding: 15px 0;
+  grid-template-columns: var(--rail) 1fr;
+  gap: var(--rail-gap);
+  padding: 14px 0;
   border-top: 1px solid var(--hairline);
   align-items: baseline;
 }
@@ -277,13 +288,6 @@
   font-size: 15px;
   line-height: 1.65;
   color: var(--bone);
-}
-
-@media (max-width: 600px) {
-  .joy {
-    grid-template-columns: 1fr;
-    gap: 6px;
-  }
 }
 
 /* ---------- contact ---------- */
@@ -315,9 +319,10 @@
 }
 
 .cRow {
-  display: flex;
-  gap: 18px;
-  padding: 12px 0;
+  display: grid;
+  grid-template-columns: var(--rail) 1fr;
+  gap: var(--rail-gap);
+  padding: 14px 0;
   border-top: 1px solid var(--hairline);
   align-items: baseline;
 }
@@ -327,7 +332,6 @@
   font-size: 10px;
   letter-spacing: 0.14em;
   color: var(--dim);
-  min-width: 86px;
 }
 
 .cLink {
@@ -349,4 +353,30 @@
   text-transform: uppercase;
   color: var(--dim);
   opacity: 0.65;
+  grid-column: 1 / -1;
+}
+
+/* ---------- responsive: rail narrows, then collapses ---------- */
+@media (max-width: 680px) {
+  .root {
+    --rail: 84px;
+  }
+  .mRow {
+    grid-template-columns: var(--rail) 1fr;
+  }
+  .mNote {
+    grid-column: 2;
+  }
+  .stats {
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .race,
+  .joy,
+  .cRow {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
 }

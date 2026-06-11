@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
-import { ChamberTitle, Marginalia, Stat, Gallery } from './shared';
+import { ChamberTitle, Marginalia, Stat, Gallery, HeroArt } from './shared';
 import { useStore } from '../state/store';
 import s from './Dolomite.module.css';
 
-/* Layout language: a radar / ops board — dark, instrument-like, sparse (§3). */
+/* Layout language: a radar / ops board — dark, instrument-like, sparse (§3).
+   Grid: instruments hold the left rail (radar, then the strata band), text the right. */
 
 const BLIPS = [
   [204, 96, 'JARVIS'],
@@ -26,26 +27,12 @@ const TICKS = Array.from({ length: 12 }, (_, i) => {
   };
 });
 
-type MissionStatus = 'running' | 'complete' | 'scheduled' | 'continuous';
-
-const MISSIONS: ReadonlyArray<{
-  id: string;
-  verb: string;
-  desc: string;
-  status: MissionStatus;
-}> = [
-  { id: 'M-01', verb: 'dispatch', desc: 'missions handed to claude code', status: 'running' },
-  { id: 'M-02', verb: 'consolidate', desc: 'stray repos, one tree', status: 'complete' },
-  { id: 'M-03', verb: 'audit', desc: 'credentials swept, rotated', status: 'scheduled' },
-  { id: 'M-04', verb: 'observe', desc: 'every node on this map', status: 'continuous' },
-];
-
-const STATUS_UI: Record<MissionStatus, { dot: string; text: string; label: string }> = {
-  running: { dot: s.dotRunning, text: s.stRunning, label: 'running' },
-  complete: { dot: s.dotComplete, text: s.stComplete, label: 'complete' },
-  scheduled: { dot: s.dotScheduled, text: s.stScheduled, label: 'scheduled' },
-  continuous: { dot: s.dotContinuous, text: s.stContinuous, label: 'continuous' },
-};
+/* The three standing missions — exactly what the desk does, nothing speculative. */
+const MISSIONS = [
+  { id: 'M-01', verb: 'dispatch', desc: 'missions out to coding agents' },
+  { id: 'M-02', verb: 'consolidate', desc: 'stray repos into one tree' },
+  { id: 'M-03', verb: 'audit', desc: 'credentials, swept' },
+] as const;
 
 function MissionClock() {
   const reduced = useStore((st) => st.reducedMotion);
@@ -115,8 +102,10 @@ export default function Dolomite() {
     <div className={s.root}>
       <header className={s.head}>
         <div className={s.headLeft}>
-          <ChamberTitle kicker="DOLOMITE — MISSION CONTROL">It runs the rest.</ChamberTitle>
-          <Marginalia>The tool the other tools report to.</Marginalia>
+          <ChamberTitle kicker="DOLOMITE — MISSION CONTROL · LOCAL">
+            Every project answers to one desk.
+          </ChamberTitle>
+          <Marginalia className={s.tagline}>Internal tool. One machine. One operator.</Marginalia>
         </div>
         <div className={s.readout} aria-label="System readout">
           <p className={s.readoutRow}>
@@ -134,47 +123,61 @@ export default function Dolomite() {
         </div>
       </header>
 
-      <div className={s.board}>
-        <Radar />
-        <section className={s.missions} aria-label="Mission board">
-          <div className={s.boardHead}>
-            <Marginalia>mission board</Marginalia>
-            <Marginalia>status</Marginalia>
-          </div>
-          <ul className={s.missionList}>
-            {MISSIONS.map((m) => {
-              const ui = STATUS_UI[m.status];
-              return (
+      <section className={s.section} aria-label="Mission board">
+        <Marginalia className={s.marker}>01 / the board</Marginalia>
+        <div className={s.duo}>
+          <Radar />
+          <div className={s.missions}>
+            <div className={s.boardHead}>
+              <Marginalia>missions</Marginalia>
+              <Marginalia>mode</Marginalia>
+            </div>
+            <ul className={s.missionList}>
+              {MISSIONS.map((m) => (
                 <li key={m.id} className={s.mission}>
                   <span className={s.mId}>{m.id}</span>
                   <span className={s.mVerb}>{m.verb}</span>
                   <span className={s.mDesc}>{m.desc}</span>
-                  <span className={`${s.mStatus} ${ui.text}`}>
-                    <span className={`${s.dot} ${ui.dot}`} aria-hidden="true" />
-                    {ui.label}
+                  <span className={s.mMode}>
+                    <span className={s.dot} aria-hidden="true" />
+                    semi-auto
                   </span>
                 </li>
-              );
-            })}
-          </ul>
-        </section>
-      </div>
+              ))}
+            </ul>
+            <div className={s.stats}>
+              <Stat value="3" label="standing missions" />
+              <Stat value="1" label="operator" />
+              <Stat value="internal" label="no users to count" />
+            </div>
+          </div>
+        </div>
+      </section>
 
-      <div className={s.stats}>
-        <Stat value="every" label="project · one plane" />
-        <Stat value="1" label="operator" />
-        <Stat value="0" label="left unwatched" />
-      </div>
+      <section className={s.section}>
+        <Marginalia className={s.marker}>02 / debrief</Marginalia>
+        <div className={s.duo}>
+          <div className={s.heroWrap}>
+            <HeroArt id="dolomite" alt="Macro rock strata, amber edge light" />
+          </div>
+          <div className={`prose ${s.debrief}`}>
+            <p>
+              Dolomite is local mission control for my other projects. It dispatches missions
+              through coding agents, pulls stray repos into one tree, and audits credentials.
+              Semi-autonomous — the agents do the work, and I am still in the chair.
+            </p>
+            <p>
+              There are no users to count and no revenue to report. It is an internal tool: every
+              other chamber on this map reports to it. That is the whole job.
+            </p>
+          </div>
+        </div>
+      </section>
 
-      <div className="prose">
-        <p>
-          A local command plane over every personal project. Missions dispatch through Claude Code
-          — repos consolidated, credentials audited, nothing unwatched. Semi-autonomous: it asks
-          before it acts. I built the tools. This one runs them.
-        </p>
-      </div>
-
-      <Gallery id="dolomite" captions={['ops board — live missions', 'dispatch — claude code uplink']} />
+      <section className={s.section}>
+        <Marginalia className={s.marker}>03 / evidence</Marginalia>
+        <Gallery id="dolomite" captions={['ops board — live missions', 'dispatch — claude code uplink']} />
+      </section>
     </div>
   );
 }

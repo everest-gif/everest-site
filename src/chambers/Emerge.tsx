@@ -1,4 +1,4 @@
-import { ChamberTitle, Marginalia, Stat, Gallery } from './shared';
+import { ChamberTitle, Marginalia, Stat, Gallery, HeroArt } from './shared';
 import { useStore } from '../state/store';
 import s from './Emerge.module.css';
 
@@ -18,7 +18,7 @@ const FILES: CaseFile[] = [
     index: '01',
     tag: 'active',
     title: 'Appointment',
-    body: 'APM & Solutions Engineer. One desk, both sides of it — scope the agent on the product side, then build it, ship it, and hold it on the engineering side.',
+    body: 'APM & Solutions Engineer. One desk, both sides of it — I scope the agent on the product side, then build it, ship it, and hold it on the engineering side.',
     exhibit: 'role · emerge ai',
     span: s.span2,
   },
@@ -26,23 +26,23 @@ const FILES: CaseFile[] = [
     index: '02',
     tag: 'deployed',
     title: 'Four production agents',
-    body: 'Claude Managed Agents built and shipped to production — reception, talent pre-screening, and the talent interview pipelines. Scoped, deployed, and kept in service.',
+    body: 'Four Claude Managed Agents shipped to production — reception and talent pipelines. All of them built for the company’s clients. The headline is literal.',
     exhibit: 'claude managed agents · ×4',
     span: s.span4,
   },
   {
     index: '03',
     tag: 'delivered',
-    title: 'The YPO seminar',
-    body: 'Led an AI seminar for a room of fifteen chief executives. Translating agent systems for the people who sign for them is its own engineering discipline.',
+    title: 'The CEO seminar',
+    body: 'I led an AI seminar for a room of fifteen chief executives. If I can’t explain an agent to the people who pay for it, I haven’t finished building it.',
     exhibit: 'audience · 15 ceos',
     span: s.span3,
   },
   {
     index: '04',
-    tag: 'adopted',
+    tag: 'designed',
     title: 'Pricing & usage architecture',
-    body: 'Designed how the platform charges for agents — the pricing and usage architecture under every deployment. The meter the business runs on.',
+    body: 'I designed how the platform charges for agents — the pricing and usage architecture under every deployment. The meter the business runs on.',
     exhibit: 'scope · platform-wide',
     span: s.span3,
   },
@@ -53,10 +53,12 @@ export default function Emerge() {
   return (
     <div className={reduced ? s.root : `${s.root} ${s.animate}`}>
       <header className={s.head}>
-        <ChamberTitle kicker="EMERGE AI — OPERATOR">Matters of record.</ChamberTitle>
+        <ChamberTitle kicker="EMERGE AI — CLIENT WORK">
+          Four agents live. None of them mine.
+        </ChamberTitle>
         <div className={s.stamp} aria-hidden="true">
           <span className={s.stampOrg}>Emerge AI</span>
-          <span className={s.stampLine}>record · in service</span>
+          <span className={s.stampLine}>client record · live</span>
         </div>
       </header>
 
@@ -74,18 +76,26 @@ export default function Emerge() {
         </li>
       </ul>
 
-      <div className={`prose ${s.summary}`}>
-        <p>
-          The seat is half product, half deployment: scope an agent, then build it, ship it, and
-          hold it in production. Four entries on file. All of them shipped.
-        </p>
-      </div>
-
-      <div className={s.tally}>
-        <Stat value="4" label="production agents shipped" />
-        <Stat value="3" label="agent pipelines in service" />
-        <Stat value="15" label="CEOs, one seminar" />
-        <Stat value="1" label="platform pricing architecture" />
+      <div className={s.brief}>
+        <div className={s.briefText}>
+          <div className={`prose ${s.summary}`}>
+            <p>
+              I hold one seat with two jobs at Emerge AI: scope the agent on the product side,
+              build and ship it on the engineering side. Four Claude Managed Agents are live in
+              production — every one built for the company&rsquo;s clients, not for me.
+            </p>
+          </div>
+          <div className={s.tally}>
+            <Stat value="4" label="agents live in production" />
+            <Stat value="0" label="of them mine" />
+            <Stat value="15" label="CEOs, one seminar" />
+            <Stat value="1" label="pricing architecture, platform-wide" />
+          </div>
+        </div>
+        <div className={s.heroSlot}>
+          <HeroArt id="emerge" alt="Dossier paper under raking light" />
+          <Marginalia className={s.heroCap}>fig. 00 — dossier, raking light</Marginalia>
+        </div>
       </div>
 
       <section className={s.files} aria-label="Case files">

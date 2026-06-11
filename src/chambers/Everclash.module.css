@@ -4,7 +4,7 @@
   gap: 48px;
 }
 
-/* ---------- header: title left, lobby readout right ---------- */
+/* ---------- header: title left, cabinet readout right ---------- */
 .head {
   display: flex;
   justify-content: space-between;
@@ -32,11 +32,11 @@
   color: var(--bone);
 }
 
-.liveDot {
+/* insert-coin blink — amber, not red: nothing here claims a live server */
+.tick {
   width: 6px;
   height: 6px;
-  border-radius: 50%;
-  background: var(--red); /* the one permitted live-status tick */
+  background: var(--amber);
   animation: pulse 2.4s cubic-bezier(0.22, 1, 0.36, 1) infinite;
 }
 
@@ -58,14 +58,33 @@
   color: var(--dim);
 }
 
-/* ---------- roster: the character-select grid ---------- */
-.rosterBar {
+/* ---------- section scaffold: numbered mono markers on a shared hairline ---------- */
+.secBar {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
+  gap: 16px;
   padding-bottom: 10px;
   border-bottom: 1px solid var(--hairline);
-  margin-bottom: 18px;
+  margin-bottom: 20px;
+}
+
+.secMark {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+
+.secNum {
+  color: var(--amber);
+}
+
+.secBody {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
 }
 
 .timer {
@@ -76,6 +95,7 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* ---------- roster: the character-select grid ---------- */
 .rosterGrid {
   list-style: none;
   margin: 0;
@@ -239,6 +259,29 @@
   color: var(--dim);
 }
 
+/* ---------- impact study: caption rail hangs in the left margin, art letterboxed ---------- */
+.heroBand {
+  display: grid;
+  grid-template-columns: minmax(120px, 0.26fr) minmax(0, 1fr);
+  gap: 24px;
+}
+
+.heroRail {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 2px 0;
+}
+
+.heroCap {
+  max-width: 18ch;
+}
+
+.heroBand :global(.ch-hero img) {
+  aspect-ratio: 21 / 9;
+}
+
 /* ---------- stack readout ---------- */
 .specBar {
   display: grid;
@@ -274,24 +317,45 @@
   color: var(--bone);
 }
 
-/* ---------- prose + stats band ---------- */
+/* ---------- prose + stats band: stats keyed off a hairline rule ---------- */
 .band {
   display: grid;
   grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
-  gap: 32px;
+  gap: 40px;
   align-items: start;
 }
 
 .stats {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 20px 24px;
+  gap: 24px 28px;
+  border-left: 1px solid var(--hairline);
+  padding-left: 32px;
+}
+
+/* ---------- lab line ---------- */
+.labLine {
+  max-width: 62ch;
+}
+
+.labName {
+  font-family: var(--font-mono);
+  font-size: 0.82em;
+  letter-spacing: 0.12em;
+  color: var(--amber);
 }
 
 /* ---------- responsive ---------- */
 @media (max-width: 860px) {
   .band {
     grid-template-columns: 1fr;
+    gap: 28px;
+  }
+  .stats {
+    border-left: none;
+    padding-left: 0;
+    border-top: 1px solid var(--hairline);
+    padding-top: 24px;
   }
 }
 
@@ -310,6 +374,18 @@
   .slot {
     aspect-ratio: 3 / 2;
   }
+  .heroBand {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .heroRail {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .heroBand :global(.ch-hero img) {
+    aspect-ratio: 16 / 10;
+  }
   .specBar {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -323,7 +399,7 @@
 
 /* ---------- reduced motion ---------- */
 @media (prefers-reduced-motion: reduce) {
-  .liveDot {
+  .tick {
     animation: none;
   }
   .scan {

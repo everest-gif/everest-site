@@ -213,6 +213,11 @@ a {
   bottom: 20px;
   right: 24px;
 }
+/* skip-intro lives bottom-left during the intro (R6 — cursor-ring collision at br) */
+.hud-skip {
+  bottom: 20px;
+  left: 24px;
+}
 .hud button,
 .hud a {
   pointer-events: auto;
@@ -392,7 +397,7 @@ a {
   flex-direction: column;
   align-items: center;
   justify-content: flex-end;
-  padding-bottom: 9vh;
+  padding-bottom: 12.5vh; /* R6 — raised so the sub-line and ENTER ring breathe */
   text-align: center;
   pointer-events: none;
   visibility: hidden; /* gsap autoAlpha reveals */
@@ -431,7 +436,7 @@ a {
   text-shadow: 0 0 38px rgba(232, 162, 61, 0.18);
 }
 .lockup-sub {
-  margin-top: 14px;
+  margin-top: 18px;
   font-family: var(--font-body);
   font-size: 15px;
   color: var(--dim);
@@ -898,6 +903,19 @@ a {
   .ch-ph-scan {
     animation: none;
   }
+}
+
+/* ---------- chamber hero art (R4.2 — atmosphere only) ---------- */
+.ch-hero {
+  margin: 0;
+  border: 1px solid var(--hairline);
+  overflow: hidden;
+}
+.ch-hero img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
 }
 
 /* ---------- webgl context-loss fallback (§9.7) ---------- */

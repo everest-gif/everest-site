@@ -60,12 +60,16 @@ export default function HUD() {
         )}
       </nav>
 
-      <div className={`hud-br${intro || onHud ? ' is-on' : ''}`}>
+      {/* bottom-left during the intro — bottom-right collided with the cursor ring (R6) */}
+      <div className={`hud-skip${intro ? ' is-on' : ''}`}>
         {intro && (
           <button type="button" onClick={skipToHub} aria-label="Skip the intro and go to the hub">
             [ skip intro ]
           </button>
         )}
+      </div>
+
+      <div className={`hud-br${onHud ? ' is-on' : ''}`}>
         {act === 'hub' && (
           <button
             type="button"

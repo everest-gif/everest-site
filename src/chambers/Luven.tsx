@@ -1,9 +1,11 @@
 import type { ReactNode } from 'react';
-import { ChamberTitle, Marginalia, Gallery } from './shared';
+import { ChamberTitle, Marginalia, Gallery, HeroArt } from './shared';
 import { CONTACT } from '../content/nodes';
 import s from './Luven.module.css';
 
-/* Layout language: a business one-pager with editorial weight (§3). */
+/* Layout language: a business one-pager with editorial weight (§3).
+   One grid: 148px marginalia gutter + content column. The hero band sits
+   directly under the headline — atmosphere up top, evidence at the bottom. */
 
 interface LedgerRow {
   label: string;
@@ -14,10 +16,10 @@ interface LedgerRow {
 
 const LEDGER: readonly LedgerRow[] = [
   { label: 'first production sale', value: '$994', note: 'closed March 2026', star: true },
-  { label: 'production workflows', value: '9', note: 'n8n · all live' },
-  { label: 'workflow nodes', value: '770+', note: 'across nine flows' },
+  { label: 'workflows', value: '9', note: 'in production' },
+  { label: 'nodes', value: '770+', note: 'across nine workflows' },
   { label: 'delivery', value: 'GHL-native', note: "inside the client's CRM" },
-  { label: 'coverage', value: '24/7', note: 'nights, weekends, jobsites' },
+  { label: 'coverage', value: '24/7', note: 'answers · qualifies · books' },
 ];
 
 function Section({ index, label, children }: { index: string; label: string; children: ReactNode }) {
@@ -45,20 +47,27 @@ export default function Luven() {
       </div>
 
       <header className={s.head}>
-        <ChamberTitle kicker="LUVEN AI — FOUNDER">Every missed call is a missed job.</ChamberTitle>
+        <ChamberTitle kicker="FOUNDER · LUVEN TECHNOLOGIES LLC">
+          Every missed call is a missed job.
+        </ChamberTitle>
       </header>
+
+      <div className={s.heroBand}>
+        <p className={s.secLabel}>after hours</p>
+        <HeroArt id="luven" alt="A workshop phone glowing at night" />
+      </div>
 
       <Section index="01" label="the product">
         <div className={`prose ${s.lede}`}>
           <p>
-            Luven is an AI voice receptionist for trades and home-services businesses — it answers,
+            I founded Luven: an AI voice receptionist for trades and home-services. It answers,
             qualifies, and books. 24/7.
           </p>
         </div>
       </Section>
 
       <Section index="02" label="the numbers">
-        <div className={s.ledger} role="group" aria-label="Luven AI, in numbers">
+        <div className={s.ledger} role="group" aria-label="Luven, in numbers">
           {LEDGER.map((row, i) => (
             <div key={row.label} className={s.row} style={{ animationDelay: `${0.2 + i * 0.09}s` }}>
               <span className={s.rowLabel}>{row.label}</span>
@@ -72,22 +81,19 @@ export default function Luven() {
         </div>
       </Section>
 
-      <Section index="03" label="the vertical">
+      <Section index="03" label="the work">
         <div className="prose">
           <p>
-            The vertical, plainly: trades and home-services. HVAC, plumbing, electrical, roofing —
-            businesses run from a truck, where the owner is on a roof when the phone rings and the
-            job goes to whoever picks up. Luven picks up.
+            Trades and home-services run on the phone, and the owner is rarely next to it. Luven
+            picks up — day or night — qualifies the caller, and books the job.
           </p>
           <p>
-            Nine production n8n workflows — 770-plus nodes between them — delivered native inside
-            GoHighLevel. Booked calls land straight on the client&rsquo;s calendar. No new software,
-            nothing to learn.
+            I built nine production workflows, 770-plus nodes between them, and delivered the
+            system GHL-native: it lives inside the CRM the client already uses.
           </p>
           <p>
-            First production sale closed March 2026: $994. A small number with the right shape — a
-            real business paying real money for calls it used to miss. Operated under Luven
-            Technologies LLC.
+            First production sale closed March 2026. $994. I run the company as Luven Technologies
+            LLC, and it is in production today.
           </p>
         </div>
       </Section>

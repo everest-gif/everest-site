@@ -1,22 +1,22 @@
 import { useEffect, useRef, useState } from 'react';
-import { ChamberTitle, Marginalia, Stat, Gallery } from './shared';
+import { ChamberTitle, Marginalia, Stat, Gallery, HeroArt } from './shared';
 import { useStore } from '../state/store';
 import s from './Jarvis.module.css';
 
 /* Layout language: a live system console (§3). */
 
 const LOG_LINES = [
-  ['23:41:07', 'evolver', 'nightly chain started — 3 missions queued'],
-  ['23:41:09', 'researcher', 'scanning 14 sources · agent eval harnesses'],
+  ['23:41:07', 'evolver', 'nightly chain started · missions queued'],
+  ['23:41:09', 'researcher', 'source scan running · agent eval harnesses'],
   ['23:41:31', 'builder', 'patch applied · tests 220/220 green'],
   ['23:42:02', 'content', 'draft assembled · tone check passed'],
   ['23:42:18', 'core', 'routing: tier-2 → tier-1 (hard reasoning step)'],
   ['23:42:40', 'builder', 'electron dashboard: mission card updated'],
-  ['23:43:05', 'evolver', 'self-review: 2 improvements proposed'],
+  ['23:43:05', 'evolver', 'self-review: improvements proposed'],
   ['23:43:21', 'core', 'voice loop idle · wake word armed'],
   ['23:43:58', 'researcher', 'summary committed to memory store'],
-  ['23:44:12', 'core', 'cost guard: 91.4% inference routed to small tier'],
-  ['23:44:36', 'builder', 'chain 2/3 complete · zero intervention'],
+  ['23:44:12', 'core', 'cost guard: inference cost down ~90%'],
+  ['23:44:36', 'builder', 'chain complete · zero intervention'],
   ['23:45:01', 'evolver', 'tomorrow: ship, verify, repeat'],
 ] as const;
 
@@ -105,42 +105,57 @@ export default function Jarvis() {
   return (
     <div className={s.root}>
       <header className={s.head}>
-        <ChamberTitle kicker="JARVIS — PERSONAL AI ORCHESTRATOR">Four agents. One operator.</ChamberTitle>
-        <Marginalia className={s.tagline}>The site you just flew through is shaped like this system.</Marginalia>
+        <ChamberTitle kicker="JARVIS — PERSONAL AI ORCHESTRATOR · LOCAL ON APPLE SILICON">
+          Four agents. One operator.
+        </ChamberTitle>
+        <Marginalia className={s.tagline}>It builds while I sleep.</Marginalia>
       </header>
 
-      <div className={s.grid}>
-        <Console />
-        <div className={s.side}>
-          <Diagram />
-          <div className={s.stats}>
-            <Stat value="4" label="specialized agents" />
-            <Stat value="220" label="tests green" />
-            <Stat value="nightly" label="autonomous build chains" />
-            <Stat value="90%+" label="inference cost reduction" />
+      <section className={s.section}>
+        <Marginalia className={s.marker}>01 / telemetry</Marginalia>
+        <div className={s.grid}>
+          <Console />
+          <div className={s.side}>
+            <Diagram />
+            <div className={s.stats}>
+              <Stat value="4" label="agents, one core" />
+              <Stat value="220" label="tests green at merge" />
+              <Stat value="nightly" label="autonomous build chains" />
+              <Stat value="~90%" label="inference cost cut" />
+            </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      <div className={`prose ${s.body}`}>
-        <p>
-          Jarvis is an autonomous multi-agent system running locally on Apple Silicon. Four
-          specialized agents — Researcher, Builder, Content, Evolver — coordinate through a central
-          core: nightly build chains run while I sleep, an Electron mission-control dashboard
-          watches everything, and a voice interface closes the loop — wake word, speech-to-text,
-          tool dispatch, speech back.
-        </p>
-        <p>
-          Two-tier model routing sends routine work to small models and hard reasoning to large
-          ones. Inference cost fell more than ninety percent. The orchestrator you navigated to
-          reach this panel is its portrait.
-        </p>
-      </div>
+      <section className={s.section}>
+        <Marginalia className={s.marker}>02 / how it runs</Marginalia>
+        <div className={s.grid}>
+          <div className="prose">
+            <p>
+              Jarvis is my personal AI orchestrator, running locally on Apple Silicon. Four agents
+              — Researcher, Builder, Content, Evolver — work under one core. Nightly build chains
+              run without me. An Electron dashboard is mission control. The voice loop closes it:
+              wake word, speech-to-text, tools, speech back.
+            </p>
+            <p>
+              Routing is two-tier — small models take the routine work, hard reasoning goes to the
+              large ones. That cut inference cost about ninety percent. At merge, 220 tests were
+              green.
+            </p>
+          </div>
+          <div className={s.heroWrap}>
+            <HeroArt id="jarvis" alt="Long-exposure light study — a dark control room, one amber monitor glow" />
+          </div>
+        </div>
+      </section>
 
-      <Gallery
-        id="jarvis"
-        captions={['mission control — dashboard', 'voice loop — live session', 'nightly chain — run log']}
-      />
+      <section className={s.section}>
+        <Marginalia className={s.marker}>03 / evidence</Marginalia>
+        <Gallery
+          id="jarvis"
+          captions={['mission control — dashboard', 'voice loop — live session', 'nightly chain — run log']}
+        />
+      </section>
     </div>
   );
 }
