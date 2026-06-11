@@ -32,3 +32,14 @@
     smoothstep edges, no division that can hit 0 — one NaN pixel destroys the whole bloom chain.
 13. **Lockup legibility scrim** — neutral black-alpha radial behind the type block (not a hue gradient;
     anti-slop rules ban hue gradients outside WebGL, black alpha is fine).
+14. **54bpm heartbeat easter egg** — the hub core pulses at 0.9Hz (`exp(-fract(t*0.9)*5)`): 54bpm,
+    the resting heart rate of an endurance athlete (spec §2 Act III).
+15. **Hub nodes are DOM buttons projected over the canvas** (not canvas hit-testing): native Tab order,
+    real focus, aria-labels for free; positions stream from the render loop through a module-level
+    bridge (`nodeScreens`), no React re-renders per frame.
+16. **Esc on the hub triggers the reverse breach.** Spec defines Esc for closing chambers; on the hub
+    it mirrors `[ return to mountains ]` — consistent "step back" semantics.
+17. **Pulse-traffic colors:** core→node instructions amber, node→core reports jade — makes the
+    orchestration metaphor legible without labels.
+18. **Sector arc-text drawn into CanvasTextures** with the bundled JetBrains Mono (no troika/external
+    font fetch); characters traversed clockwise (descending angle) or the text mirrors.

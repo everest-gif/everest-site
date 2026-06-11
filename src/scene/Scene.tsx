@@ -5,6 +5,7 @@ import { useStore } from '../state/store';
 import CameraRig from './CameraRig';
 import ThresholdWorld from './ThresholdWorld';
 import TunnelWorld from './TunnelWorld';
+import HubWorld from './HubWorld';
 import BreachTimeline from './BreachTimeline';
 import PostFX from './PostFX';
 
@@ -81,6 +82,7 @@ export default function Scene() {
         <BreachTimeline />
         <ThresholdWorld />
         <TunnelWorld />
+        <HubWorld />
         <PostFX />
         <Precompiler />
         <FrameloopGovernor />

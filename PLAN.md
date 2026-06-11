@@ -42,14 +42,17 @@
 - [x] Re-entry verified (second breach after reverse works; no stale timelines)
 - [x] Phase exit ritual (typecheck ✓ build ✓ preview console clean ✓)
 
-## P3 — Act III: Hub  [TODO]
-- [ ] Core amber orb (fresnel, noise churn, 54bpm pulse) + `everest` label
-- [ ] 8 nodes, 2 rings, unique drift params; sector arc-labels
-- [ ] Threads core↔nodes + irregular traveling light pulses (0.8–4s)
-- [ ] Hover: brighten + thread solid + others dim 40% + stat chip; crosshair cursor
-- [ ] Keyboard: Tab cycles nodes (amber focus ring), Enter opens, Esc returns
-- [ ] Reverse-breach (1.4s compressed) via [ return to mountains ]
-- [ ] Phase exit ritual
+## P3 — Act III: Hub  [DONE]
+- [x] Core amber orb (fresnel, churn, 54bpm heartbeat in shader) + `everest` label (projected DOM)
+- [x] 8 nodes (XY-plane orbits facing camera, unique radius/speed/phase/incline), 2 ring guides, sector arc-text (canvas-texture, self-hosted mono font, clockwise traverse)
+- [x] Threads (per-node THREE.Line, endpoint updated per frame) + pulse traffic (22-slot pool, 0.8–4s irregular, amber=instruction core→node, jade=report node→core)
+- [x] Hover/focus: node brightens ×1.25, thread solid, others dim 40%, stat chip docks; crosshair cursor via data-cursor
+- [x] DOM overlay buttons projected from 3D (native Tab cycling, aria-labels, focus ring); Enter opens; Esc on hub = reverse breach
+- [x] Mobile fit factors (xFit/yFit) reflow to tall constellation; core scales down
+- [x] Reveal stagger on arrival (core 0.35s + nodes 0.4s × 0.055 stagger)
+- [x] Reduced motion: drift frozen, pulses become slow opacity ticks
+- [x] Phase exit ritual (typecheck ✓ build ✓ hover/keyboard/Esc verified in browser ✓ console clean ✓)
+- LESSON: hard-reload (cache-bust ?cb=) when verifying preview builds — a stale cached index.html cost a debugging detour.
 
 ## P4 — Act IV: Chambers  [TODO]
 - [ ] Transition system: isolation (0.3s) → handoff (0.4s, orchestrator → live mini-widget bottom-left) → CRT scan-line materialization from node position

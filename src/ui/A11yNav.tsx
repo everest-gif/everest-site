@@ -12,7 +12,7 @@ export default function A11yNav() {
       <ul>
         {NODES.map((n) => (
           <li key={n.id}>
-            <a href={`#/hub/${n.id}`}>
+            <a href={`#/hub/${n.id}`} tabIndex={-1}>
               {n.label} — {n.role}
             </a>
           </li>

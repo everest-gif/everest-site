@@ -490,6 +490,91 @@ a {
   }
 }
 
+/* ---------- Act III: hub overlay ---------- */
+.hub-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-lockup);
+  pointer-events: none;
+}
+.hub-node {
+  position: absolute;
+  top: 0;
+  left: 0;
+  will-change: transform, opacity;
+}
+.hub-node-btn {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: auto;
+  padding: 26px 10px 4px;
+}
+.hub-node-hit {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 48px;
+  height: 48px;
+  transform: translate(-50%, -100%);
+}
+.hub-node-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  color: var(--dim);
+  transition: color var(--t-micro) var(--ease-out), opacity var(--t-micro) var(--ease-out);
+  white-space: nowrap;
+}
+.hub-node-btn.is-hot .hub-node-label {
+  color: var(--amber);
+}
+.hub-node-btn.is-dim .hub-node-label {
+  opacity: 0.4;
+}
+.hub-node-btn:focus-visible {
+  outline: none;
+}
+.hub-node-btn:focus-visible .hub-node-label {
+  color: var(--amber);
+  outline: 1px solid var(--amber);
+  outline-offset: 6px;
+}
+.hub-chip {
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  transform: translate(-50%, 8px);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+  color: var(--bone);
+  background: rgba(17, 17, 20, 0.92);
+  border: 1px solid var(--hairline);
+  border-left: 2px solid var(--amber);
+  padding: 7px 12px;
+  opacity: 0;
+  translate: 0 4px;
+  transition: opacity var(--t-micro) var(--ease-out), translate var(--t-micro) var(--ease-out);
+  pointer-events: none;
+}
+.hub-chip.is-on {
+  opacity: 1;
+  translate: 0 0;
+}
+.hub-core-label {
+  position: absolute;
+  top: 0;
+  left: 0;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.22em;
+  color: var(--dim);
+  will-change: transform, opacity;
+}
+
 /* ---------- webgl context-loss fallback (§9.7) ---------- */
 .context-lost {
   position: fixed;
