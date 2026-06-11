@@ -1,8 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import '@fontsource-variable/jetbrains-mono';
-import '@fontsource-variable/geist';
-import '@fontsource-variable/fraunces/opsz-italic.css';
+import '@fontsource-variable/newsreader/wght.css';
+import '@fontsource-variable/fraunces/full-italic.css';
+import '@fontsource-variable/fraunces/wght.css';
 import './styles/global.css';
 import App from './App';
 import { initRouter } from './state/router';

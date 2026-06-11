@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { ChamberTitle, Marginalia, Stat, Gallery, HeroArt } from './shared';
+import { ChamberTitle, Marginalia, Stat, Gallery, HeroArt, PullStat } from './shared';
 import { useStore } from '../state/store';
 import s from './Jarvis.module.css';
 
@@ -104,12 +104,14 @@ function Diagram() {
 export default function Jarvis() {
   return (
     <div className={s.root}>
-      <header className={s.head}>
+      <header className={`${s.head} ch-head-overlap`}>
         <ChamberTitle kicker="JARVIS — PERSONAL AI ORCHESTRATOR · LOCAL ON APPLE SILICON">
           Four agents. One operator.
         </ChamberTitle>
         <Marginalia className={s.tagline}>It builds while I sleep.</Marginalia>
       </header>
+
+      <PullStat value={220} caption="tests green at merge — every nightly chain" />
 
       <section className={s.section}>
         <Marginalia className={s.marker}>01 / telemetry</Marginalia>

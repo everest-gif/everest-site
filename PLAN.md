@@ -1,8 +1,23 @@
 # PLAN — everest-site build state
 
-> Source spec: `ENTER_THE_MOUNTAINS.md` + refinement directive `ENTER_THE_MOUNTAINS_R2.md` (R2 overrides on conflict).
+> Source spec: `ENTER_THE_MOUNTAINS.md` + `ENTER_THE_MOUNTAINS_R2.md` + `GORGEOUS_PASS.md` (latest overrides on conflict).
 > This file always reflects exact current state.
 > A fresh session resumes from here: read CLAUDE.md → this file → DECISIONS.md, then continue at the first unchecked item.
+
+## GORGEOUS PASS (sequence: M1 → M3 → M2+M7 → M4+M5 → M6 → M8+M9 → M10)
+- [x] M1 Typography: Newsreader prose (17–19px/1.65/38ch), Geist retired, Fraunces full-italic
+      (opsz+SOFT+WONK) + roman numerals; threshold headline 11vw; chamber titles 6.6vw w/
+      SplitText line-mask + opsz sweep; ghost numerals (auto, 01–08, 22vh/12vh mobile);
+      PullStat component (counts up once, 800ms); reveal engine (prose line-stagger 60ms,
+      [data-rule] scaleX, .ch-stat-value tickers); limb overlap via chamber camera (NDC −0.38)
+      + in-padding margin pull. Payload 278.2KB ≤ 280KB. Reference pull-stats in jarvis/luven;
+      remaining six land with M7.
+- [ ] M3 Threshold: full-bleed terrain, hidden tunnel dome, 4 seasons + weather front + control
+- [ ] M2+M7 Light/atmosphere + eight editorial chamber spreads
+- [ ] M4+M5 Breach ≤2.2s denser + hub (nebula, corona, planet materials, pulses, anti-overlap, arc-text deleted)
+- [ ] M6 INDEX overlay + EXPLORE chips + arrow-key hops
+- [ ] M8+M9 Twelve jewelry details + sound pass
+- [ ] M10 Verification, evidence in verification/gorgeous/, deploy, production smoke
 
 ## R1 — Breach total rework  [IN PROGRESS]
 - [x] BEFORE evidence captured (verification/r2/before/: breach video+frames, hub, 8 nodes, 2 chambers)

@@ -45,14 +45,15 @@ export function chamberCam(
     .copy(p)
     .addScaledVector(_out, -dist * 0.42)
     .add(_mid.set(0, dist * 0.16, dist * 0.92));
-  /* push the look right of the planet → planet lands at NDC x ≈ −0.5 */
+  /* push the look right of the planet → planet lands at NDC x ≈ −0.38: the limb
+     tucks under the content column so headlines physically cross it (M1) */
   const tanH = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * camera.aspect;
   const tanV = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
   _fwd.copy(p).sub(outPos).normalize();
   _mid.crossVectors(_fwd, _out.set(0, 1, 0)).normalize(); /* camera-right */
   outLook
     .copy(p)
-    .addScaledVector(_mid, tanH * dist * 0.44)
+    .addScaledVector(_mid, tanH * dist * 0.37)
     .y -= tanV * dist * 0.07;
   return true;
 }

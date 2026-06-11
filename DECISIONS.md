@@ -114,3 +114,17 @@
     construction, deterministic, regenerable, graded with grain + duotone. The
     public/art/<id>/hero.* convention means diffusion outputs can replace them later with
     zero code changes. R4's own rule decided it: darkness is better than slop.
+37. **Geist retired entirely (M1).** Newsreader's wght variant carries all prose — its default
+    opsz (16) IS the text optical size; the opsz-axis file would cost 132KB vs 58KB for zero
+    visible gain at body sizes. Measured load payload 278.2KB ≤ 280KB budget: Fraunces
+    full-italic 146.2 (buys SOFT/WONK personality axes) + Fraunces roman wght 35.8 (ghost
+    numerals) + JetBrains Mono 39.5 + Newsreader 56.7.
+38. **Limb-overlap headlines come from camera framing, not negative margins.** The chamber
+    scroll container needs overflow-y:auto, which forces overflow-x to clip — any text pulled
+    past its left edge is cut. So the planet moved right instead (look offset 0.44→0.37 ≈
+    NDC −0.38): the limb tucks under the column and headlines cross it inside their own box.
+    Headline pull capped at −3.2vw, within the column padding.
+39. **SplitText masks padded ±0.24em horizontally** (+0.2/0.24em vertically) with compensating
+    negative margins: Fraunces at opsz 144 italic paints far outside its em box, and the
+    masks' overflow:clip cut swashes/descenders at rest. Lines start at yPercent 145 so the
+    extended clip window still hides them fully before the rise.

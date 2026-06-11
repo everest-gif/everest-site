@@ -6,6 +6,8 @@ import { NODES, NODE_MAP } from '../content/nodes';
 import { nodeScreens, handles } from '../scene/handles';
 import { beginFlight, endFlight, FLY_IN_S, FLY_HOP_S } from '../scene/flight';
 import { chamberControl } from '../chambers/control';
+import { GhostNumeral } from '../chambers/shared';
+import { initChamberReveals } from '../chambers/reveal';
 import Jarvis from '../chambers/Jarvis';
 import Luven from '../chambers/Luven';
 import Emerge from '../chambers/Emerge';
@@ -182,6 +184,21 @@ function ChamberStage({ id }: { id: NodeId }) {
     };
   }, [id]);
 
+  /* M1 kinetic type — prose lines, hairline rules, stat tickers reveal as they enter.
+     Armed at ~0.45s so the first viewport's reveals land just as the scan completes. */
+  useEffect(() => {
+    const panel = panelRef.current;
+    if (!panel) return;
+    let cleanup: (() => void) | null = null;
+    const t = window.setTimeout(() => {
+      cleanup = initChamberReveals(panel);
+    }, 450);
+    return () => {
+      window.clearTimeout(t);
+      cleanup?.();
+    };
+  }, [id]);
+
   /* de-rez (shared by close and hop): content collapses back toward the planet's limb */
   useEffect(() => {
     const derez = (onDone: () => void) => {
@@ -238,6 +255,7 @@ function ChamberStage({ id }: { id: NodeId }) {
         aria-label={`${node.label} — ${node.role}`}
         tabIndex={-1}
       >
+        <GhostNumeral index={idx + 1} />
         <div className="chamber-scroll" ref={scrollRef}>
           <div className="chamber-content">
             <Content />

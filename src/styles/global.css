@@ -16,7 +16,8 @@
 
   --font-display: 'Fraunces Variable', Georgia, 'Times New Roman', serif;
   --font-mono: 'JetBrains Mono Variable', 'Courier New', monospace;
-  --font-body: 'Geist Variable', 'Avenir Next', 'Helvetica Neue', sans-serif;
+  /* M1 — Newsreader carries all prose (text optical size); Geist is retired */
+  --font-body: 'Newsreader Variable', Georgia, 'Times New Roman', serif;
 
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --t-micro: 200ms;
@@ -430,10 +431,25 @@ a {
   font-weight: 300;
   font-style: italic;
   font-variation-settings: 'opsz' 144;
-  font-size: clamp(2.8rem, 6vw, 5.5rem);
-  line-height: 1.04;
+  /* M1 scale courage — the headline is the voice, not a caption */
+  font-size: clamp(4.5rem, 11vw, 11rem);
+  line-height: 0.98;
+  letter-spacing: -0.01em;
   color: var(--bone);
   text-shadow: 0 0 38px rgba(232, 162, 61, 0.18);
+}
+/* SplitText line masks — each line rises out of its own clip.
+   The masks get padding + compensating negative margins so italic overhangs,
+   ascenders and descenders never clip at rest (Fraunces 144opsz paints well
+   outside its em box); layout is unchanged. */
+.lockup-h1 .sp-line-mask,
+.ch-title .sp-line-mask {
+  padding: 0.2em 0.24em 0.24em;
+  margin: -0.2em -0.24em -0.24em;
+}
+.lockup-h1 .sp-line,
+.ch-title .sp-line {
+  will-change: transform;
 }
 .lockup-sub {
   margin-top: 18px;
@@ -747,10 +763,80 @@ a {
   font-weight: 300;
   font-style: italic;
   font-variation-settings: 'opsz' 144;
-  font-size: clamp(2.4rem, 5vw, 4.4rem);
-  line-height: 1.05;
+  /* M1 scale courage — fills 60–75% of the content column */
+  font-size: clamp(3.2rem, 6.6vw, 6.8rem);
+  line-height: 1.0;
+  letter-spacing: -0.01em;
   color: var(--bone);
   visibility: hidden; /* gsap reveals */
+}
+/* M1 — the headline block crosses the planet's limb. The pull stays inside the
+   column padding (the scroll container clips at its edge); the rest of the
+   overlap comes from the chamber camera placing the limb under the column. */
+.ch-head-overlap {
+  position: relative;
+  z-index: 2;
+  margin-left: clamp(-52px, -3.2vw, 0px);
+}
+@media (max-width: 900px) {
+  .ch-head-overlap {
+    margin-left: 0;
+  }
+}
+
+/* ---------- M1: ghost numeral — 01–08, Fraunces roman, behind content, cropped by the edge ---------- */
+.ch-ghost {
+  position: absolute;
+  right: -0.08em;
+  top: -0.14em;
+  z-index: 0;
+  font-family: var(--font-display);
+  font-style: normal;
+  font-weight: 340;
+  font-size: 22vh;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: rgba(237, 232, 223, 0.035);
+  pointer-events: none;
+  user-select: none;
+}
+@media (max-width: 900px) {
+  .ch-ghost {
+    font-size: 12vh;
+    right: -0.06em;
+    top: -0.1em;
+  }
+}
+
+/* ---------- M1: pull-stat — one enormous counted number per chamber ---------- */
+.ch-pull {
+  position: relative;
+  padding: clamp(18px, 3vh, 34px) 0;
+  border-top: 1px solid var(--hairline);
+  border-bottom: 1px solid var(--hairline);
+}
+.ch-pull-value {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 300;
+  font-variation-settings: 'opsz' 144;
+  font-size: clamp(96px, 16vh, 210px);
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+  color: var(--bone);
+  white-space: nowrap;
+}
+.ch-pull-value .ch-pull-unit {
+  font-size: 0.42em;
+  color: var(--amber);
+}
+.ch-pull-cap {
+  margin-top: 10px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--dim);
 }
 .ch-marginalia {
   font-family: var(--font-mono);
@@ -780,17 +866,22 @@ a {
   margin-top: 6px;
 }
 .prose {
+  /* M1 — Newsreader, text optical size: 17–19px / 1.65 / max 38ch */
   font-family: var(--font-body);
-  font-size: 16px;
-  line-height: 1.75;
+  font-size: clamp(17px, 1.2vw, 19px);
+  line-height: 1.65;
   color: var(--bone);
-  max-width: 62ch;
+  max-width: 38ch;
 }
 .prose p + p {
   margin-top: 1em;
 }
 .prose .dim {
   color: var(--dim);
+}
+/* body line-stagger reveal targets (SplitText) */
+.prose .sp-bline {
+  display: block;
 }
 
 /* ---------- gallery + procedural placeholder frames ---------- */

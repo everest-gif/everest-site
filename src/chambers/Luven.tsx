@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { ChamberTitle, Marginalia, Gallery, HeroArt } from './shared';
+import { ChamberTitle, Marginalia, Gallery, HeroArt, PullStat } from './shared';
 import { CONTACT } from '../content/nodes';
 import s from './Luven.module.css';
 
@@ -46,11 +46,13 @@ export default function Luven() {
         </span>
       </div>
 
-      <header className={s.head}>
+      <header className={`${s.head} ch-head-overlap`}>
         <ChamberTitle kicker="FOUNDER · LUVEN TECHNOLOGIES LLC">
           Every missed call is a missed job.
         </ChamberTitle>
       </header>
+
+      <PullStat value={994} prefix="$" caption="first production sale — closed March 2026" />
 
       <div className={s.heroBand}>
         <p className={s.secLabel}>after hours</p>

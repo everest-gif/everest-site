@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
+import { SplitText } from 'gsap/SplitText';
 import { useStore } from '../state/store';
 
-gsap.registerPlugin(useGSAP);
+gsap.registerPlugin(useGSAP, SplitText);
 
 /* Act I type lockup + ENTER affordance. Magnetic hover per §5 (≤8px translate, spring back). */
 export default function ThresholdLockup() {
@@ -12,7 +13,16 @@ export default function ThresholdLockup() {
   const [mounted, setMounted] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
+  const splitRef = useRef<SplitText | null>(null);
   const visible = act === 'threshold';
+
+  /* revert the headline split when the lockup unmounts */
+  useEffect(() => {
+    if (!mounted) {
+      splitRef.current?.revert();
+      splitRef.current = null;
+    }
+  }, [mounted]);
 
   /* falls behind the camera during the breach; unmounting mid-flight cost a ~57ms style
      recalc right at the blade moment — defer teardown into the arrival light-wrap */
@@ -39,20 +49,29 @@ export default function ThresholdLockup() {
         }
         gsap.set(root, { autoAlpha: 1 });
         gsap.set(root.querySelectorAll('.lk-item'), { scaleX: 1, scaleY: 1 });
+        /* M1 kinetic type — the headline rises out of per-line masks while opsz sweeps */
+        splitRef.current?.revert();
+        const h = root.querySelector<HTMLElement>('.lockup-h1');
+        const split = h ? SplitText.create(h, { type: 'lines', mask: 'lines', linesClass: 'sp-line' }) : null;
+        splitRef.current = split;
         const tl = gsap.timeline({ defaults: { ease: 'expo.out' } });
         tl.fromTo(
           '.lockup-eyebrow',
           { autoAlpha: 0, y: 14 },
           { autoAlpha: 1, y: 0, duration: 0.7 },
           0.1,
-        )
-          .fromTo(
-            '.lockup-h1',
-            { autoAlpha: 0, y: 26, fontVariationSettings: "'opsz' 9" },
-            { autoAlpha: 1, y: 0, fontVariationSettings: "'opsz' 144", duration: 1.1 },
-            0.25,
-          )
-          .fromTo('.lockup-sub', { autoAlpha: 0, y: 16 }, { autoAlpha: 1, y: 0, duration: 0.7 }, 0.55)
+        );
+        if (h && split) {
+          tl.set(h, { autoAlpha: 1, y: 0 }, 0.25)
+            .fromTo(split.lines, { yPercent: 145 }, { yPercent: 0, duration: 1.05, stagger: 0.09 }, 0.25)
+            .fromTo(
+              h,
+              { fontVariationSettings: "'opsz' 9" },
+              { fontVariationSettings: "'opsz' 144", duration: 1.15 },
+              0.25,
+            );
+        }
+        tl.fromTo('.lockup-sub', { autoAlpha: 0, y: 16 }, { autoAlpha: 1, y: 0, duration: 0.7 }, 0.55)
           .fromTo('.enter-wrap', { autoAlpha: 0, scale: 0.92 }, { autoAlpha: 1, scale: 1, duration: 0.8 }, 0.75);
       } else if (useStore.getState().act === 'breach' && !reducedMotion) {
         /* R1.1 — signage passing a car window: falls behind the camera with motion blur.

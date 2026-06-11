@@ -1,40 +1,128 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import gsap from 'gsap';
+import { SplitText } from 'gsap/SplitText';
 import type { NodeId } from '../state/store';
 import { useStore } from '../state/store';
+import { countUp, formatNumeric } from './reveal';
+
+gsap.registerPlugin(SplitText);
 
 /* ============================================================
    Shared chamber primitives — every chamber builds from these.
    Design system: §4 tokens, mono labels, Fraunces opsz reveals.
    ============================================================ */
 
-/* Chamber display heading — Fraunces 300 italic with the MANDATORY opsz axis sweep (§2 Act IV).
-   The chamber panel stays clip-hidden until ~0.7s into the open timeline (ChamberLayer), so the
-   sweep starts at 0.78s: the axis visibly travels 9→144 as the headline lands behind the scan. */
-export function ChamberTitle({ children, kicker }: { children: ReactNode; kicker?: string }) {
+/* Chamber display heading — Fraunces 300 italic, SplitText line-mask reveal with the
+   MANDATORY opsz axis sweep (§2 Act IV): each line rises out of its own clip while the
+   optical axis travels 9→144 as the headline lands behind the scan.
+   `wonk` engages Fraunces' WONK axis — personality moments only (Beyond). */
+export function ChamberTitle({
+  children,
+  kicker,
+  wonk = false,
+}: {
+  children: ReactNode;
+  kicker?: string;
+  wonk?: boolean;
+}) {
   const ref = useRef<HTMLDivElement>(null);
   const reduced = useStore((s) => s.reducedMotion);
   useEffect(() => {
-    const h = ref.current?.querySelector('.ch-title');
+    const h = ref.current?.querySelector<HTMLElement>('.ch-title');
+    const k = ref.current?.querySelector<HTMLElement>('.ch-kicker');
     if (!h) return;
+    const axes = (opsz: number) => `'opsz' ${opsz}${wonk ? ", 'WONK' 1, 'SOFT' 28" : ''}`;
     if (reduced) {
-      gsap.set(h, { fontVariationSettings: "'opsz' 144", autoAlpha: 1, y: 0 });
+      gsap.set(h, { fontVariationSettings: axes(144), autoAlpha: 1 });
       return;
     }
-    const tw = gsap.fromTo(
-      h,
-      { fontVariationSettings: "'opsz' 9", autoAlpha: 0, y: 18 },
-      /* R3 moved the panel reveal to ~0.06s — the sweep lands with the scan, on screen */
-      { fontVariationSettings: "'opsz' 144", autoAlpha: 1, y: 0, duration: 0.95, ease: 'expo.out', delay: 0.18 },
-    );
+    const split = SplitText.create(h, { type: 'lines', mask: 'lines', linesClass: 'sp-line' });
+    const tl = gsap.timeline({ delay: 0.18 });
+    if (k) tl.fromTo(k, { autoAlpha: 0, y: 10 }, { autoAlpha: 1, y: 0, duration: 0.5, ease: 'power3.out' }, 0);
+    tl.set(h, { autoAlpha: 1 }, 0)
+      .fromTo(
+        split.lines,
+        { yPercent: 145 },
+        { yPercent: 0, duration: 0.85, ease: 'expo.out', stagger: 0.085 },
+        0.02,
+      )
+      .fromTo(
+        h,
+        { fontVariationSettings: axes(9) },
+        { fontVariationSettings: axes(144), duration: 0.95, ease: 'expo.out' },
+        0.02,
+      );
     return () => {
-      tw.kill();
+      tl.kill();
+      split.revert();
     };
-  }, [reduced]);
+  }, [reduced, wonk]);
   return (
     <div ref={ref}>
       {kicker && <p className="ch-kicker">{kicker}</p>}
       <h2 className="ch-title">{children}</h2>
+    </div>
+  );
+}
+
+/* M1 — ghost numeral 01–08: Fraunces roman, ~22vh, 3–4% bone, behind content,
+   cropped by the viewport edge. Mounted once per chamber by ChamberStage. */
+export function GhostNumeral({ index }: { index: number }) {
+  return (
+    <div className="ch-ghost" aria-hidden="true">
+      {String(index).padStart(2, '0')}
+    </div>
+  );
+}
+
+/* M1 — the pull-stat moment: one enormous Fraunces-italic number per chamber,
+   hairline rules above/below, mono caption, counts up once on reveal (800ms eased). */
+export function PullStat({
+  value,
+  caption,
+  prefix = '',
+  suffix = '',
+  decimals = 0,
+}: {
+  value: number;
+  caption: string;
+  prefix?: string;
+  suffix?: string;
+  decimals?: number;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const reduced = useStore((s) => s.reducedMotion);
+  const parts = { prefix: '', num: value, suffix: '', decimals };
+  const final = formatNumeric(parts, value);
+  useEffect(() => {
+    const root = ref.current;
+    const el = root?.querySelector<HTMLElement>('.ch-pull-num');
+    if (!root || !el || reduced) return;
+    let tween: gsap.core.Tween | null = null;
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((e) => e.isIntersecting)) return;
+        io.disconnect();
+        tween = countUp(el, parts);
+      },
+      { threshold: 0.4 },
+    );
+    el.textContent = formatNumeric(parts, 0);
+    io.observe(root);
+    return () => {
+      io.disconnect();
+      tween?.kill();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reduced, value, decimals]);
+  return (
+    <div className="ch-pull" ref={ref}>
+      <div className="ch-pull-value">
+        {prefix && <span className="ch-pull-unit">{prefix}</span>}
+        <span className="ch-pull-num">{final}</span>
+        {suffix && <span className="ch-pull-unit">{suffix}</span>}
+      </div>
+      <p className="ch-pull-cap">{caption}</p>
     </div>
   );
 }

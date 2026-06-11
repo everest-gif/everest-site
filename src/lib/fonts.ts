@@ -4,8 +4,9 @@ import { useStore } from '../state/store';
 export function trackFontLoading(): void {
   const specs = [
     'italic 300 1rem "Fraunces Variable"',
+    '400 1rem "Fraunces Variable"',
     '400 1rem "JetBrains Mono Variable"',
-    '400 1rem "Geist Variable"',
+    '400 1rem "Newsreader Variable"',
   ];
   let done = 0;
   const report = () => useStore.getState().setBootFonts(done / specs.length);

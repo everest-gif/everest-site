@@ -53,7 +53,8 @@
 /* ---------- headline ---------- */
 .head {
   margin-top: clamp(44px, 7vh, 72px);
-  max-width: 18ch;
+  /* M1 scale courage: the headline fills the column and breaks naturally —
+     18ch resolved against the DIV's 16px base (≈288px), strangling the h2 */
 }
 
 /* ---------- hero band — atmosphere art on the section grid, letterboxed ---------- */
