@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
 import { handles, TUNNEL_CY, TUNNEL_R, TUNNEL_Z0, TUNNEL_LEN, AMBER, JADE } from './handles';
@@ -211,8 +211,21 @@ function SpeedLines({ count = 420 }: { count?: number }) {
 }
 
 export default function TunnelWorld() {
+  const groupRef = useRef<THREE.Group>(null);
+
+  /* M3 — the pre-staged tunnel is INVISIBLE until the mountain actually opens:
+     at idle the opaque tube read as a dark dome occluding stars behind the peak.
+     It mounts into visibility only once the seam parts (masked by the SeamShroud)
+     or a transit is underway, so nothing ever pops on screen. */
+  useFrame(() => {
+    const g = groupRef.current;
+    if (!g) return;
+    g.visible =
+      handles.seam.value > 0.001 || handles.tunnelLight.value > 0.001 || handles.tunnelProgress.value > 0.001;
+  });
+
   return (
-    <group position={[0, TUNNEL_CY, 0]}>
+    <group ref={groupRef} position={[0, TUNNEL_CY, 0]} visible={false}>
       <TunnelTube />
       <EndCap />
       <Ribbons />

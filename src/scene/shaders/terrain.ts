@@ -1,4 +1,5 @@
 import { GLSL_NOISE } from './noise';
+import { GLSL_SEASON } from '../season';
 
 /* Shared height-field + seam displacement, used by both the wireframe lines and the pulse points
    so they stay welded together. Seam peel (§2 Act II): vertices part around x≈0 as uSeam rises. */
@@ -50,19 +51,29 @@ vec3 displaceSeam(vec3 pos) {
 export const terrainVert = /* glsl */ `
 ${GLSL_NOISE}
 ${GLSL_TERRAIN_COMMON}
+${GLSL_SEASON}
 varying float vH;
 varying vec3 vWorld;
 varying float vSeamGlow;
 varying float vSeamK;
+varying float vSlope;
 
 void main() {
   vec3 pos = position; /* plane lies in XY pre-rotation: x across, y depth-ish — geometry is rotated on CPU so here x,z grid, y=0 */
   float h = heightAt(pos.xz);
   pos.y += h * uAmp;
+  /* slope from central differences — winter snow settles on up-facing ground (M3) */
+  float e = 0.7;
+  float hx = heightAt(pos.xz + vec2(e, 0.0)) - heightAt(pos.xz - vec2(e, 0.0));
+  float hz = heightAt(pos.xz + vec2(0.0, e)) - heightAt(pos.xz - vec2(0.0, e));
+  vSlope = length(vec2(hx, hz)) * uAmp / (2.0 * e);
   float w = exp(-abs(pos.x) * 0.30);
   vSeamGlow = uSeam * w;
   vSeamK = uSeam;
   pos = displaceSeam(pos);
+  /* 1-vertex shimmer riding the weather front (M3 reconstruction transition) */
+  float shim = seasonShimmer(pos.x);
+  pos.y += shim * snoise(vec2(pos.x * 2.7, pos.z * 3.3)) * 0.16;
   vH = clamp(h, 0.0, 1.4) / 1.4;
   vec4 world = modelMatrix * vec4(pos, 1.0);
   vWorld = world.xyz;
@@ -71,6 +82,7 @@ void main() {
 `;
 
 export const terrainFrag = /* glsl */ `
+${GLSL_SEASON}
 uniform vec3 uColor;
 uniform float uNearBright;
 uniform float uFade;
@@ -78,21 +90,52 @@ varying float vH;
 varying vec3 vWorld;
 varying float vSeamGlow;
 varying float vSeamK;
+varying float vSlope;
+
+/* M3 — season palettes: value/temperature shifts within the family, never candy */
+vec3 seasonCol(float s, float glow, float h, float slope) {
+  if (s < 0.5) {
+    /* NIGHT — the original amber study */
+    return uColor * glow;
+  } else if (s < 1.5) {
+    /* WINTER — cold bone; snow settles on upper, up-facing ground */
+    float snow = smoothstep(0.28, 0.85, h) * (1.0 - smoothstep(0.45, 1.5, slope));
+    vec3 cold = mix(vec3(0.20, 0.25, 0.34), vec3(0.74, 0.80, 0.92), snow);
+    return cold * (glow * 0.8 + 0.10);
+  } else if (s < 2.5) {
+    /* SPRING — jade rising through the valley floors */
+    float valley = 1.0 - smoothstep(0.10, 0.48, h);
+    vec3 jade = vec3(0.16, 0.72, 0.55);
+    return mix(uColor * glow, jade * (glow * 0.75 + 0.05), valley * 0.82);
+  }
+  /* AUTUMN — rust-amber elevation banding */
+  float band = abs(2.0 * fract(h * 4.0) - 1.0);
+  vec3 rust = vec3(0.62, 0.21, 0.07);
+  return mix(rust * (glow * 0.9 + 0.03), uColor * glow * 1.08, smoothstep(0.32, 0.7, band));
+}
 
 void main() {
   float d = length(vWorld - cameraPosition);
   float depthFade = 1.0 - smoothstep(16.0, 56.0, d) * 0.8;
-  float nearFade = smoothstep(2.5, 10.0, d); /* kill the in-your-face foreground grid */
+  /* M3 full-bleed at rest; during the breach approach (uNearBright ramps) the old
+     wide near-fade returns — otherwise the fly-through drowns the lens in additive lines */
+  float bk = clamp(uNearBright * 2.86, 0.0, 1.0);
+  float nearFade = smoothstep(mix(1.2, 2.8, bk), mix(4.5, 10.0, bk), d);
   float glow = 0.05 + pow(max(vH, 0.0), 1.6) * 0.85; /* flats nearly black; crests glow */
+  /* near valley floor keeps a faint presence — no dead band under the lockup */
+  glow += (1.0 - smoothstep(3.0, 15.0, d)) * 0.085 * (1.0 - bk);
   glow *= 1.0 + uNearBright * 0.8; /* R0.4: approach warms the rock, never torches it */
-  glow += vSeamGlow * 1.6; /* wound edges glow amber — edges, not a fireball */
-  vec3 col = uColor * glow;
+  float k = seasonCoverage(vWorld.x);
+  float shim = seasonShimmer(vWorld.x);
+  vec3 col = mix(seasonCol(uSeasonFrom, glow, vH, vSlope), seasonCol(uSeasonTo, glow, vH, vSlope), k);
+  col += vec3(0.93, 0.91, 0.875) * shim * 0.5; /* frontline shimmer */
+  col += uColor * vSeamGlow * 1.6; /* wound edges glow amber — edges, not a fireball */
   /* gap-straddling segments read as tearing threads mid-split, then snap away once open
      (they'd otherwise streak across the tunnel corridor) */
   float snap = smoothstep(0.55, 0.9, vSeamK);
   float bridge = 1.0 - snap * (1.0 - smoothstep(1.0, 3.2, abs(vWorld.x)));
   /* AdditiveBlending uses SrcAlpha — do NOT premultiply or brightness goes alpha² */
-  float alpha = uFade * depthFade * nearFade * bridge;
+  float alpha = clamp(uFade * depthFade * nearFade * bridge + shim * 0.25 * uFade, 0.0, 1.0);
   gl_FragColor = vec4(col, alpha);
 }
 `;
@@ -103,6 +146,7 @@ ${GLSL_TERRAIN_COMMON}
 attribute float aSeed;
 uniform float uTime;
 varying float vA;
+varying float vX;
 
 void main() {
   vec3 pos = position;
@@ -113,6 +157,7 @@ void main() {
   /* most of the time dark; occasionally a vertex pops like traffic on a network */
   float pulse = smoothstep(0.0, 0.05, cycle) * (1.0 - smoothstep(0.05, 0.20, cycle));
   vA = pulse * 0.6;
+  vX = pos.x;
   vec4 mv = modelViewMatrix * vec4(pos, 1.0);
   gl_PointSize = min(5.0, (1.1 + 2.0 * pulse) * (90.0 / max(1.0, -mv.z)));
   gl_Position = projectionMatrix * mv;
@@ -120,8 +165,18 @@ void main() {
 `;
 
 export const pulseFrag = /* glsl */ `
+${GLSL_SEASON}
 uniform vec3 uColor;
 varying float vA;
+varying float vX;
+
+/* season-tinted network traffic (M3) — amber / cold bone / jade / warm rust */
+vec3 pulseCol(float s) {
+  if (s < 0.5) return uColor;
+  if (s < 1.5) return vec3(0.72, 0.78, 0.9);
+  if (s < 2.5) return vec3(0.25, 0.78, 0.6);
+  return vec3(0.85, 0.42, 0.14);
+}
 
 void main() {
   vec2 c = gl_PointCoord - 0.5;
@@ -129,7 +184,8 @@ void main() {
   float disc = 1.0 - smoothstep(0.18, 0.5, r);
   float a = vA * disc;
   if (a < 0.01) discard;
-  gl_FragColor = vec4(uColor, a);
+  vec3 col = mix(pulseCol(uSeasonFrom), pulseCol(uSeasonTo), seasonCoverage(vX));
+  gl_FragColor = vec4(col, a);
 }
 `;
 

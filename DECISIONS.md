@@ -128,3 +128,23 @@
     negative margins: Fraunces at opsz 144 italic paints far outside its em box, and the
     masks' overflow:clip cut swashes/descenders at rest. Lines start at yPercent 145 so the
     extended clip window still hides them fully before the rise.
+40. **Tunnel dome hidden by handle-gating, not art (M3).** The opaque tube read as a dark dome
+    occluding stars behind the peak. Its group is now visible only while seam/tunnelLight/
+    tunnelProgress > 0 — it enters visibility during the split, fully masked by the SeamShroud,
+    so the no-cut audit never sees a pop. Precompile still covers it (gl.compile traverses
+    invisible nodes).
+41. **Full-bleed near terrain is rest-state only.** nearFade tightened to (1.2→4.5) and a faint
+    valley-floor glow added so terrain meets the bottom edge — but during the breach the camera
+    flies THROUGH that geometry and the additive lines flooded the lens. The fade window now
+    widens back to (2.8→10) as uNearBright ramps, restoring the verified R1 in-flight look.
+    Confirmed against r2/scrub-40 ground truth.
+42. **Sky-level season elements (fog density/tint, star sharpness, sky glow) mix globally**
+    over the same 1.4s window, while terrain, pulse dots and particles split spatially at the
+    front. Weather lives on the ground; the sky has no frontline to read, and a hard star-field
+    seam would look like a rendering bug. Reduced motion reuses the identical uniform path with
+    edge width 400 — the front degenerates into a 250ms crossfade, one code path.
+43. **Season particles go dark under reduced motion** rather than freezing mid-air — a blizzard
+    suspended between sky and ground reads as a glitch, not a still.
+44. **Skip-intro returned to bottom-right; the season control owns bottom-left.** GORGEOUS_PASS
+    M3 sites the seasons "bottom-left opposite skip-intro"; smoke screenshots show no cursor
+    collision at br (the R6 worry) now that the control there is plain text.

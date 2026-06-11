@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useStore } from '../state/store';
 import { NODE_MAP } from '../content/nodes';
+import SeasonControl from './SeasonControl';
 
 function BoulderClock() {
   const [now, setNow] = useState('');
@@ -60,7 +61,8 @@ export default function HUD() {
         )}
       </nav>
 
-      {/* bottom-left during the intro — bottom-right collided with the cursor ring (R6) */}
+      {/* M3 — seasons own bottom-left; skip-intro moved opposite (bottom-right) */}
+      <SeasonControl />
       <div className={`hud-skip${intro ? ' is-on' : ''}`}>
         {intro && (
           <button type="button" onClick={skipToHub} aria-label="Skip the intro and go to the hub">

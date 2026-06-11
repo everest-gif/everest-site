@@ -12,7 +12,14 @@
       [data-rule] scaleX, .ch-stat-value tickers); limb overlap via chamber camera (NDC −0.38)
       + in-padding margin pull. Payload 278.2KB ≤ 280KB. Reference pull-stats in jarvis/luven;
       remaining six land with M7.
-- [ ] M3 Threshold: full-bleed terrain, hidden tunnel dome, 4 seasons + weather front + control
+- [x] M3 Threshold: front layer extended past the camera's bottom ray (full-bleed, zero dead
+      band, 100dvh lock); tunnel tube+cap gated invisible until the seam parts; 4 seasons
+      (night/winter/spring/autumn) as terrain-shader palettes + seasonal fog/stars/sky-glow +
+      3 particle systems (snow/petals/tumbling leaves); weather-front sweep 1.4s L→R w/
+      frontline shimmer + spatial re-tint (probe-front05.png), reduced-motion = 250ms
+      crossfade via giant edge width; season control bottom-left (drawn glyphs, 54bpm ring,
+      radiogroup keyboard, sessionStorage persist); skip-intro → bottom-right; breach
+      near-fade regression caught + fixed (uNearBright-driven fade window)
 - [ ] M2+M7 Light/atmosphere + eight editorial chamber spreads
 - [ ] M4+M5 Breach ≤2.2s denser + hub (nebula, corona, planet materials, pulses, anti-overlap, arc-text deleted)
 - [ ] M6 INDEX overlay + EXPLORE chips + arrow-key hops

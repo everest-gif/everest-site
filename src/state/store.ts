@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { loadSeason, persistSeason, type Season } from '../scene/season';
 
 export type NodeId =
   | 'jarvis'
@@ -36,6 +37,8 @@ interface AppState {
   act: Act;
   chamber: NodeId | null;
   hovered: NodeId | null;
+  /* M3 — threshold season; persists for the session */
+  season: Season;
   soundOn: boolean;
   reducedMotion: boolean;
   contextLost: boolean;
@@ -61,6 +64,7 @@ interface AppState {
   skipToHub: () => void;
   gotoThreshold: () => void;
   setHovered: (id: NodeId | null) => void;
+  setSeason: (s: Season) => void;
   toggleSound: () => void;
   setReducedMotion: (v: boolean) => void;
   setContextLost: (v: boolean) => void;
@@ -76,6 +80,7 @@ export const useStore = create<AppState>((set, get) => ({
   act: 'boot',
   chamber: null,
   hovered: null,
+  season: loadSeason(),
   soundOn: false,
   reducedMotion: false,
   contextLost: false,
@@ -140,6 +145,10 @@ export const useStore = create<AppState>((set, get) => ({
     set({ act: 'threshold', chamber: null });
   },
   setHovered: (hovered) => set({ hovered }),
+  setSeason: (season) => {
+    persistSeason(season);
+    set({ season });
+  },
   toggleSound: () => set((s) => ({ soundOn: !s.soundOn })),
   setReducedMotion: (reducedMotion) => set({ reducedMotion }),
   setContextLost: (contextLost) => set({ contextLost }),
