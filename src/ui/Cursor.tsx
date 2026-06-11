@@ -48,6 +48,18 @@ export default function Cursor() {
       ring.setAttribute('data-mode', mode);
     };
 
+    /* M8.10 — ring-pulse on successful click of anything interactive */
+    let pulseT = 0;
+    const onClick = (e: MouseEvent) => {
+      const el = e.target as Element | null;
+      if (!el?.closest?.('button, a, [role="radio"]')) return;
+      ring.classList.remove('is-pulse');
+      window.clearTimeout(pulseT);
+      void ring.offsetWidth; /* restart the animation */
+      ring.classList.add('is-pulse');
+      pulseT = window.setTimeout(() => ring.classList.remove('is-pulse'), 340);
+    };
+
     const loop = () => {
       dx += (tx - dx) * 0.6;
       dy += (ty - dy) * 0.6;
@@ -60,11 +72,14 @@ export default function Cursor() {
     raf = requestAnimationFrame(loop);
     window.addEventListener('mousemove', onMove, { passive: true });
     window.addEventListener('mouseover', onOver, { passive: true });
+    window.addEventListener('click', onClick, { passive: true });
     document.documentElement.addEventListener('mouseleave', onLeave);
     return () => {
       cancelAnimationFrame(raf);
+      window.clearTimeout(pulseT);
       window.removeEventListener('mousemove', onMove);
       window.removeEventListener('mouseover', onOver);
+      window.removeEventListener('click', onClick);
       document.documentElement.removeEventListener('mouseleave', onLeave);
       document.documentElement.classList.remove('cursor-hidden');
     };

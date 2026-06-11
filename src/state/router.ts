@@ -11,6 +11,9 @@ function parse(hash: string): Route {
   if (h === 'hub') return { target: 'hub', chamber: null };
   const m = /^hub\/([a-z]+)$/.exec(h);
   if (m && isNodeId(m[1])) return { target: 'hub', chamber: m[1] };
+  /* M8.12 — anything else is lost coordinates: fall back to the threshold,
+     but surface the in-world 404 so the wrong turn is acknowledged */
+  if (h !== '') useStore.getState().setLost(true);
   return { target: 'threshold', chamber: null };
 }
 

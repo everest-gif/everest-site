@@ -62,9 +62,10 @@ body {
   height: 100%;
 }
 
+/* M8.5 — custom selection: amber ground, ink text */
 ::selection {
-  background: rgba(232, 162, 61, 0.3);
-  color: var(--bone);
+  background: var(--amber);
+  color: var(--ink);
 }
 
 /* custom cursor owns the pointer on fine-pointer devices (§5) */
@@ -717,12 +718,14 @@ a {
   background: radial-gradient(ellipse 46% 46% at 38% 50%, rgba(232, 162, 61, 0.085), transparent 70%);
   pointer-events: none;
 }
+/* M8.6 — styled chamber scrollbar: 2px bone track, amber thumb */
 .chamber-scroll {
   position: absolute;
   inset: 0 0 0 33vw;
   overflow-y: auto;
   overflow-x: hidden;
-  scrollbar-width: none;
+  scrollbar-width: thin;
+  scrollbar-color: var(--amber) rgba(237, 232, 223, 0.08);
 }
 /* ---------- M6: EXPLORE chips — travel to the neighbours, obviously clickable ---------- */
 .chamber-chips {
@@ -842,6 +845,98 @@ a {
     height: 40vh;
     transform: translate(-50%, -50%);
   }
+}
+
+/* ---------- M8.1 — hover underlines draw on left→right (1px amber, 180ms) ---------- */
+.prose a,
+.chamber-content a {
+  background-image: linear-gradient(var(--amber), var(--amber));
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 0% 1px;
+  transition: background-size 180ms var(--ease-out);
+}
+.prose a:hover,
+.prose a:focus-visible,
+.chamber-content a:hover,
+.chamber-content a:focus-visible {
+  background-size: 100% 1px;
+}
+
+/* ---------- M8.10 — cursor ring-pulse on successful click ---------- */
+.cursor-ring.is-pulse {
+  animation: ring-pulse 0.32s var(--ease-out);
+}
+@keyframes ring-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(232, 162, 61, 0.55);
+  }
+  100% {
+    box-shadow: 0 0 0 14px rgba(232, 162, 61, 0);
+  }
+}
+
+/* ---------- M8.8 — live HUD footer readouts: scene · bodies · fps ---------- */
+.hud-bc {
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: var(--dim);
+  white-space: nowrap;
+}
+@media (max-width: 640px) {
+  .hud-bc {
+    display: none;
+  }
+}
+
+/* ---------- M8.12 — lost coordinates (404), styled in-world ---------- */
+.lost-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 85;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  background: rgba(10, 10, 12, 0.88);
+  font-family: var(--font-mono);
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  text-align: center;
+  padding: 24px;
+}
+.lost-code {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 300;
+  font-variation-settings: 'opsz' 144;
+  font-size: clamp(5rem, 14vw, 11rem);
+  line-height: 1;
+  color: var(--bone);
+  letter-spacing: -0.01em;
+  text-transform: none;
+}
+.lost-line {
+  font-size: 11px;
+  color: var(--dim);
+}
+.lost-coords {
+  font-size: 10px;
+  color: rgba(232, 162, 61, 0.8);
+}
+.lost-return {
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--dim);
+  transition: color var(--t-micro) var(--ease-out);
+}
+.lost-return:hover,
+.lost-return:focus-visible {
+  color: var(--amber);
 }
 
 /* ---------- M6: INDEX — a ship's manifest, not a hamburger menu ---------- */
@@ -1038,7 +1133,13 @@ a {
   }
 }
 .chamber-scroll::-webkit-scrollbar {
-  display: none;
+  width: 2px;
+}
+.chamber-scroll::-webkit-scrollbar-track {
+  background: rgba(237, 232, 223, 0.08);
+}
+.chamber-scroll::-webkit-scrollbar-thumb {
+  background: var(--amber);
 }
 .chamber-content {
   min-height: 100%;

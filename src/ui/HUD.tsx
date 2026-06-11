@@ -3,6 +3,33 @@ import { useStore } from '../state/store';
 import { NODE_MAP } from '../content/nodes';
 import SeasonControl from './SeasonControl';
 
+/* M8.8 — live footer readouts: scene · bodies · real fps (tiny mono) */
+function Readouts() {
+  const act = useStore((s) => s.act);
+  const [fps, setFps] = useState(0);
+  useEffect(() => {
+    let raf = 0;
+    let frames = 0;
+    let last = performance.now();
+    const loop = (t: number) => {
+      frames += 1;
+      if (t - last >= 500) {
+        setFps(Math.round((frames * 1000) / (t - last)));
+        frames = 0;
+        last = t;
+      }
+      raf = requestAnimationFrame(loop);
+    };
+    raf = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(raf);
+  }, []);
+  return (
+    <span aria-hidden="true">
+      scene:{act} · bodies:08 · {String(fps).padStart(3, '0')}fps
+    </span>
+  );
+}
+
 function BoulderClock() {
   const [now, setNow] = useState('');
   useEffect(() => {
@@ -70,6 +97,8 @@ export default function HUD() {
           <span className="crumb-live">HUB</span>
         )}
       </nav>
+
+      <div className={`hud-bc${onHud ? ' is-on' : ''}`}>{onHud && <Readouts />}</div>
 
       {/* M3 — seasons own bottom-left; skip-intro moved opposite (bottom-right) */}
       <SeasonControl />

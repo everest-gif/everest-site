@@ -43,8 +43,19 @@
       backstop + rate-bounded spring (orbits.ts); hit areas 56px. OFFICIAL drift audit
       (shipped solver, 300s@60Hz): minDiscGap +0.227, minCenterSep 0.635 (≈73px) — zero
       overlaps; 900s headroom +0.119/0.535 (verification/gorgeous/drift-audit.log)
-- [ ] M6 INDEX overlay + EXPLORE chips + arrow-key hops
-- [ ] M8+M9 Twelve jewelry details + sound pass
+- [x] M6 INDEX manifest (groups SYSTEMS/VENTURES/GAMES/LIFE + PLACES, drawn glyphs
+      [ui/glyphs.tsx], descriptors + honest statuses, scan-line reveal + backlit glow, arrows
+      walk rows / Enter travels / Esc closes via capture handler, focus restore); travel
+      reuses flights (hub→open, chamber→hop, mountains→close-then-reverse via guarded poll);
+      EXPLORE chips (glyph + name + EXPLORE arrow, charge-rect sweep, magnetic ≤6px, z5
+      above spread stacking, clear of hud-br); ArrowLeft/Right hop planets. Esc guards so
+      the INDEX owns keys while open.
+- [x] M8+M9 Jewelry 12/12: draw-on underlines (.prose/.chamber-content a), [data-rule]
+      scaleX engine, stat tickers, brackets+FIG, amber/ink selection, 2px chamber scrollbar,
+      amber focus rings (pre-existing), HUD readouts scene·bodies·fps (real rAF), charge
+      sweep systemized (.chip-charge), cursor ring-pulse on click, 54bpm season glyph,
+      in-world 404 (router→lost flag, Fraunces 404 over live threshold, [ return ]).
+      M9: tick attack 25ms, ambience LP 130Hz, 0.5s pitch-down close-whoosh (chamber→hub).
 - [ ] M10 Verification, evidence in verification/gorgeous/, deploy, production smoke
 
 ## R1 — Breach total rework  [IN PROGRESS]

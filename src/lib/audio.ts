@@ -80,7 +80,7 @@ class AudioEngine {
     src.loop = true;
     const lp = ctx.createBiquadFilter();
     lp.type = 'lowpass';
-    lp.frequency.value = 160;
+    lp.frequency.value = 130; /* M9 — ambience sits slightly lower */
     const ng = ctx.createGain();
     ng.gain.value = 0.05;
     src.connect(lp).connect(ng).connect(gain);
@@ -125,7 +125,7 @@ class AudioEngine {
     src.stop(t0 + duration + 0.1);
   }
 
-  /* sub-audible tick on node hover */
+  /* sub-audible tick on node hover — M9: 25ms attack, no transient click */
   tick(): void {
     if (!useStore.getState().soundOn) return;
     const ctx = this.ensure();
@@ -134,11 +134,34 @@ class AudioEngine {
     osc.frequency.value = 660;
     const g = ctx.createGain();
     const t0 = ctx.currentTime;
-    g.gain.setValueAtTime(0.05, t0);
-    g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.045);
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.linearRampToValueAtTime(0.045, t0 + 0.025);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.085);
     osc.connect(g).connect(this.master!);
     osc.start(t0);
-    osc.stop(t0 + 0.06);
+    osc.stop(t0 + 0.1);
+  }
+
+  /* M9 — barely-audible pitch-down whoosh as a chamber closes */
+  closeWhoosh(): void {
+    if (!useStore.getState().soundOn) return;
+    const ctx = this.ensure();
+    const src = ctx.createBufferSource();
+    src.buffer = this.noise();
+    src.loop = true;
+    const bp = ctx.createBiquadFilter();
+    bp.type = 'bandpass';
+    bp.Q.value = 1.4;
+    const t0 = ctx.currentTime;
+    bp.frequency.setValueAtTime(900, t0);
+    bp.frequency.exponentialRampToValueAtTime(260, t0 + 0.5);
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.linearRampToValueAtTime(0.16, t0 + 0.06);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.55);
+    src.connect(bp).connect(g).connect(this.master!);
+    src.start(t0);
+    src.stop(t0 + 0.6);
   }
 }
 
@@ -152,6 +175,7 @@ export function initAudio(): void {
     if (s.act !== prev.act) {
       if (s.act === 'breach') audio.whoosh(2.2);
       if (s.act === 'reverse-breach') audio.whoosh(1.4, true);
+      if (prev.act === 'chamber' && s.act === 'hub') audio.closeWhoosh();
       if (s.act === 'hub' || s.act === 'chamber') audio.startHum();
       else audio.stopHum();
     }

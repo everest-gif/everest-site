@@ -6,6 +6,7 @@ import ThresholdLockup from './ui/ThresholdLockup';
 import HubOverlay from './ui/HubOverlay';
 import ChamberLayer from './ui/ChamberLayer';
 import IndexOverlay from './ui/IndexOverlay';
+import Lost from './ui/Lost';
 import HUD from './ui/HUD';
 import Cursor from './ui/Cursor';
 import Grain from './ui/Grain';
@@ -31,6 +32,7 @@ export default function App() {
       <HubOverlay />
       <ChamberLayer />
       <IndexOverlay />
+      <Lost />
       <A11yNav />
       <HUD />
       <Boot />

@@ -41,6 +41,8 @@ interface AppState {
   season: Season;
   /* M6 — the INDEX overlay (ship's manifest) */
   indexOpen: boolean;
+  /* M8.12 — unknown hash: lost coordinates, styled in-world */
+  lost: boolean;
   soundOn: boolean;
   reducedMotion: boolean;
   contextLost: boolean;
@@ -68,6 +70,7 @@ interface AppState {
   setHovered: (id: NodeId | null) => void;
   setSeason: (s: Season) => void;
   setIndexOpen: (v: boolean) => void;
+  setLost: (v: boolean) => void;
   toggleSound: () => void;
   setReducedMotion: (v: boolean) => void;
   setContextLost: (v: boolean) => void;
@@ -85,6 +88,7 @@ export const useStore = create<AppState>((set, get) => ({
   hovered: null,
   season: loadSeason(),
   indexOpen: false,
+  lost: false,
   soundOn: false,
   reducedMotion: false,
   contextLost: false,
@@ -154,6 +158,7 @@ export const useStore = create<AppState>((set, get) => ({
     set({ season });
   },
   setIndexOpen: (indexOpen) => set({ indexOpen }),
+  setLost: (lost) => set({ lost }),
   toggleSound: () => set((s) => ({ soundOn: !s.soundOn })),
   setReducedMotion: (reducedMotion) => set({ reducedMotion }),
   setContextLost: (contextLost) => set({ contextLost }),
