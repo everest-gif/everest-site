@@ -76,4 +76,6 @@
 - [x] Full §9 protocol scripted: `node verification/verify.mjs` → **47/47 PASS** (results in verification/RESULTS.json)
 - [x] §9.1 click-through · §9.2 console gate (zero messages) · §9.3 screenshots inspected · §9.4 reduced motion · §9.5 mobile · §9.6 perf (144fps breach / 145fps hub / 328KB gzip) · §9.7 resilience · §9.8 a11y (5.32:1)
 - [x] VERIFICATION_REPORT.md complete
-- [ ] Fresh-subagent review vs §11 → fix gaps → re-verify → final commit
+- [x] Fresh-subagent review vs §11 → 2 gaps found (chamber opsz sweep hidden behind clip; magnetic hover missing on node labels) → both fixed + probe-verified → full §9 re-run 47/47 PASS → final commit
+
+## BUILD COMPLETE — all phases done, all §11 criteria met, evidence in VERIFICATION_REPORT.md

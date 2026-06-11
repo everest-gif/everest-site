@@ -634,8 +634,8 @@ a {
   height: 2px;
   background: var(--amber);
   box-shadow:
-    0 0 14px rgba(232, 162, 61, 0.9),
-    0 0 38px rgba(232, 162, 61, 0.4);
+    0 0 12px rgba(232, 162, 61, 0.95),
+    0 0 24px rgba(232, 162, 61, 0.45);
   opacity: 0;
   pointer-events: none;
 }
@@ -909,5 +909,9 @@ a {
   /* the clock owns the top edge on small screens */
   .hud-tl {
     display: none;
+  }
+  /* stronger lockup scrim — mobile ridges sit closer to the type */
+  .lockup::before {
+    background: radial-gradient(ellipse 62% 58% at 50% 72%, rgba(10, 10, 12, 0.8), transparent 76%);
   }
 }

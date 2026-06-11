@@ -13,7 +13,8 @@ export default function HubOverlay() {
   const rootRef = useRef<HTMLDivElement>(null);
   const onStage = act === 'hub';
 
-  /* rAF loop applying projected anchors to DOM transforms */
+  /* rAF loop applying projected anchors to DOM transforms.
+     Magnetic hover (§5): labels translate toward the cursor, max 8px, spring back. */
   useEffect(() => {
     if (!onStage) return;
     const root = rootRef.current;
@@ -21,12 +22,38 @@ export default function HubOverlay() {
     let raf = 0;
     const items = Array.from(root.querySelectorAll<HTMLElement>('[data-node]'));
     const coreEl = root.querySelector<HTMLElement>('.hub-core-label');
+    const fine = window.matchMedia('(pointer: fine)').matches;
+    const mouse = { x: -9999, y: -9999 };
+    const pull = new Map(items.map((el) => [el, { x: 0, y: 0 }]));
+    const onMove = (e: MouseEvent) => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+    };
+    if (fine) window.addEventListener('mousemove', onMove, { passive: true });
+
     const loop = () => {
+      const reduced = useStore.getState().reducedMotion;
       for (const el of items) {
         const id = el.dataset.node!;
         const a = nodeScreens[id];
         if (!a) continue;
-        el.style.transform = `translate3d(${a.x}px, ${a.y}px, 0) translate(-50%, -50%)`;
+        const p = pull.get(el)!;
+        let tx = 0;
+        let ty = 0;
+        if (fine && !reduced) {
+          const dx = mouse.x - a.x;
+          const dy = mouse.y - a.y;
+          const d = Math.hypot(dx, dy);
+          const reach = 84;
+          if (d < reach && d > 0.01) {
+            const k = (1 - d / reach) * 8; /* max 8px */
+            tx = (dx / d) * k;
+            ty = (dy / d) * k;
+          }
+        }
+        p.x += (tx - p.x) * 0.16; /* spring toward target / back to rest */
+        p.y += (ty - p.y) * 0.16;
+        el.style.transform = `translate3d(${a.x + p.x}px, ${a.y + p.y}px, 0) translate(-50%, -50%)`;
         el.style.opacity = String(a.visible ? a.reveal : 0);
         el.style.pointerEvents = a.visible && a.reveal > 0.5 ? 'auto' : 'none';
       }
@@ -37,7 +64,10 @@ export default function HubOverlay() {
       raf = requestAnimationFrame(loop);
     };
     raf = requestAnimationFrame(loop);
-    return () => cancelAnimationFrame(raf);
+    return () => {
+      cancelAnimationFrame(raf);
+      if (fine) window.removeEventListener('mousemove', onMove);
+    };
   }, [onStage]);
 
   /* Esc on the hub returns to the mountains (reverse breach) */

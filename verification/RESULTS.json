@@ -12,17 +12,17 @@
   {
     "id": "9.1/9.6 breach no frame-long stalls",
     "pass": true,
-    "detail": "{\"avgFps\":144,\"worstGapMs\":8}"
+    "detail": "{\"avgFps\":121,\"worstGapMs\":12}"
   },
   {
     "id": "9.6 breach ≥50fps",
     "pass": true,
-    "detail": "144fps"
+    "detail": "121fps"
   },
   {
     "id": "9.6 hub ≥50fps",
     "pass": true,
-    "detail": "{\"avgFps\":145,\"worstGapMs\":8}"
+    "detail": "{\"avgFps\":121,\"worstGapMs\":9}"
   },
   {
     "id": "9.1 hover jarvis → chip",

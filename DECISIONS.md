@@ -60,3 +60,11 @@
     spend limit before writing Beyond.module.css — stylesheet completed by the main session in the
     same layout language. (TS passed even with the CSS missing — ambient vite types don't resolve
     css-module files; the build catches it. Worth knowing.)
+24. **HUD `everest.os v1.0` hidden ≤640px** — at 390px it collided with the Boulder clock; the
+    clock + sound toggle own the top edge on phones. Breadcrumb and returns unaffected.
+25. **Chamber opsz sweep delayed to 0.78s** (was 0.15s) — the panel is clip-hidden until ~0.7s of
+    the open timeline, so the earlier sweep finished invisibly (caught by the §0.8 fresh-agent
+    review with a frame probe). The axis now travels 9→144 entirely on screen as the headline lands.
+26. **Hub magnetic reach 84px / max 8px** — §5 fixes the 8px cap; reach tuned so drifting labels
+    don't snag the cursor from across the ring. Composed into the projection rAF (no extra loop),
+    inert on touch + reduced motion.

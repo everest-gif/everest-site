@@ -8,7 +8,9 @@ import { useStore } from '../state/store';
    Design system: §4 tokens, mono labels, Fraunces opsz reveals.
    ============================================================ */
 
-/* Chamber display heading — Fraunces 300 italic with the MANDATORY opsz axis sweep (§2 Act IV). */
+/* Chamber display heading — Fraunces 300 italic with the MANDATORY opsz axis sweep (§2 Act IV).
+   The chamber panel stays clip-hidden until ~0.7s into the open timeline (ChamberLayer), so the
+   sweep starts at 0.78s: the axis visibly travels 9→144 as the headline lands behind the scan. */
 export function ChamberTitle({ children, kicker }: { children: ReactNode; kicker?: string }) {
   const ref = useRef<HTMLDivElement>(null);
   const reduced = useStore((s) => s.reducedMotion);
@@ -22,7 +24,7 @@ export function ChamberTitle({ children, kicker }: { children: ReactNode; kicker
     const tw = gsap.fromTo(
       h,
       { fontVariationSettings: "'opsz' 9", autoAlpha: 0, y: 18 },
-      { fontVariationSettings: "'opsz' 144", autoAlpha: 1, y: 0, duration: 0.9, ease: 'expo.out', delay: 0.15 },
+      { fontVariationSettings: "'opsz' 144", autoAlpha: 1, y: 0, duration: 0.95, ease: 'expo.out', delay: 0.78 },
     );
     return () => {
       tw.kill();

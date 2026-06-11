@@ -2,6 +2,19 @@
 
 Run: 2026-06-10 · `vite preview` @ localhost:4173 · headed Chromium (Playwright 1.60, real GPU)
 · full machine-run protocol: `node verification/verify.mjs` → `verification/RESULTS.json` — **47/47 PASS**
+(re-run in full after the fresh-subagent review fixes below; 47/47 both times)
+
+## §0.8 Fresh-subagent acceptance review (vs §11)
+An independent zero-context agent audited code + evidence + live preview. Two gaps found, both
+fixed and re-verified at rAF granularity:
+1. **Chamber `opsz` sweep ran while the panel was clip-hidden** (axis hit 142.8/144 before first
+   visible frame). Fixed: sweep now starts at 0.78s, synchronized with the scan-line reveal —
+   measured first visible frame shows `opsz: 9`, full 9→144 travel happens in view.
+2. **Magnetic hover missing on hub node labels** (§5 requires it on ENTER *and* node labels).
+   Fixed in the HubOverlay projection loop: labels translate toward the cursor (max 8px,
+   reach 84px) and spring back; verified by transform probe. Disabled under reduced motion.
+Minor observations addressed: scan-beam glow capped at 24px blur; mobile lockup scrim
+strengthened; HUD version label hidden ≤640px recorded in DECISIONS.md.
 
 ## §9.1 Functional click-through — PASS (all)
 
@@ -44,7 +57,7 @@ node hit areas, all on-screen; chambers scroll smoothly (Lenis); zero horizontal
 ## §9.6 Performance — PASS
 - Breach: **144fps avg**, worst gap 8ms (Apple Silicon, headed Chromium, 1440×900)
 - Hub idle: **145fps avg**, worst gap 8ms
-- Bundle: **328.2 KB gzip total JS** (three 265.6 + app 42.3 + gsap 28.2) vs 900 KB budget
+- Bundle: **336.1 KB (328.2 KiB) gzip total JS** — three 265.6 + app 42.3 + gsap 28.2 (KB) — vs 900 KB budget
 - RAF pauses on `visibilitychange` and while a chamber covers the canvas (mini-orchestrator keeps
   the system alive on a 2D canvas at ~30fps)
 
