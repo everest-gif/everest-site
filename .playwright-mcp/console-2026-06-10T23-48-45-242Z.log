@@ -1,3 +1,0 @@
-[      54ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://localhost:5174/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=6ca43953:21550
-[   23274ms] [WARNING] WebGL: INVALID_OPERATION: readPixels: type HALF_FLOAT but ArrayBufferView not Uint16Array @ http://localhost:5174/node_modules/.vite/deps/chunk-G4VKLGV4.js?v=6ca43953:18745
-[   23274ms] [WARNING] WebGL: INVALID_OPERATION: readPixels: type HALF_FLOAT but ArrayBufferView not Uint16Array @ http://localhost:5174/node_modules/.vite/deps/chunk-G4VKLGV4.js?v=6ca43953:18745

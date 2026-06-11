@@ -189,7 +189,7 @@ function SeamLight() {
   });
   return (
     <mesh material={material} position={[0, 4.4, -13.4]}>
-      <planeGeometry args={[3.6, 11, 1, 1]} />
+      <planeGeometry args={[2.4, 12, 1, 1]} />
     </mesh>
   );
 }

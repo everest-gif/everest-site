@@ -1,6 +1,0 @@
-[      32ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://localhost:5174/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=92ac2534:21550
-[   65735ms] [WARNING] WARNING: Multiple instances of Three.js being imported. @ http://localhost:5174/node_modules/.vite/deps/chunk-G4VKLGV4.js?v=740d0169:31527
-[   65979ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://localhost:5174/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=740d0169:21550
-[   96529ms] [LOG] [vite] server connection lost. Polling for restart... @ http://localhost:5174/@vite/client:559
-[   96531ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:5174/:0
-[   97836ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://localhost:5174/node_modules/.vite/deps/chunk-YCOEJRGR.js?v=6ca43953:21550

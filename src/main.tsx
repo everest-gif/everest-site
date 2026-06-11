@@ -7,9 +7,18 @@ import './styles/global.css';
 import App from './App';
 import { initRouter } from './state/router';
 import { trackFontLoading } from './lib/fonts';
+import { useStore } from './state/store';
 
 initRouter();
 trackFontLoading();
+
+if (import.meta.env.DEV) {
+  const log: Array<{ t: number; act: string }> = [];
+  (window as unknown as Record<string, unknown>).__actLog = log;
+  useStore.subscribe((s, prev) => {
+    if (s.act !== prev.act) log.push({ t: performance.now(), act: s.act });
+  });
+}
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

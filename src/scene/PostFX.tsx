@@ -55,24 +55,15 @@ export default function PostFX() {
   const size = useThree((s) => s.size);
 
   const { composer, bloom, grade } = useMemo(() => {
-    const q = new URLSearchParams(window.location.search);
     const composer = new EffectComposer(gl);
     composer.addPass(new RenderPass(scene, camera));
-    const bloom = new UnrealBloomPass(
-      new THREE.Vector2(size.width, size.height),
-      0.4,
-      0.4,
-      q.has('bt999') ? 999 : 0.8,
-    );
-    if (!q.has('nobloom')) composer.addPass(bloom);
+    const bloom = new UnrealBloomPass(new THREE.Vector2(size.width, size.height), 0.4, 0.4, 0.8);
+    composer.addPass(bloom);
     const grade = new ShaderPass(BreachFXShader);
-    if (!q.has('nograde')) composer.addPass(grade);
-    if (!q.has('noout')) composer.addPass(new OutputPass());
+    composer.addPass(grade);
+    composer.addPass(new OutputPass());
     if (import.meta.env.DEV) {
       (window as unknown as Record<string, unknown>).__composer = composer;
-      (window as unknown as Record<string, unknown>).__gl = gl;
-      (window as unknown as Record<string, unknown>).__scene = scene;
-      (window as unknown as Record<string, unknown>).__camera = camera;
     }
     return { composer, bloom, grade };
     // eslint-disable-next-line react-hooks/exhaustive-deps
