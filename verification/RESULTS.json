@@ -12,17 +12,17 @@
   {
     "id": "9.1/9.6 breach no frame-long stalls",
     "pass": true,
-    "detail": "{\"avgFps\":120,\"worstGapMs\":19}"
+    "detail": "{\"avgFps\":143,\"worstGapMs\":26}"
   },
   {
     "id": "9.6 breach ≥50fps",
     "pass": true,
-    "detail": "120fps"
+    "detail": "143fps"
   },
   {
     "id": "9.6 hub ≥50fps",
     "pass": true,
-    "detail": "{\"avgFps\":121,\"worstGapMs\":11}"
+    "detail": "{\"avgFps\":144,\"worstGapMs\":9}"
   },
   {
     "id": "9.1 hover jarvis → chip",
@@ -172,7 +172,7 @@
   {
     "id": "9.4 reduced motion: no breach — instant crossfade",
     "pass": true,
-    "detail": "47ms"
+    "detail": "162ms"
   },
   {
     "id": "9.4 reduced motion: chamber opens instantly",
@@ -283,6 +283,31 @@
     "id": "M8.12 [ return ] recovers to the threshold",
     "pass": true,
     "detail": ""
+  },
+  {
+    "id": "S1 ascent ≤1.8s (+input latency)",
+    "pass": true,
+    "detail": "1847ms"
+  },
+  {
+    "id": "S7 rail: 8 named stops, one ringed current, 0n/NAME label",
+    "pass": true,
+    "detail": "{\"n\":8,\"named\":true,\"current\":1,\"pos\":\"01 / JARVIS\"}"
+  },
+  {
+    "id": "S7/9.8 rail stops keyboard-focusable",
+    "pass": true,
+    "detail": ""
+  },
+  {
+    "id": "S7 rail click travels (direct flight)",
+    "pass": true,
+    "detail": "#/hub/everclash"
+  },
+  {
+    "id": "S4 hop has no zoom-out intermediate (fov mid-arc ≤58)",
+    "pass": true,
+    "detail": "fov 54.7"
   },
   {
     "id": "9.2 console gate: zero errors & warnings across full flow",

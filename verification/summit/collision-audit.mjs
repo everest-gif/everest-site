@@ -83,9 +83,10 @@ const collect = `(() => {
   for (const a of els) for (const b of els) {
     if (a !== b && a.contains(b)) contains.push([a.__auditKey, b.__auditKey]);
   }
-  /* floating layer */
+  /* floating layer — interactive leaves only (containers would pair with their
+     own children) */
   const floats = [];
-  for (const el of document.querySelectorAll('.explore-chip, .orbital-rail button, .orbital-rail, .hud-br, .hud-tr')) {
+  for (const el of document.querySelectorAll('.explore-chip, .rail-stop, .rail-pos, .hud-br, .hud-tr')) {
     if (!(el instanceof HTMLElement) || !isVisible(el)) continue;
     const r = el.getBoundingClientRect();
     if (r.width < 2) continue;
@@ -129,7 +130,7 @@ for (const vp of WIDTHS) {
     const fbad = intersections(
       res.floats.map((f, i) => ({ ...f, key: String(i) })),
       [],
-    ).filter(({ a, b }) => !(a.sel.includes('orbital') && b.sel.includes('orbital')));
+    );
     const n = bad.length + fbad.length;
     totalFail += n;
     console.log(`[${vp.name}] ${id}: ${res.parts.length} parts, ${n === 0 ? 'CLEAN' : n + ' INTERSECTIONS'}`);

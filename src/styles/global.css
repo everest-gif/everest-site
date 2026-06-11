@@ -731,7 +731,8 @@ a {
 /* ---------- M6: EXPLORE chips — travel to the neighbours, obviously clickable ---------- */
 .chamber-chips {
   position: absolute;
-  left: 42vw;
+  /* S7 — true corners: the bottom band is shared with the centered orbital rail */
+  left: clamp(20px, 4vw, 56px);
   right: clamp(20px, 4vw, 56px);
   bottom: 62px; /* clear of the hud-br return control */
   display: flex;

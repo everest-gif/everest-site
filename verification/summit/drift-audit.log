@@ -1,0 +1,4 @@
+SUMMIT drift audit re-run (shipped solver, scrub build)
+300s@60Hz: minDiscGap +0.2273, minCenterSep 0.6348, worst everclash·voxhalla @287.7s
+900s@60Hz: minDiscGap +0.1188, minCenterSep 0.5354, worst everclash·beyond @637.7s
+identical to M10 baseline — zero overlaps, orbits untouched by summit changes

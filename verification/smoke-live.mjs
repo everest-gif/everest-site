@@ -143,6 +143,24 @@ const hopped = await page
   .then(() => true)
   .catch(() => false);
 check('arrow-key hop works', hopped, await page.evaluate(() => location.hash));
+
+/* ============ SUMMIT PASS — orbital rail + direct rail hop ============ */
+await page.waitForTimeout(1400);
+const rail = await page.evaluate(() => {
+  const stops = [...document.querySelectorAll('.rail-stop')];
+  return {
+    n: stops.length,
+    current: document.querySelectorAll('.rail-stop[aria-current="true"]').length,
+    pos: document.querySelector('.rail-pos')?.textContent ?? '',
+  };
+});
+check('orbital rail: 8 stops, one current, position label', rail.n === 8 && rail.current === 1 && /\d{2}/.test(rail.pos), JSON.stringify(rail));
+await page.evaluate(() => [...document.querySelectorAll('.rail-stop')][7].click());
+const railHop = await page
+  .waitForFunction(() => location.hash === '#/hub/beyond' && !!document.querySelector('.chamber-panel'), null, { timeout: 6000 })
+  .then(() => true)
+  .catch(() => false);
+check('rail click → direct flight to beyond', railHop);
 await page.keyboard.press('Escape');
 await page.waitForFunction(() => location.hash === '#/hub', null, { timeout: 5000 });
 

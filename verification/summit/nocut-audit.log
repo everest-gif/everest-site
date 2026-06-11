@@ -1,0 +1,5 @@
+SUMMIT no-cut audit — 12fps frame-step review (manual, every adjacent pair at the seams)
+ascent.webm  (110 frames): open→blade→split→thread→rush→preglow→reveal→dock — continuous, zero cuts, no dead frames
+descent.webm: station→pull-away→dive→gap-thread→settle→seam-knit — continuous, zero cuts
+hop.webm: derez-in-flight→arc past system→materialize-on-dock — continuous, zero cuts
+artifact note: recordings use deviceScaleFactor=1 (see DECISIONS #54); perf from rAF sampler only

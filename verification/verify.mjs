@@ -485,6 +485,56 @@ for (const key of ['Enter', ' ']) {
   await ctx.close();
 }
 
+/* ============ SUMMIT PASS — S1 ascent timing, S7 rail, S4 direct hops ============ */
+{
+  const { ctx, page } = await newPage();
+  await page.goto(`${BASE}/?vsum&scrub=1`);
+  await page.waitForSelector('.enter-ring', { state: 'visible', timeout: 15000 });
+  await page.waitForTimeout(900);
+  const t0 = Date.now();
+  await page.keyboard.press('Enter');
+  await page.waitForFunction(() => location.hash === '#/hub', null, { timeout: 4000 });
+  const dt = Date.now() - t0;
+  check('S1 ascent ≤1.8s (+input latency)', dt < 2100, `${dt}ms`);
+
+  await page.waitForTimeout(1300);
+  await page.evaluate(() => {
+    location.hash = '#/hub/jarvis';
+  });
+  await page.waitForSelector('.orbital-rail', { timeout: 6000 });
+  const rail = await page.evaluate(() => {
+    const stops = [...document.querySelectorAll('.rail-stop')];
+    return {
+      n: stops.length,
+      named: stops.every((s) => (s.getAttribute('aria-label') ?? '').length > 0),
+      current: document.querySelectorAll('.rail-stop[aria-current="true"]').length,
+      pos: document.querySelector('.rail-pos')?.textContent ?? '',
+    };
+  });
+  check(
+    'S7 rail: 8 named stops, one ringed current, 0n/NAME label',
+    rail.n === 8 && rail.named && rail.current === 1 && rail.pos.includes('01'),
+    JSON.stringify(rail),
+  );
+  const focusable = await page.evaluate(() => {
+    document.querySelector('.rail-stop')?.focus();
+    return document.activeElement?.classList.contains('rail-stop') ?? false;
+  });
+  check('S7/9.8 rail stops keyboard-focusable', focusable);
+
+  /* rail click → S4 direct arc; the lens never zooms out mid-hop */
+  await page.evaluate(() => [...document.querySelectorAll('.rail-stop')][4].click());
+  await page.waitForTimeout(560);
+  const fovMid = await page.evaluate(() => window.__handles.camera.fov);
+  const landed = await page
+    .waitForFunction(() => location.hash === '#/hub/everclash' && !!document.querySelector('.chamber-panel'), null, { timeout: 4000 })
+    .then(() => true)
+    .catch(() => false);
+  check('S7 rail click travels (direct flight)', landed, await page.evaluate(() => location.hash));
+  check('S4 hop has no zoom-out intermediate (fov mid-arc ≤58)', fovMid <= 58, `fov ${fovMid.toFixed(1)}`);
+  await ctx.close();
+}
+
 /* ============ 9.2 console gate — across everything above ============ */
 const realIssues = consoleLog.filter((l) => !l.includes('GPU stall due to ReadPixels'));
 check('9.2 console gate: zero errors & warnings across full flow', realIssues.length === 0, realIssues.slice(0, 6).join(' | ') || 'clean');
