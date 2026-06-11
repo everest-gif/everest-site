@@ -51,8 +51,12 @@
       3 one-time draws, rm = disabled. Tuning loop ×3 from posters (teepee fix → band
       placement). Evidence: life.webm (shooting star at f_040 + autumn front w/ trees),
       threshold-{season}.png; check-paths 7/7 re-run clean.
-- [ ] S3 Cosmos: milky-way band behind hub, deep-space violet-indigo allowance 6–12%
-      (sky only), drift + parallax; DECISIONS entry
+- [x] S3 Cosmos: MilkyWay.tsx — diagonal band (tilt −24°) behind everything: fbm spine
+      (gaussian tuned to fall off in-frame), dark dust lanes, granulated star-density,
+      slow drift, + 380-star band-aligned cloud for drag-orbit parallax; violet-indigo
+      #7A6FA8 deep-space-only (DECISIONS #52), envelope ≤0.105; reveal-gated with the
+      system (invisible during the open phase). Poster: cosmos-hub.png + lean parallax
+      shot — no purple-website read.
 - [ ] S8 Verification & ship: motion evidence ×5 + poster tests, no-cut audits, collision logs,
       §9 protocol re-run, tunnel-remnant grep = zero, deploy + production smoke
 

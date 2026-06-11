@@ -28,6 +28,7 @@ import { makePlanet as makeEverclash } from './planets/everclash';
 import { makePlanet as makeVoxhalla } from './planets/voxhalla';
 import { makePlanet as makeBigback } from './planets/bigback';
 import { makePlanet as makeBeyond } from './planets/beyond';
+import MilkyWay from './MilkyWay';
 
 const amber = new THREE.Color(AMBER);
 const jade = new THREE.Color(JADE);
@@ -523,7 +524,8 @@ export default function HubWorld() {
 
   return (
     <group ref={groupRef} position={[0, HUB_Y, 0]} visible={visible}>
-      {/* universe backdrop — the system floats somewhere, not in void (M5) */}
+      {/* universe backdrop — the system floats somewhere, not in void (M5/S3) */}
+      <MilkyWay reveal={coreReveal} />
       <points geometry={backdrop.starGeo} material={backdrop.starMat} renderOrder={-2} frustumCulled={false} />
       <mesh material={backdrop.nebMat} position={[0, 0, -34]} renderOrder={-1}>
         <planeGeometry args={[150, 90, 1, 1]} />

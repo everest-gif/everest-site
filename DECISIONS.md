@@ -190,7 +190,19 @@
     inline spans — giant display digits bleed their em-box past the line box, which is
     typography, not layout), exempts aria-hidden decoration except headlines themselves,
     and checks the floating travel chrome as its own layer.
-51. **Recording tooling: deviceScaleFactor pinned to 1.** A PerformanceMonitor dpr step
+52. **S3 — deep-space-only violet allowance.** The milky-way band (and only it) carries
+    desaturated violet-indigo (#7A6FA8 pulled 38% toward ink, mixed ≤36% toward amber
+    dust) per the SUMMIT_PASS S3 register: dreamy, dark, quiet. The allowance ends at
+    the sky: planets, threads, pulses, UI, and type remain strictly amber/jade/bone.
+    Band alpha envelope ≤0.105 additive (inside the directive's 6–12%); the gaussian
+    spine is tuned to fall off INSIDE the framed window (a too-wide profile read as
+    all-over mottling, not a band). Poster check: no still reads "purple website."
+53. **S2 — silhouette darkness is sRGB-aware.** The OutputPass encode lifts linear darks
+    hard (0.06 linear ≈ mid-grey on screen): true silhouettes (treeline, life events)
+    must sit BELOW the sky ink (≈0.02 linear), reading as light-absent cutouts against
+    the glowing wireframe — and they only read at all where lit lines pass behind them,
+    so the treeline band lives on the glowing lower slopes, not the dark valley floor.
+54. **Recording tooling: deviceScaleFactor pinned to 1.** A PerformanceMonitor dpr step
     mid-flight resizes the canvas and stalls Chromium's screencast — the page stays
     healthy (rAF sampler + live probe proved it) while the video freezes on its last
     frame. Pinning dsf=1 sidesteps the decline. Perf evidence comes from the rAF
