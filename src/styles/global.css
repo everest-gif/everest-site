@@ -821,6 +821,104 @@ a {
     min-height: 44px; /* M7 mobile — tappable */
   }
 }
+/* ---------- S7: orbital rail — all eight stops in orbit order, bottom-center ---------- */
+.orbital-rail {
+  position: absolute;
+  left: 50%;
+  bottom: 58px;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  z-index: 5;
+  pointer-events: none;
+}
+.rail-stops {
+  list-style: none;
+  margin: 0;
+  padding: 0 6px;
+  display: flex;
+  gap: 2px;
+  pointer-events: auto;
+  border: 1px solid var(--hairline);
+  background: rgba(10, 10, 12, 0.72);
+}
+.rail-stop {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--dim);
+  transition: color var(--t-micro) var(--ease-out);
+}
+.rail-stop:hover,
+.rail-stop:focus-visible {
+  color: var(--bone);
+}
+.rail-stop.is-current {
+  color: var(--amber);
+}
+/* amber ring on the current stop — a node orb marker (sanctioned circle) */
+.rail-stop.is-current::after {
+  content: '';
+  position: absolute;
+  inset: 5px;
+  border: 1px solid var(--amber);
+  border-radius: 50%;
+}
+/* hover names the stop in mono, above the rail */
+.rail-name {
+  position: absolute;
+  bottom: calc(100% + 7px);
+  left: 50%;
+  transform: translateX(-50%) translateY(3px);
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--bone);
+  background: rgba(10, 10, 12, 0.85);
+  border: 1px solid var(--hairline);
+  padding: 4px 8px;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity var(--t-micro) var(--ease-out),
+    transform var(--t-micro) var(--ease-out);
+}
+.rail-stop:hover .rail-name,
+.rail-stop:focus-visible .rail-name {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+.rail-pos {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--dim);
+  white-space: nowrap;
+}
+.rail-pos-num {
+  color: var(--amber);
+}
+@media (max-width: 900px) {
+  .orbital-rail {
+    bottom: 118px; /* its own band above the EXPLORE chips */
+    flex-direction: column;
+    gap: 8px;
+  }
+  .rail-stop {
+    width: 44px; /* S7 — ≥44px touch targets */
+    height: 44px;
+  }
+  .rail-name {
+    display: none; /* no hover on touch; the position label carries the name */
+  }
+}
 @media (max-width: 900px) {
   .chamber-scroll {
     inset: 0;

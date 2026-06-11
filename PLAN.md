@@ -38,8 +38,10 @@
       hopChamber → one path (chips/INDEX/arrows). Reduced motion: true 200ms crossfade
       (0.1s out + 0.1s in). Evidence: motion/hop.webm + frames; 8-hop ring traversal +
       rapid-fire abuse → console silent.
-- [ ] S7 Orbital rail: bottom-center, 8 glyphs in orbit order, amber ring + 0n/NAME,
-      hover names, keyboard, ≥44px mobile targets
+- [x] S7 Orbital rail: bottom-center nav in every chamber — 8 NodeGlyphs in orbit order,
+      current ringed amber + `0n / NAME` beside, hover names each stop in mono, clicks
+      ride the S4 direct flight, native-button keyboard order, aria-current; mobile: own
+      band above the chips, 44×44 targets (probe-verified), tooltip yields to the label.
 - [ ] S2 Threshold lives: season-aware instanced treeline (shader-welded to terrain heightAt)
       + ambient life events (8–20s cadence, season-matched silhouettes, rare ridgeline elk);
       reduced-motion disabled

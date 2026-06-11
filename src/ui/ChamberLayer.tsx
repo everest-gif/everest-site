@@ -186,6 +186,39 @@ function ExploreChip({ dir, node }: { dir: 'prev' | 'next'; node: NodeDef }) {
   );
 }
 
+/* S7 — orbital rail: all eight planet glyphs in orbit order, bottom-center.
+   The current chamber is ringed in amber with `0n / NAME` beside the rail;
+   any glyph is one click (S4 direct flight) away. Hover names each stop. */
+function OrbitalRail({ current }: { current: NodeId }) {
+  const idx = NODES.findIndex((n) => n.id === current);
+  return (
+    <nav className="orbital-rail" aria-label="All chambers in orbit order">
+      <ol className="rail-stops">
+        {NODES.map((n) => (
+          <li key={n.id}>
+            <button
+              type="button"
+              className={`rail-stop${n.id === current ? ' is-current' : ''}`}
+              data-cursor="node"
+              aria-label={`Travel to ${n.label} — ${n.role}`}
+              aria-current={n.id === current ? 'true' : undefined}
+              onClick={() => useStore.getState().hopChamber(n.id)}
+            >
+              <NodeGlyph id={n.id} size={13} />
+              <span className="rail-name" aria-hidden="true">
+                {n.label}
+              </span>
+            </button>
+          </li>
+        ))}
+      </ol>
+      <span className="rail-pos" aria-hidden="true">
+        <span className="rail-pos-num">{String(idx + 1).padStart(2, '0')}</span> / {NODE_MAP[current].label}
+      </span>
+    </nav>
+  );
+}
+
 function ChamberStage({ id }: { id: NodeId }) {
   const rootRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -367,6 +400,7 @@ function ChamberStage({ id }: { id: NodeId }) {
           <ExploreChip dir="prev" node={prev} />
           <ExploreChip dir="next" node={next} />
         </nav>
+        <OrbitalRail current={id} />
       </div>
       <div className="chamber-beam" aria-hidden="true" />
       <div className="chamber-beam" aria-hidden="true" />
