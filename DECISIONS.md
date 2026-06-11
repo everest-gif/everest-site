@@ -68,3 +68,9 @@
 26. **Hub magnetic reach 84px / max 8px** — §5 fixes the 8px cap; reach tuned so drifting labels
     don't snag the cursor from across the ring. Composed into the projection rAF (no extra loop),
     inert on touch + reduced motion.
+27. **Empty media manifests pre-seeded for all 8 chambers** (`{ "images": [] }`) — Vercel static
+    hosting returns real 404s for missing files, and Chrome logs network 404s as console errors,
+    which broke the §9.2 zero-console gate on the live production smoke (vite preview had masked
+    this: its SPA fallback answers any path with 200 + index.html). `useMedia` already treats an
+    empty list as "no media" → placeholder frames, so 200 + empty manifest restores the README's
+    "nothing 404s" guarantee with zero code changes.
