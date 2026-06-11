@@ -8,14 +8,17 @@ import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass.js';
 import { handles } from './handles';
 
-/* Final grade pass — chromatic aberration, amber whiteout, fisheye. All breach-driven, idle at 0. */
+/* Final grade pass — chromatic aberration (seam-entry/arrival only, ≤0.0035) and the
+   amber light-wrap with a radial extent so arrival visibly CONTRACTS into the hub core.
+   The R1 fisheye/DoF smear is gone: sharpness is the luxury. */
 const BreachFXShader = {
   name: 'BreachFXShader',
   uniforms: {
     tDiffuse: { value: null },
     uChroma: { value: 0 },
     uWhite: { value: 0 },
-    uDistort: { value: 0 },
+    uWrapR: { value: 1.1 },
+    uAspect: { value: 16 / 9 },
   },
   vertexShader: /* glsl */ `
     varying vec2 vUv;
@@ -28,19 +31,20 @@ const BreachFXShader = {
     uniform sampler2D tDiffuse;
     uniform float uChroma;
     uniform float uWhite;
-    uniform float uDistort;
+    uniform float uWrapR;
+    uniform float uAspect;
     varying vec2 vUv;
 
     void main() {
-      vec2 c = vUv - 0.5;
-      float r2 = dot(c, c);
-      vec2 uv = 0.5 + c * (1.0 + uDistort * r2);
-      vec2 shift = (uv - 0.5) * uChroma;
-      float rr = texture2D(tDiffuse, uv + shift).r;
-      float gg = texture2D(tDiffuse, uv).g;
-      float bb = texture2D(tDiffuse, uv - shift).b;
+      vec2 shift = (vUv - 0.5) * uChroma;
+      float rr = texture2D(tDiffuse, vUv + shift).r;
+      float gg = texture2D(tDiffuse, vUv).g;
+      float bb = texture2D(tDiffuse, vUv - shift).b;
       vec3 col = vec3(rr, gg, bb);
-      col = mix(col, vec3(1.0, 0.84, 0.58), uWhite); /* amber-tinted whiteout, never pure white */
+      /* radial light-wrap: uWrapR 1.1 floods the frame; →0 contracts into screen center */
+      float d = length((vUv - 0.5) * vec2(uAspect, 1.0));
+      float wrap = 1.0 - smoothstep(uWrapR - 0.22, uWrapR + 0.02, d);
+      col = mix(col, vec3(1.0, 0.82, 0.52), uWhite * wrap); /* amber, never pure white */
       gl_FragColor = vec4(col, 1.0);
     }
   `,
@@ -73,7 +77,8 @@ export default function PostFX() {
     composer.setPixelRatio(gl.getPixelRatio());
     composer.setSize(size.width, size.height);
     bloom.resolution.set(size.width, size.height);
-  }, [composer, bloom, gl, size]);
+    grade.uniforms.uAspect.value = size.width / size.height;
+  }, [composer, bloom, grade, gl, size]);
 
   useEffect(() => () => composer.dispose(), [composer]);
 
@@ -82,7 +87,7 @@ export default function PostFX() {
     bloom.strength = handles.bloomIntensity.value;
     grade.uniforms.uChroma.value = handles.chromaOffset.value;
     grade.uniforms.uWhite.value = handles.whiteout.value;
-    grade.uniforms.uDistort.value = handles.tunnelLight.value * 0.35;
+    grade.uniforms.uWrapR.value = handles.wrapRadius.value;
     composer.render();
   }, 1);
 

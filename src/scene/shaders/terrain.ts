@@ -28,10 +28,17 @@ float heightAt(vec2 p) {
 }
 
 vec3 displaceSeam(vec3 pos) {
+  /* never 0 — a sign(0)=0 vertex column at x=0 would smear lines across the open gap */
+  float s = pos.x >= 0.0 ? 1.0 : -1.0;
   float w = exp(-abs(pos.x) * 0.30);
-  float peel = uSeam * w;
-  pos.x += sign(pos.x) * peel * 7.0;
-  pos.y += peel * 2.2;
+  /* strata shelves (R1.2): each elevation band slides by its own amount — cut rock layers */
+  float band = floor(pos.y * 1.6);
+  float strata = 0.72 + 0.28 * hash11(band * 7.31 + uSeed);
+  float peel = uSeam * w * strata;
+  /* tear jitter — wireframe under tension; peaks mid-split, settles once open */
+  float tear = uSeam * (1.0 - uSeam) * w * 4.0;
+  pos.x += s * peel * 7.5 + s * tear * snoise(vec2(pos.y * 2.1 + uSeed, pos.x * 0.7)) * 0.4;
+  pos.y += peel * 0.6;
   return pos;
 }
 `;
@@ -42,6 +49,7 @@ ${GLSL_TERRAIN_COMMON}
 varying float vH;
 varying vec3 vWorld;
 varying float vSeamGlow;
+varying float vSeamK;
 
 void main() {
   vec3 pos = position; /* plane lies in XY pre-rotation: x across, y depth-ish — geometry is rotated on CPU so here x,z grid, y=0 */
@@ -49,6 +57,7 @@ void main() {
   pos.y += h * uAmp;
   float w = exp(-abs(pos.x) * 0.30);
   vSeamGlow = uSeam * w;
+  vSeamK = uSeam;
   pos = displaceSeam(pos);
   vH = clamp(h, 0.0, 1.4) / 1.4;
   vec4 world = modelMatrix * vec4(pos, 1.0);
@@ -64,17 +73,22 @@ uniform float uFade;
 varying float vH;
 varying vec3 vWorld;
 varying float vSeamGlow;
+varying float vSeamK;
 
 void main() {
   float d = length(vWorld - cameraPosition);
   float depthFade = 1.0 - smoothstep(16.0, 56.0, d) * 0.8;
   float nearFade = smoothstep(2.5, 10.0, d); /* kill the in-your-face foreground grid */
   float glow = 0.05 + pow(max(vH, 0.0), 1.6) * 0.85; /* flats nearly black; crests glow */
-  glow *= 1.0 + uNearBright * 1.9;
-  glow += vSeamGlow * 3.2;
+  glow *= 1.0 + uNearBright * 0.8; /* R0.4: approach warms the rock, never torches it */
+  glow += vSeamGlow * 1.6; /* wound edges glow amber — edges, not a fireball */
   vec3 col = uColor * glow;
+  /* gap-straddling segments read as tearing threads mid-split, then snap away once open
+     (they'd otherwise streak across the tunnel corridor) */
+  float snap = smoothstep(0.55, 0.9, vSeamK);
+  float bridge = 1.0 - snap * (1.0 - smoothstep(1.0, 3.2, abs(vWorld.x)));
   /* AdditiveBlending uses SrcAlpha — do NOT premultiply or brightness goes alpha² */
-  float alpha = uFade * depthFade * nearFade;
+  float alpha = uFade * depthFade * nearFade * bridge;
   gl_FragColor = vec4(col, alpha);
 }
 `;
@@ -115,28 +129,48 @@ void main() {
 }
 `;
 
-/* The seam light — a thin vertical blade of light inside the fissure, dormant until the breach. */
+/* The seam light (R1.2): a bone-white hairline BLADE draws downward from the crest,
+   then the amber wound light swells in the gap as the halves part. */
 export const seamVert = /* glsl */ `
 varying vec2 vUv;
+varying vec3 vWorld;
 void main() {
   vUv = uv;
-  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  vec4 world = modelMatrix * vec4(position, 1.0);
+  vWorld = world.xyz;
+  gl_Position = projectionMatrix * viewMatrix * world;
 }
 `;
 
 export const seamFrag = /* glsl */ `
 ${GLSL_NOISE}
 uniform float uSeam;
+uniform float uBlade; /* 0→1 draws the hairline from crest to base */
+uniform float uFade;  /* thresholdFade — the wound light dies as the camera slips in */
 uniform float uTime;
 uniform vec3 uColor;
 varying vec2 vUv;
+varying vec3 vWorld;
 
 void main() {
-  float c0 = max(0.0, 1.0 - abs(vUv.x - 0.5) * 2.0);
-  float core = c0 * c0 * c0;
-  float flicker = 0.85 + 0.15 * snoise(vec2(vUv.y * 6.0 - uTime * 1.4, uTime * 0.6));
-  float vert = smoothstep(0.0, 0.18, vUv.y) * (1.0 - smoothstep(0.82, 1.0, vUv.y));
-  float a = core * vert * uSeam * flicker;
-  gl_FragColor = vec4(uColor * 2.4, a);
+  /* melt away as the camera arrives — never a wall of light across the lens */
+  float near = clamp((length(vWorld - cameraPosition) - 1.6) / 2.6, 0.0, 1.0);
+  float x = abs(vUv.x - 0.5);
+  float tipY = 1.0 - uBlade;
+  /* hairline: a blade, not a glow */
+  float hair = exp(-x * x * 5200.0);
+  float drawn = smoothstep(tipY, tipY + 0.025, vUv.y) * step(0.001, uBlade);
+  float dy = vUv.y - tipY;
+  float tip = exp(-dy * dy * 700.0) * uBlade * (1.0 - uBlade) * 4.0;
+  float flick = 0.93 + 0.07 * snoise(vec2(vUv.y * 9.0 - uTime * 2.2, uTime * 0.8));
+  vec3 bone = vec3(0.93, 0.91, 0.875);
+  vec3 col = bone * hair * (drawn * 2.4 + tip * 2.8);
+  /* wound light — amber, swells with the split, narrow and restrained */
+  float wound = exp(-x * x * 150.0) * uSeam;
+  col += uColor * wound * 1.0 * flick;
+  float vert = smoothstep(0.0, 0.06, vUv.y);
+  float a = clamp(hair * (drawn * 2.0 + tip) + wound * 0.9, 0.0, 1.0) * vert * flick * uFade * near;
+  if (a < 0.004) discard;
+  gl_FragColor = vec4(col, a);
 }
 `;

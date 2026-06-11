@@ -6,26 +6,34 @@ import type * as THREE from 'three';
 interface SceneHandles {
   camera: THREE.PerspectiveCamera | null;
   seam: { value: number };
+  blade: { value: number };
   nearBright: { value: number };
   thresholdFade: { value: number };
   tunnelProgress: { value: number };
   tunnelLight: { value: number };
+  converge: { value: number };
   bloomIntensity: { value: number };
   chromaOffset: { value: number };
   whiteout: { value: number };
+  wrapRadius: { value: number };
   hubReveal: { value: number };
 }
 
 export const handles: SceneHandles = {
   camera: null,
   seam: { value: 0 },
+  blade: { value: 0 },
   nearBright: { value: 0 },
   thresholdFade: { value: 1 },
   tunnelProgress: { value: 0 },
   tunnelLight: { value: 0 },
+  converge: { value: 0 },
   bloomIntensity: { value: 0.85 },
   chromaOffset: { value: 0 },
   whiteout: { value: 0 },
+  /* radial extent of the whiteout (grade pass): 1.1 floods the frame, 0 = gone.
+     Tweened 1.1 → 0 on arrival so the light visibly contracts into the hub core. */
+  wrapRadius: { value: 1.1 },
   hubReveal: { value: 0 },
 };
 
@@ -42,9 +50,13 @@ export interface ScreenAnchor {
 export const nodeScreens: Record<string, ScreenAnchor> = {};
 export const coreScreen: ScreenAnchor = { x: 0, y: 0, scale: 1, visible: false, reveal: 0 };
 
-/* World layout — each act lives in its own pocket of space. */
+/* World layout. The tunnel lives in THRESHOLD space, bored into the mountain behind the
+   ridge seam — the breach camera physically flies into it (R1.1: one unbroken shot).
+   Only the hub remains a separate pocket, reached inside the 120ms arrival light-wrap. */
 export const HUB_Y = 600;
-export const TUNNEL_Y = 300;
+export const TUNNEL_CY = 3.4; /* tube axis height ≈ camera path through the seam */
+export const TUNNEL_R = 2.6; /* small enough to hide behind the ridge silhouette at idle */
+export const TUNNEL_Z0 = -15.5; /* entrance, just behind the ridge planes at z −8 / −13.5 */
 export const TUNNEL_LEN = 64;
 
 export const AMBER = '#E8A23D';

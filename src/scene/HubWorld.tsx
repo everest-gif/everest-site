@@ -157,6 +157,16 @@ export default function HubWorld() {
     return [mk(SECTORS.inner, 2.5 + 0.22, Math.PI * 0.72), mk(SECTORS.outer, 4.1 + 0.22, Math.PI * 1.78)];
   }, []);
 
+  /* upload the 1024² canvas textures during boot — first hub draw otherwise stalls ~30ms
+     inside the arrival light-wrap */
+  const gl = useThree((s) => s.gl);
+  useEffect(() => {
+    for (const p of sectorPlanes) {
+      const map = p.m.map;
+      if (map) gl.initTexture(map);
+    }
+  }, [gl, sectorPlanes]);
+
   /* pulse traffic buffers */
   const traffic = useMemo(() => {
     const positions = new Float32Array(PULSE_SLOTS * 3);

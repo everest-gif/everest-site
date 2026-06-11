@@ -1,25 +1,143 @@
 import { useMemo } from 'react';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
-import { useStore } from '../state/store';
-import { handles, TUNNEL_Y, TUNNEL_LEN, AMBER, JADE } from './handles';
-import { tunnelVert, tunnelFrag, speedlineVert, speedlineFrag } from './shaders/tunnel';
+import { handles, TUNNEL_CY, TUNNEL_R, TUNNEL_Z0, TUNNEL_LEN, AMBER, JADE } from './handles';
+import {
+  tunnelVert,
+  tunnelFrag,
+  capFrag,
+  ribbonVert,
+  ribbonFrag,
+  speedlineVert,
+  speedlineFrag,
+} from './shaders/tunnel';
+
+/* R1.1 — the tunnel is bored into the mountain in THRESHOLD space, directly behind the
+   ridge seam. The breach camera physically flies into it; nothing mounts or unmounts.
+   The tube is opaque ink (occludes stars + outer terrain once inside); all light is
+   ribbon geometry. Always mounted, always visible — beyond the far plane from the hub. */
 
 const amber = new THREE.Color(AMBER);
 const jade = new THREE.Color(JADE);
 
 function TunnelTube() {
   const { geometry, material } = useMemo(() => {
-    const g = new THREE.CylinderGeometry(3, 3, TUNNEL_LEN, 48, 1, true);
+    const g = new THREE.CylinderGeometry(TUNNEL_R, TUNNEL_R, TUNNEL_LEN, 64, 1, true);
     g.rotateX(Math.PI / 2); /* axis along Z */
     const m = new THREE.ShaderMaterial({
       vertexShader: tunnelVert,
       fragmentShader: tunnelFrag,
       side: THREE.BackSide,
-      depthWrite: false,
       uniforms: {
         uTime: { value: 0 },
         uProgress: handles.tunnelProgress,
+        uLight: handles.tunnelLight,
+        uAmber: { value: amber },
+      },
+    });
+    return { geometry: g, material: m };
+  }, []);
+
+  useFrame((state) => {
+    material.uniforms.uTime.value = state.clock.elapsedTime;
+  });
+
+  return <mesh geometry={geometry} material={material} position={[0, 0, TUNNEL_Z0 - TUNNEL_LEN / 2]} />;
+}
+
+/* Sealed far end — the distant point the ribbons converge into at arrival. */
+function EndCap() {
+  const material = useMemo(
+    () =>
+      new THREE.ShaderMaterial({
+        vertexShader: tunnelVert,
+        fragmentShader: capFrag,
+        uniforms: {
+          uLight: handles.tunnelLight,
+          uConverge: handles.converge,
+          uAmber: { value: amber },
+        },
+      }),
+    [],
+  );
+  return (
+    <mesh material={material} position={[0, 0, TUNNEL_Z0 - TUNNEL_LEN + 0.2]}>
+      <circleGeometry args={[TUNNEL_R + 0.05, 48]} />
+    </mesh>
+  );
+}
+
+/* 7 streak ribbons — amber dominant, exactly one jade (R1.3). */
+const RIBBONS = [
+  { angle: 0.6, radius: 2.2, width: 0.1, len: 16, speed: 30, phase: 5, jade: 0, bright: 1.0 },
+  { angle: 1.9, radius: 2.38, width: 0.06, len: 22, speed: 38, phase: 30, jade: 0, bright: 0.8 },
+  { angle: 2.7, radius: 2.05, width: 0.13, len: 11, speed: 26, phase: 55, jade: 0, bright: 0.65 },
+  { angle: 3.6, radius: 2.3, width: 0.05, len: 19, speed: 44, phase: 12, jade: 1, bright: 0.75 },
+  { angle: 4.4, radius: 2.42, width: 0.09, len: 14, speed: 33, phase: 70, jade: 0, bright: 0.9 },
+  { angle: 5.3, radius: 2.15, width: 0.07, len: 24, speed: 50, phase: 42, jade: 0, bright: 0.7 },
+  { angle: 0.15, radius: 2.34, width: 0.11, len: 9, speed: 22, phase: 82, jade: 0, bright: 0.55 },
+];
+
+function Ribbons() {
+  const { geometry, material } = useMemo(() => {
+    const n = RIBBONS.length;
+    const attr = {
+      angle: new Float32Array(n * 4),
+      radius: new Float32Array(n * 4),
+      len: new Float32Array(n * 4),
+      speed: new Float32Array(n * 4),
+      phase: new Float32Array(n * 4),
+      jade: new Float32Array(n * 4),
+      side: new Float32Array(n * 4),
+      head: new Float32Array(n * 4),
+      width: new Float32Array(n * 4),
+      bright: new Float32Array(n * 4),
+    };
+    const index: number[] = [];
+    RIBBONS.forEach((r, i) => {
+      /* 4 verts per ribbon: (tail,−1) (tail,+1) (head,−1) (head,+1) */
+      for (let v = 0; v < 4; v++) {
+        const k = i * 4 + v;
+        attr.angle[k] = r.angle;
+        attr.radius[k] = r.radius;
+        attr.len[k] = r.len;
+        attr.speed[k] = r.speed;
+        attr.phase[k] = r.phase;
+        attr.jade[k] = r.jade;
+        attr.side[k] = v % 2 === 0 ? -1 : 1;
+        attr.head[k] = v < 2 ? 0 : 1;
+        attr.width[k] = r.width;
+        attr.bright[k] = r.bright;
+      }
+      const b = i * 4;
+      index.push(b, b + 1, b + 2, b + 1, b + 3, b + 2);
+    });
+    const g = new THREE.BufferGeometry();
+    /* positions are shader-computed; placeholder attribute keeps three happy */
+    g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(n * 4 * 3), 3));
+    g.setAttribute('aAngle', new THREE.BufferAttribute(attr.angle, 1));
+    g.setAttribute('aRadius', new THREE.BufferAttribute(attr.radius, 1));
+    g.setAttribute('aLen', new THREE.BufferAttribute(attr.len, 1));
+    g.setAttribute('aSpeed', new THREE.BufferAttribute(attr.speed, 1));
+    g.setAttribute('aPhase', new THREE.BufferAttribute(attr.phase, 1));
+    g.setAttribute('aJade', new THREE.BufferAttribute(attr.jade, 1));
+    g.setAttribute('aSide', new THREE.BufferAttribute(attr.side, 1));
+    g.setAttribute('aHead', new THREE.BufferAttribute(attr.head, 1));
+    g.setAttribute('aWidth', new THREE.BufferAttribute(attr.width, 1));
+    g.setAttribute('aBright', new THREE.BufferAttribute(attr.bright, 1));
+    g.setIndex(index);
+    g.boundingSphere = new THREE.Sphere(new THREE.Vector3(0, 0, TUNNEL_Z0 - TUNNEL_LEN / 2), 50);
+    const m = new THREE.ShaderMaterial({
+      vertexShader: ribbonVert,
+      fragmentShader: ribbonFrag,
+      transparent: true,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+      side: THREE.DoubleSide,
+      uniforms: {
+        uTime: { value: 0 },
+        uProgress: handles.tunnelProgress,
+        uConverge: handles.converge,
         uLight: handles.tunnelLight,
         uAmber: { value: amber },
         uJade: { value: jade },
@@ -32,8 +150,7 @@ function TunnelTube() {
     material.uniforms.uTime.value = state.clock.elapsedTime;
   });
 
-  /* camera flies +z→−z through the tube; far end (−z) is the arrival point */
-  return <mesh geometry={geometry} material={material} position={[0, 0, -TUNNEL_LEN / 2 + 8]} />;
+  return <mesh geometry={geometry} material={material} frustumCulled={false} />;
 }
 
 function SpeedLines({ count = 420 }: { count?: number }) {
@@ -45,7 +162,7 @@ function SpeedLines({ count = 420 }: { count?: number }) {
     const seed = new Float32Array(count * 2);
     for (let i = 0; i < count; i++) {
       const a = Math.random() * Math.PI * 2;
-      const r = 1.1 + Math.random() * 1.6;
+      const r = 1.0 + Math.random() * 1.4;
       const x = Math.cos(a) * r;
       const y = Math.sin(a) * r;
       const zb = Math.random() * 58;
@@ -69,7 +186,7 @@ function SpeedLines({ count = 420 }: { count?: number }) {
     g.setAttribute('aLen', new THREE.BufferAttribute(len, 1));
     g.setAttribute('aSeed', new THREE.BufferAttribute(seed, 1));
     /* the shader computes z; keep the default bounding sphere from spanning origin */
-    g.boundingSphere = new THREE.Sphere(new THREE.Vector3(0, 0, -26), 40);
+    g.boundingSphere = new THREE.Sphere(new THREE.Vector3(0, 0, TUNNEL_Z0 - TUNNEL_LEN / 2), 44);
     const m = new THREE.ShaderMaterial({
       vertexShader: speedlineVert,
       fragmentShader: speedlineFrag,
@@ -81,7 +198,6 @@ function SpeedLines({ count = 420 }: { count?: number }) {
         uTime: { value: 0 },
         uLight: handles.tunnelLight,
         uAmber: { value: amber },
-        uJade: { value: jade },
       },
     });
     return { geometry: g, material: m };
@@ -95,11 +211,11 @@ function SpeedLines({ count = 420 }: { count?: number }) {
 }
 
 export default function TunnelWorld() {
-  const act = useStore((s) => s.act);
-  const visible = act === 'boot' || act === 'breach' || act === 'reverse-breach';
   return (
-    <group position={[0, TUNNEL_Y, 0]} visible={visible}>
+    <group position={[0, TUNNEL_CY, 0]}>
       <TunnelTube />
+      <EndCap />
+      <Ribbons />
       <SpeedLines />
     </group>
   );

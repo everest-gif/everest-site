@@ -14,14 +14,17 @@ export default function ThresholdLockup() {
   const wrapRef = useRef<HTMLDivElement>(null);
   const visible = act === 'threshold';
 
-  /* keep mounted briefly while fading out into the breach */
+  /* falls behind the camera during the breach; unmounting mid-flight cost a ~57ms style
+     recalc right at the blade moment — defer teardown into the arrival light-wrap */
   useEffect(() => {
-    if (visible) setMounted(true);
-    else if (mounted) {
-      const t = window.setTimeout(() => setMounted(false), 700);
-      return () => window.clearTimeout(t);
+    if (visible) {
+      setMounted(true);
+      return;
     }
-  }, [visible, mounted]);
+    if (!mounted || act === 'breach') return;
+    const t = window.setTimeout(() => setMounted(false), 80);
+    return () => window.clearTimeout(t);
+  }, [visible, mounted, act]);
 
   useGSAP(
     () => {
@@ -35,6 +38,7 @@ export default function ThresholdLockup() {
           return;
         }
         gsap.set(root, { autoAlpha: 1 });
+        gsap.set(root.querySelectorAll('.lk-item'), { scaleX: 1, scaleY: 1 });
         const tl = gsap.timeline({ defaults: { ease: 'expo.out' } });
         tl.fromTo(
           '.lockup-eyebrow',
@@ -50,6 +54,21 @@ export default function ThresholdLockup() {
           )
           .fromTo('.lockup-sub', { autoAlpha: 0, y: 16 }, { autoAlpha: 1, y: 0, duration: 0.7 }, 0.55)
           .fromTo('.enter-wrap', { autoAlpha: 0, scale: 0.92 }, { autoAlpha: 1, scale: 1, duration: 0.8 }, 0.75);
+      } else if (useStore.getState().act === 'breach' && !reducedMotion) {
+        /* R1.1 — signage passing a car window: falls behind the camera with motion blur.
+           Animate the small text items, not the full-viewport root — blur on a huge
+           layer caused 25–50ms raster hitches. */
+        /* vertical stretch instead of filter blur — same motion-smear read, none of the
+           25–275ms filter raster stalls the real blur caused */
+        gsap.to(root.querySelectorAll('.lk-item'), {
+          y: '+=210',
+          scaleY: 1.18,
+          scaleX: 1.02,
+          autoAlpha: 0,
+          duration: 0.85,
+          ease: 'power3.in',
+        });
+        gsap.to(root, { autoAlpha: 0, duration: 0.2, delay: 0.75 });
       } else {
         gsap.to(root, { autoAlpha: 0, duration: 0.45, ease: 'power2.in' });
       }

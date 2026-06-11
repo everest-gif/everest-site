@@ -74,3 +74,25 @@
     this: its SPA fallback answers any path with 200 + index.html). `useMedia` already treats an
     empty list as "no media" → placeholder frames, so 200 + empty manifest restores the README's
     "nothing 404s" guarantee with zero code changes.
+28. **R1 breach: tunnel relocated into threshold world space** (entrance z −15.5 behind the ridge
+    seam, axis y 3.4) so the camera physically flies through the opening mountain — the old
+    whiteout-masked teleport between y-pockets was the "perceptible cut" R1.1 bans. Duration grew
+    ~3.2s → ~4.4s to fit R1.2's blade/split/thread sequence, which the original spec never had.
+    Hub remains a pocket, reached inside the sanctioned ≤120ms amber wrap; the wrap then
+    CONTRACTS into the core via a radial mask (uWrapR) in the grade pass.
+29. **Camera rides Fritsch–Carlson monotone cubic splines** (z / y / FOV) across the whole
+    breach — C1-continuous velocity, so no tween-boundary is perceptible (R1.4). Look-target and
+    roll are conventional tweens; micro-shake ≤0.3px is two incommensurate sines on rotation.
+30. **Mountain interior darkness is geometry, not grading**: the tube is OPAQUE ink (occludes
+    stars), a SeamShroud plane behind the wound fades in with uSeam (so the split reveals black,
+    and the tube's rim never silhouettes), and one fog sheet moved in front of the mouth to veil
+    the disc at idle. Gap-straddling wireframe segments read as tearing threads mid-split, then
+    alpha-snap once uSeam > 0.55 (they'd otherwise streak across the corridor).
+31. **Lockup "motion blur" is transform stretch, not CSS filter blur** — filter blur on the
+    falling lockup cost 25–275ms raster stalls (traced); scaleY 1.18 + fall + fade reads the
+    same at speed. Lockup unmount deferred until arrival (a ~50ms teardown recalc otherwise
+    landed exactly on the blade beat).
+32. **Scrub/verification tooling**: `?scrub=1` exposes __breachTl + __handles on production
+    builds; the scrub stepper runs INSIDE the page on a fixed clock (post-Enter CDP evaluates
+    proved flaky) and node screenshots on absolute deadlines (relative waits drifted a full step
+    by stop 4). Occluded headed windows throttle the compositor — bringToFront before captures.

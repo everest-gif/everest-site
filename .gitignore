@@ -5,3 +5,5 @@ dist/
 npm-debug.log*
 .playwright-mcp/
 .vercel
+verification/r2/*/breach-frames/
+verification/r2/*/reverse-frames/

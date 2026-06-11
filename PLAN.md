@@ -1,7 +1,22 @@
 # PLAN — everest-site build state
 
-> Source spec: `ENTER_THE_MOUNTAINS.md`. This file always reflects exact current state.
+> Source spec: `ENTER_THE_MOUNTAINS.md` + refinement directive `ENTER_THE_MOUNTAINS_R2.md` (R2 overrides on conflict).
+> This file always reflects exact current state.
 > A fresh session resumes from here: read CLAUDE.md → this file → DECISIONS.md, then continue at the first unchecked item.
+
+## R1 — Breach total rework  [IN PROGRESS]
+- [x] BEFORE evidence captured (verification/r2/before/: breach video+frames, hub, 8 nodes, 2 chambers)
+- [x] Continuity: tunnel moved from y=300 pocket into threshold space behind the seam (TUNNEL_CY/Z0 in handles); camera flies one monotone-cubic C1 spline (z/y/FOV) home→seam→tunnel; entry teleport DELETED; only the sanctioned ≤120ms amber wrap at hub arrival remains
+- [x] Mountain opens (R1.2): bone blade draws down crest (0.3s) → strata-banded split w/ tear jitter + snapping gap-bridge threads (0.5s) → camera threads in during final 0.3s; SeamShroud = solid interior darkness behind the wound
+- [x] Tunnel art direction (R1.3): opaque-ink tube (occludes stars), ghost hex ≤5% lit by sliding pools, 7 streak ribbons (1 jade), dim particle field, sealed end cap w/ convergence point; brown ambient + giant hexes + DoF/fisheye deleted; bloom 0.6 in-flight; chroma only at seam-entry/arrival ≤0.0035
+- [x] Arrival: ribbons converge → 120ms amber wrap → wrap-radius CONTRACTION into hub core (radial mask in grade pass)
+- [x] Lockup parallax-falls behind camera (transform stretch, not filter blur — blur cost 25–275ms raster stalls)
+- [x] Perf: in-flight rAF gaps clean (avg 8.4ms @120Hz, worst 16.7ms, 0 over frame+8ms); hub canvas textures pre-uploaded at boot; lockup unmount deferred into arrival wrap
+- [x] Reverse breach rebuilt: wrap expands from core → backing out of tunnel → terrain fades in → seam closes
+- [x] Scrub test 0/20/40/60/80/100% all composition-worthy (verification/r2/scrub/; ?scrub=1 exposes __breachTl on preview builds; convergence point moved AHEAD of final camera after 100% still failed)
+- [x] Reverse breach + abort paths verified (check-paths.mjs: abort mid-breach→hub, Esc→reverse→threshold, re-entry, ?rm=1 — all pass, console clean)
+- [x] Phase exit ritual (typecheck ✓ build ✓ recordings clean ✓ commit)
+- NOTE: arrival teleport carries a ~30–50ms task (lockup unmount + HubOverlay mount) fully inside the amber wrap — invisible; in-flight is 0 frames over budget.
 
 ## P0 — Scaffold  [IN PROGRESS]
 - [x] git init (branch `main`)
