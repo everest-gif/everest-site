@@ -8,6 +8,8 @@ import { beginFlight, endFlight, FLY_IN_S, FLY_HOP_S } from '../scene/flight';
 import { chamberControl } from '../chambers/control';
 import { GhostNumeral } from '../chambers/shared';
 import { initChamberReveals } from '../chambers/reveal';
+import { NodeGlyph } from './glyphs';
+import type { NodeDef } from '../content/nodes';
 import Jarvis from '../chambers/Jarvis';
 import Luven from '../chambers/Luven';
 import Emerge from '../chambers/Emerge';
@@ -101,7 +103,7 @@ export default function ChamberLayer() {
   useEffect(() => {
     if (act !== 'chamber' || open) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key !== 'Escape') return;
+      if (e.key !== 'Escape' || useStore.getState().indexOpen) return;
       endFlight();
       useStore.getState().closeChamber();
     };
@@ -111,6 +113,62 @@ export default function ChamberLayer() {
 
   if (act !== 'chamber' || !shown || !open) return null;
   return <ChamberStage key={shown} id={shown} />;
+}
+
+/* M6 — EXPLORE chip: destination glyph + mono name + EXPLORE arrow, hairline
+   border, ring-charge sweep on hover, magnetic pull. Obviously clickable. */
+function ExploreChip({ dir, node }: { dir: 'prev' | 'next'; node: NodeDef }) {
+  const ref = useRef<HTMLButtonElement>(null);
+
+  /* magnetic pull — same family as the ENTER ring (≤6px, springs back) */
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    if (useStore.getState().reducedMotion || !window.matchMedia('(pointer: fine)').matches) return;
+    const xTo = gsap.quickTo(el, 'x', { duration: 0.45, ease: 'expo.out' });
+    const yTo = gsap.quickTo(el, 'y', { duration: 0.45, ease: 'expo.out' });
+    const onMove = (e: MouseEvent) => {
+      const r = el.getBoundingClientRect();
+      const cx = r.left + r.width / 2;
+      const cy = r.top + r.height / 2;
+      const dx = e.clientX - cx;
+      const dy = e.clientY - cy;
+      const d = Math.hypot(dx, dy);
+      const reach = Math.max(r.width, r.height) / 2 + 48;
+      if (d < reach && d > 0.01) {
+        const pull = (1 - d / reach) * 6;
+        xTo((dx / d) * pull);
+        yTo((dy / d) * pull);
+      } else {
+        xTo(0);
+        yTo(0);
+      }
+    };
+    window.addEventListener('mousemove', onMove, { passive: true });
+    return () => window.removeEventListener('mousemove', onMove);
+  }, []);
+
+  return (
+    <button
+      type="button"
+      ref={ref}
+      className={`explore-chip chip-${dir}`}
+      data-cursor="node"
+      onClick={() => useStore.getState().hopChamber(node.id)}
+      aria-label={`Travel to ${node.label} — ${node.role}`}
+    >
+      <svg className="chip-charge" aria-hidden="true">
+        <rect pathLength={100} />
+      </svg>
+      <span className="chip-glyph">
+        <NodeGlyph id={node.id} size={15} />
+      </span>
+      <span className="chip-body">
+        <span className="chip-name">{node.label}</span>
+        <span className="chip-explore">{dir === 'prev' ? '← EXPLORE' : 'EXPLORE →'}</span>
+      </span>
+    </button>
+  );
 }
 
 function ChamberStage({ id }: { id: NodeId }) {
@@ -230,6 +288,7 @@ function ChamberStage({ id }: { id: NodeId }) {
     chamberControl.close = close;
     chamberControl.derez = derez;
     const onKey = (e: KeyboardEvent) => {
+      if (useStore.getState().indexOpen) return; /* the INDEX owns keys while open */
       if (e.key === 'Escape') close();
     };
     window.addEventListener('keydown', onKey);
@@ -239,6 +298,18 @@ function ChamberStage({ id }: { id: NodeId }) {
       chamberControl.derez = null;
     };
   }, [closing, origin]);
+
+  /* M6 — arrow keys hop planets */
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (useStore.getState().indexOpen) return;
+      const idx2 = NODES.findIndex((n) => n.id === id);
+      if (e.key === 'ArrowLeft') useStore.getState().hopChamber(NODES[(idx2 + NODES.length - 1) % NODES.length].id);
+      else if (e.key === 'ArrowRight') useStore.getState().hopChamber(NODES[(idx2 + 1) % NODES.length].id);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [id]);
 
   const node = NODE_MAP[id];
   const idx = NODES.findIndex((n) => n.id === id);
@@ -269,27 +340,10 @@ function ChamberStage({ id }: { id: NodeId }) {
           </div>
         </div>
         <div className="chamber-scanlines" aria-hidden="true" />
-        {/* planet-to-planet rail — exploration without returning to the overview (R3) */}
-        <nav className="chamber-rail" aria-label="Neighbouring chambers">
-          <button
-            type="button"
-            data-cursor="node"
-            onClick={() => useStore.getState().hopChamber(prev.id)}
-            aria-label={`Travel to ${prev.label}`}
-          >
-            ← <span className="rail-glyph" aria-hidden="true" /> {prev.label}
-          </button>
-          <span className="rail-sep" aria-hidden="true">
-            ·
-          </span>
-          <button
-            type="button"
-            data-cursor="node"
-            onClick={() => useStore.getState().hopChamber(next.id)}
-            aria-label={`Travel to ${next.label}`}
-          >
-            {next.label} <span className="rail-glyph" aria-hidden="true" /> →
-          </button>
+        {/* M6 — EXPLORE chips: obviously clickable travel to the neighbours */}
+        <nav className="chamber-chips" aria-label="Neighbouring chambers">
+          <ExploreChip dir="prev" node={prev} />
+          <ExploreChip dir="next" node={next} />
         </nav>
       </div>
       <div className="chamber-beam" aria-hidden="true" />

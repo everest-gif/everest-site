@@ -113,6 +113,26 @@ export const NODE_MAP: Record<NodeId, NodeDef> = Object.fromEntries(
 
 export const SECTORS = { inner: 'SYSTEMS / VENTURES', outer: 'GAMES / LIFE' } as const;
 
+/* M6 — INDEX manifest: groups + one-line descriptors + honest statuses.
+   Statuses restate the fact-audited chips; nothing new is claimed. */
+export const INDEX_GROUPS: ReadonlyArray<{ label: string; ids: NodeId[] }> = [
+  { label: 'SYSTEMS', ids: ['jarvis', 'dolomite'] },
+  { label: 'VENTURES', ids: ['luven', 'emerge', 'bigback'] },
+  { label: 'GAMES', ids: ['everclash', 'voxhalla'] },
+  { label: 'LIFE', ids: ['beyond'] },
+];
+
+export const NODE_STATUS: Record<NodeId, string> = {
+  jarvis: 'runs nightly',
+  luven: 'in production',
+  emerge: 'active',
+  dolomite: 'local · live',
+  everclash: 'in browser',
+  voxhalla: 'parked — deliberate',
+  bigback: 'on the bench',
+  beyond: 'in training',
+};
+
 /* §7 — content placeholders. Values still REPLACE_ME render dimmed with `· pending`. */
 export const CONTACT = {
   name: 'Everest Egenhofer',

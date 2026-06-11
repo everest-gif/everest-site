@@ -80,6 +80,7 @@ export default function HubOverlay() {
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== 'Escape') return;
       const st = useStore.getState();
+      if (st.indexOpen) return; /* the INDEX owns Esc while open (M6) */
       if (st.reducedMotion) st.gotoThreshold();
       else st.beginReverseBreach();
     };

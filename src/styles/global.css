@@ -724,41 +724,98 @@ a {
   overflow-x: hidden;
   scrollbar-width: none;
 }
-/* planet-to-planet rail (R3) */
-.chamber-rail {
+/* ---------- M6: EXPLORE chips — travel to the neighbours, obviously clickable ---------- */
+.chamber-chips {
   position: absolute;
-  left: 16.5vw;
-  bottom: 26px;
-  transform: translateX(-50%);
+  left: 35vw;
+  right: clamp(20px, 4vw, 56px);
+  bottom: 62px; /* clear of the hud-br return control */
   display: flex;
-  align-items: center;
-  gap: 14px;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.12em;
-  color: var(--dim);
-  white-space: nowrap;
+  justify-content: space-between;
+  gap: 16px;
+  pointer-events: none;
+  z-index: 5; /* above chamber content stacking (some spreads use z1–2 overlaps) */
 }
-.chamber-rail button {
+.explore-chip {
+  position: relative;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
+  min-height: 48px;
+  padding: 9px 16px;
+  pointer-events: auto;
+  border: 1px solid var(--hairline-2);
+  background: rgba(17, 17, 20, 0.88); /* --ink-2 at panel weight */
   color: var(--dim);
-  transition: color var(--t-micro) var(--ease-out);
+  transition: color var(--t-micro) var(--ease-out), background var(--t-micro) var(--ease-out);
+  will-change: transform;
 }
-.chamber-rail button:hover,
-.chamber-rail button:focus-visible {
+.explore-chip:hover,
+.explore-chip:focus-visible {
+  color: var(--bone);
+  background: rgba(23, 23, 28, 0.94); /* --ink-3 — raised */
+}
+.chip-glyph {
+  display: flex;
   color: var(--amber);
 }
-.chamber-rail .rail-glyph {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  border: 1px solid currentColor;
-  display: inline-block;
+.chip-body {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  text-align: left;
 }
-.rail-sep {
-  opacity: 0.5;
+.chip-name {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: inherit;
+}
+.chip-explore {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  color: var(--amber);
+  opacity: 0.75;
+  transition: opacity var(--t-micro) var(--ease-out);
+}
+.explore-chip:hover .chip-explore,
+.explore-chip:focus-visible .chip-explore {
+  opacity: 1;
+}
+/* M8.9 — the ring-charge sweep, systemized for rectangular controls */
+.chip-charge {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.chip-charge rect {
+  x: 0.5px;
+  y: 0.5px;
+  width: calc(100% - 1px);
+  height: calc(100% - 1px);
+  fill: none;
+  stroke: var(--amber);
+  stroke-width: 1.2;
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  transition: stroke-dashoffset 0.55s var(--ease-out);
+}
+.explore-chip:hover .chip-charge rect,
+.explore-chip:focus-visible .chip-charge rect {
+  stroke-dashoffset: 0;
+}
+@media (max-width: 900px) {
+  .chamber-chips {
+    left: 16px;
+    right: 16px;
+  }
+  .explore-chip {
+    min-height: 44px; /* M7 mobile — tappable */
+  }
 }
 @media (max-width: 900px) {
   .chamber-scroll {
@@ -785,8 +842,162 @@ a {
     height: 40vh;
     transform: translate(-50%, -50%);
   }
-  .chamber-rail {
-    left: 50%;
+}
+
+/* ---------- M6: INDEX — a ship's manifest, not a hamburger menu ---------- */
+.index-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 70; /* above HUD; the manifest owns the frame while open */
+}
+.index-panel {
+  position: absolute;
+  inset: 0;
+  visibility: hidden; /* gsap reveals */
+  background: rgba(10, 10, 12, 0.92);
+  display: flex;
+  flex-direction: column;
+  padding: clamp(48px, 9vh, 96px) clamp(24px, 7vw, 120px) clamp(32px, 6vh, 72px);
+  overflow-y: auto;
+}
+/* M2 — the manifest opens with a faint backlit glow */
+.index-glow {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse 55% 45% at 50% 38%, rgba(232, 162, 61, 0.07), transparent 70%);
+  pointer-events: none;
+}
+.index-beam {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--amber);
+  box-shadow: 0 0 12px rgba(232, 162, 61, 0.95);
+  opacity: 0;
+  pointer-events: none;
+}
+.index-head {
+  display: flex;
+  align-items: baseline;
+  gap: 24px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--hairline-2);
+}
+.index-title {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 300;
+  font-variation-settings: 'opsz' 144;
+  font-size: clamp(2rem, 3.6vw, 3.4rem);
+  color: var(--bone);
+  letter-spacing: -0.01em;
+}
+.index-sub {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+.index-close {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--dim);
+  transition: color var(--t-micro) var(--ease-out);
+}
+.index-close:hover {
+  color: var(--amber);
+}
+.index-cols {
+  margin-top: clamp(20px, 4vh, 40px);
+  column-gap: clamp(32px, 5vw, 80px);
+  columns: 2;
+}
+.index-group {
+  break-inside: avoid;
+  margin-bottom: clamp(22px, 4vh, 40px);
+}
+.index-ghead {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--amber);
+  margin-bottom: 6px;
+}
+.index-ghead .ch-rule {
+  flex: 1;
+}
+.index-row {
+  display: grid;
+  grid-template-columns: 24px minmax(96px, 0.55fr) 1fr auto;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 11px 10px;
+  margin: 0 -10px;
+  text-align: left;
+  font-family: var(--font-mono);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--dim);
+  border-bottom: 1px solid var(--hairline);
+  transition: color var(--t-micro) var(--ease-out), background var(--t-micro) var(--ease-out);
+}
+.index-row:hover,
+.index-row:focus-visible {
+  color: var(--amber);
+  background: var(--ink-3);
+}
+.index-glyph {
+  display: flex;
+  color: inherit;
+  opacity: 0.85;
+}
+.index-name {
+  font-size: 12px;
+  color: var(--bone);
+  transition: color var(--t-micro) var(--ease-out);
+}
+.index-row:hover .index-name,
+.index-row:focus-visible .index-name {
+  color: var(--amber);
+}
+.index-desc {
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: none;
+  color: var(--dim);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.index-status {
+  font-size: 9.5px;
+  letter-spacing: 0.14em;
+  color: var(--dim);
+  white-space: nowrap;
+}
+.index-row:hover .index-status {
+  color: var(--amber);
+}
+@media (max-width: 900px) {
+  .index-cols {
+    columns: 1;
+  }
+  .index-row {
+    grid-template-columns: 20px minmax(80px, 0.8fr) auto;
+  }
+  .index-desc {
+    display: none;
   }
 }
 

@@ -39,6 +39,16 @@ export default function HUD() {
       <div className={`hud-tl${onHud ? ' is-on' : ''}`}>everest.os v1.0</div>
 
       <div className={`hud-tr${onHud ? ' is-on' : ''}`}>
+        {(act === 'hub' || act === 'chamber') && (
+          <button
+            type="button"
+            onClick={() => useStore.getState().setIndexOpen(true)}
+            aria-haspopup="dialog"
+            aria-label="Open the index — every destination in the system"
+          >
+            [ index ]
+          </button>
+        )}
         {onHud && <BoulderClock />}
         <button
           type="button"

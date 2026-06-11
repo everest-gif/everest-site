@@ -39,6 +39,8 @@ interface AppState {
   hovered: NodeId | null;
   /* M3 — threshold season; persists for the session */
   season: Season;
+  /* M6 — the INDEX overlay (ship's manifest) */
+  indexOpen: boolean;
   soundOn: boolean;
   reducedMotion: boolean;
   contextLost: boolean;
@@ -65,6 +67,7 @@ interface AppState {
   gotoThreshold: () => void;
   setHovered: (id: NodeId | null) => void;
   setSeason: (s: Season) => void;
+  setIndexOpen: (v: boolean) => void;
   toggleSound: () => void;
   setReducedMotion: (v: boolean) => void;
   setContextLost: (v: boolean) => void;
@@ -81,6 +84,7 @@ export const useStore = create<AppState>((set, get) => ({
   chamber: null,
   hovered: null,
   season: loadSeason(),
+  indexOpen: false,
   soundOn: false,
   reducedMotion: false,
   contextLost: false,
@@ -149,6 +153,7 @@ export const useStore = create<AppState>((set, get) => ({
     persistSeason(season);
     set({ season });
   },
+  setIndexOpen: (indexOpen) => set({ indexOpen }),
   toggleSound: () => set((s) => ({ soundOn: !s.soundOn })),
   setReducedMotion: (reducedMotion) => set({ reducedMotion }),
   setContextLost: (contextLost) => set({ contextLost }),
