@@ -4,7 +4,7 @@ import Lenis from 'lenis';
 import { useStore, type NodeId } from '../state/store';
 import { NODES, NODE_MAP } from '../content/nodes';
 import { nodeScreens, handles } from '../scene/handles';
-import { beginFlight, endFlight, FLY_IN_S, FLY_HOP_S } from '../scene/flight';
+import { beginFlight, endFlight, FLY_IN_S, FLY_HOP_S, HOP_REVEAL_S } from '../scene/flight';
 import { chamberControl } from '../chambers/control';
 import { GhostNumeral } from '../chambers/shared';
 import { initChamberReveals } from '../chambers/reveal';
@@ -30,9 +30,10 @@ const CHAMBERS: Record<NodeId, ComponentType> = {
   beyond: Beyond,
 };
 
-/* R3 — travel, not page swaps. Click → camera flight (~0.95s) → content materializes
-   beside the live planet. Hops de-rez the content, arc the camera across the system
-   (~1.15s, past the core), then materialize the next chamber. The planet IS the hero:
+/* R3/S4 — travel, not page swaps. Click → camera flight (~0.95s) → content materializes
+   beside the live planet. Hops are ONE direct dolly arc between planets (~1.1s): the
+   outgoing content de-rezzes during the first 0.3s OF the flight, the incoming chamber
+   materializes over the final 0.4s as the new planet docks. The planet IS the hero:
    the canvas keeps rendering for the whole visit — no scrim, no blurred backdrop. */
 export default function ChamberLayer() {
   const act = useStore((s) => s.act);
@@ -41,8 +42,9 @@ export default function ChamberLayer() {
   const [open, setOpen] = useState(false);
   const lastAct = useRef(act);
   const busy = useRef(false);
-  /* persists across setShown re-renders — effect cleanup must NOT clear it mid-flight */
+  /* persist across setShown re-renders — effect cleanup must NOT clear them mid-flight */
   const timer = useRef<number | null>(null);
+  const swapTimer = useRef<number | null>(null);
 
   useEffect(() => {
     const prevAct = lastAct.current;
@@ -52,6 +54,10 @@ export default function ChamberLayer() {
       if (timer.current !== null) {
         window.clearTimeout(timer.current);
         timer.current = null;
+      }
+      if (swapTimer.current !== null) {
+        window.clearTimeout(swapTimer.current);
+        swapTimer.current = null;
       }
       setShown(null);
       setOpen(false);
@@ -81,21 +87,30 @@ export default function ChamberLayer() {
     }
 
     if (chamber !== shown && !busy.current) {
-      /* planet-to-planet hop */
+      /* S4 — planet-to-planet: ONE direct arc. Reduced motion: 200ms crossfade. */
       busy.current = true;
-      const fly = () => {
-        setOpen(false);
-        setShown(chamber);
-        if (reduced || !handles.camera) {
-          setOpen(true);
+      if (reduced || !handles.camera) {
+        const swap = () => {
+          setShown(chamber);
           busy.current = false;
-          return;
-        }
-        beginFlight('hop', handles.camera);
-        timer.current = window.setTimeout(land, FLY_HOP_S * 1000 + 40);
-      };
-      if (!reduced && chamberControl.derez) chamberControl.derez(fly);
-      else fly();
+        };
+        if (chamberControl.derez) chamberControl.derez(swap);
+        else swap();
+        return;
+      }
+      /* flight and de-rez run CONCURRENTLY; the next chamber materializes over
+         the arc's final beat as its planet docks into the hero position */
+      beginFlight('hop', handles.camera, chamber);
+      chamberControl.derez?.(() => setOpen(false));
+      swapTimer.current = window.setTimeout(() => {
+        swapTimer.current = null;
+        setShown(chamber);
+        setOpen(true);
+      }, (FLY_HOP_S - HOP_REVEAL_S) * 1000);
+      timer.current = window.setTimeout(() => {
+        timer.current = null;
+        busy.current = false;
+      }, FLY_HOP_S * 1000 + 40);
     }
   }, [act, chamber, shown]);
 
@@ -196,7 +211,9 @@ function ChamberStage({ id }: { id: NodeId }) {
     const scan = root.querySelector<HTMLElement>('.chamber-scanlines');
 
     if (reduced) {
-      gsap.set(panel, { clipPath: 'inset(0% 0 0% 0)', autoAlpha: 1 });
+      /* S4 — half of the 200ms crossfade (de-rez fades the outgoing half) */
+      gsap.set(panel, { clipPath: 'inset(0% 0 0% 0)' });
+      gsap.fromTo(panel, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.1, ease: 'none' });
       panel.focus({ preventScroll: true });
       return;
     }
@@ -263,7 +280,12 @@ function ChamberStage({ id }: { id: NodeId }) {
       const st = useStore.getState();
       const panel = panelRef.current;
       const root = rootRef.current;
-      if (st.reducedMotion || !panel || !root) {
+      if (st.reducedMotion && panel) {
+        /* the outgoing half of the 200ms crossfade */
+        gsap.to(panel, { autoAlpha: 0, duration: 0.1, ease: 'none', onComplete: onDone });
+        return;
+      }
+      if (!panel || !root) {
         onDone();
         return;
       }

@@ -3,9 +3,10 @@ import gsap from 'gsap';
 import type { NodeId } from '../state/store';
 import { nodeWorld, nodeRadius, HUB_Y } from './handles';
 
-/* R3 — travel. Click flies the camera to the planet (~0.95s curved path); hops fly
-   ACROSS the system past the core (~1.15s). After landing the rig tracks the planet
-   live ('track'), so it keeps orbiting and breathing as the chamber hero. */
+/* R3/S4 — travel. Click flies the camera to the planet (~0.95s curved path); hops are
+   a SINGLE DIRECT DOLLY ARC between bodies (~1.1s) — no zoom-out to the hub overview,
+   the system sweeps past in parallax. After landing the rig tracks the planet live
+   ('track'), so it keeps orbiting and breathing as the chamber hero. */
 
 export const flightState = {
   mode: 'idle' as 'idle' | 'fly' | 'track',
@@ -17,7 +18,9 @@ export const flightState = {
 };
 
 export const FLY_IN_S = 0.95;
-export const FLY_HOP_S = 1.15;
+export const FLY_HOP_S = 1.1;
+/* the incoming chamber materializes over the arc's final beat (S4) */
+export const HOP_REVEAL_S = 0.42;
 
 const _core = new THREE.Vector3(0, HUB_Y, 0);
 const _out = new THREE.Vector3();
@@ -75,8 +78,9 @@ export function chamberCam(
 }
 
 let tween: gsap.core.Tween | null = null;
+const _bow = new THREE.Vector3();
 
-export function beginFlight(kind: 'in' | 'hop', camera: THREE.PerspectiveCamera) {
+export function beginFlight(kind: 'in' | 'hop', camera: THREE.PerspectiveCamera, destId?: NodeId) {
   tween?.kill();
   const f = flightState;
   f.kind = kind;
@@ -85,8 +89,19 @@ export function beginFlight(kind: 'in' | 'hop', camera: THREE.PerspectiveCamera)
   f.from.copy(camera.position);
   camera.getWorldDirection(_fwd);
   f.fromLook.copy(camera.position).addScaledVector(_fwd, 8);
-  if (kind === 'hop') {
-    /* arc past the core — you glimpse the whole system mid-flight */
+  if (kind === 'hop' && destId && nodeWorld[destId]) {
+    /* S4 — direct dolly arc: midpoint of the two bodies, bowed outward from the
+       core and a touch toward the lens. No intermediate hub overview. When the
+       two bodies sit near-opposite, the midpoint falls toward the sun — the bow
+       grows so the curve always clears the corona. */
+    _mid.copy(f.from).add(nodeWorld[destId]).multiplyScalar(0.5);
+    _bow.copy(_mid).sub(_core);
+    _bow.z = 0;
+    const md = _bow.length();
+    if (md < 1e-3) _bow.set(1, 0, 0);
+    else _bow.divideScalar(md);
+    f.ctrl.copy(_mid).addScaledVector(_bow, Math.max(1.3, 3.4 - md)).add(_out.set(0, 0.2, 1.4));
+  } else if (kind === 'hop') {
     f.ctrl.copy(_core).add(_mid.set(0, 0.4, 3.1));
   } else {
     f.ctrl.copy(f.from).lerp(_core, 0.45).add(_mid.set(0, 0.5, 1.6));

@@ -107,8 +107,8 @@ export default function CameraRig() {
       if (flightState.mode === 'fly' && !reducedMotion) {
         quadBez(flightState.from, flightState.ctrl, _cPos, flightState.u, _pos);
         _look.lerpVectors(flightState.fromLook, _cLook, flightState.u);
-        /* hops widen the lens mid-arc — glimpse the whole system */
-        const widen = flightState.kind === 'hop' ? 13 : 4;
+        /* S4 — direct hops breathe the lens only slightly: travel, never zoom-out */
+        const widen = flightState.kind === 'hop' ? 5 : 4;
         camera.fov = HOMES.hub.fov + Math.sin(flightState.u * Math.PI) * widen;
       } else {
         const k = reducedMotion ? 1 : 1 - Math.exp(-dt * 6);

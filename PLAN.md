@@ -31,8 +31,13 @@
       (waves ≤3), jarvis reference by main session; 2 tuning fixes from poster review
       (emerge/everclash wireframe-ball reads). close-*.png poster-passed ×8; hub 120fps
       (avg 8.35ms, worst 10.7ms) — LOD verified.
-- [ ] S4 Direct planet-to-planet flight: single dolly arc 1.0–1.2s, de-rez in first 0.3s,
-      materialize final 0.4s; chips + INDEX + arrows; reduced-motion 200ms crossfade
+- [x] S4 Direct planet-to-planet flight: single 1.1s dolly arc (midpoint bowed outward,
+      adaptive bow clears the corona for near-opposite pairs), FOV breathe 5 (was 13 —
+      no zoom-out read), de-rez concurrent with flight (first 0.32s), incoming chamber
+      materializes over final 0.42s as the planet docks. All entry points funnel through
+      hopChamber → one path (chips/INDEX/arrows). Reduced motion: true 200ms crossfade
+      (0.1s out + 0.1s in). Evidence: motion/hop.webm + frames; 8-hop ring traversal +
+      rapid-fire abuse → console silent.
 - [ ] S7 Orbital rail: bottom-center, 8 glyphs in orbit order, amber ring + 0n/NAME,
       hover names, keyboard, ≥44px mobile targets
 - [ ] S2 Threshold lives: season-aware instanced treeline (shader-welded to terrain heightAt)
