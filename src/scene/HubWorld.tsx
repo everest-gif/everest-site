@@ -2,13 +2,36 @@ import { useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import { useFrame, useThree } from '@react-three/fiber';
 import gsap from 'gsap';
-import { useStore } from '../state/store';
+import { useStore, type NodeId } from '../state/store';
 import { NODES, SECTORS } from '../content/nodes';
 import { nodeScreens, coreScreen, HUB_Y, AMBER, JADE } from './handles';
-import { coreVert, coreFrag, nodeVert, nodeFrag, pulseTrafficVert, pulseTrafficFrag } from './shaders/hub';
+import { coreVert, coreFrag, coronaVert, coronaFrag, pulseTrafficVert, pulseTrafficFrag } from './shaders/hub';
+import type { PlanetBuild } from './planets/types';
+import { makePlanet as makeJarvis } from './planets/jarvis';
+import { makePlanet as makeLuven } from './planets/luven';
+import { makePlanet as makeEmerge } from './planets/emerge';
+import { makePlanet as makeDolomite } from './planets/dolomite';
+import { makePlanet as makeEverclash } from './planets/everclash';
+import { makePlanet as makeVoxhalla } from './planets/voxhalla';
+import { makePlanet as makeBigback } from './planets/bigback';
+import { makePlanet as makeBeyond } from './planets/beyond';
 
 const amber = new THREE.Color(AMBER);
 const jade = new THREE.Color(JADE);
+
+const PLANET_FACTORY: Record<NodeId, () => PlanetBuild> = {
+  jarvis: makeJarvis,
+  luven: makeLuven,
+  emerge: makeEmerge,
+  dolomite: makeDolomite,
+  everclash: makeEverclash,
+  voxhalla: makeVoxhalla,
+  bigback: makeBigback,
+  beyond: makeBeyond,
+};
+
+/* world radius unit for planets — planet modules are built at local radius ≈1 */
+const NODE_R = 0.16;
 
 /* per-node reveal handles — staggered on hub arrival */
 const reveals = NODES.map(() => ({ value: 0 }));
@@ -19,6 +42,7 @@ const _v = new THREE.Vector3();
 const _nodePos = NODES.map(() => new THREE.Vector3());
 
 const PULSE_SLOTS = 22;
+const TRAIL = 5; /* head + 4 fading trail samples per pulse */
 
 interface PulseSlot {
   node: number;
@@ -56,7 +80,7 @@ export default function HubWorld() {
     return { x: xFit, y: yFit, core: coreScale };
   }, [size]);
 
-  /* ---------- materials & geometries ---------- */
+  /* ---------- core sun + corona ---------- */
   const core = useMemo(() => {
     const geo = new THREE.SphereGeometry(0.85, 48, 32);
     const mat = new THREE.ShaderMaterial({
@@ -68,28 +92,26 @@ export default function HubWorld() {
         uReveal: coreReveal,
       },
     });
-    return { geo, mat };
+    const coronaGeo = new THREE.SphereGeometry(0.85 * 1.3, 48, 32);
+    const coronaMat = new THREE.ShaderMaterial({
+      vertexShader: coronaVert,
+      fragmentShader: coronaFrag,
+      transparent: true,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+      uniforms: {
+        uTime: { value: 0 },
+        uColor: { value: amber },
+        uReveal: coreReveal,
+      },
+    });
+    return { geo, mat, coronaGeo, coronaMat };
   }, []);
 
-  const nodeMats = useMemo(
-    () =>
-      NODES.map(
-        () =>
-          new THREE.ShaderMaterial({
-            vertexShader: nodeVert,
-            fragmentShader: nodeFrag,
-            uniforms: {
-              uColor: { value: amber },
-              uActive: { value: 0 },
-              uDim: { value: 0 },
-              uReveal: { value: 0 },
-            },
-          }),
-      ),
-    [],
-  );
-  const nodeGeo = useMemo(() => new THREE.SphereGeometry(0.16, 20, 14), []);
-  const nodeRefs = useRef<(THREE.Mesh | null)[]>(NODES.map(() => null));
+  /* ---------- eight planets (R2.2) ---------- */
+  const planets = useMemo(() => NODES.map((n) => PLANET_FACTORY[n.id]()), []);
+  const hoverEase = useRef(NODES.map(() => ({ active: 0, dim: 0 })));
+  useEffect(() => () => planets.forEach((p) => p.dispose()), [planets]);
 
   /* threads — one Line per node, 2 vertices, end updated per frame */
   const threads = useMemo(
@@ -121,7 +143,8 @@ export default function HubWorld() {
     return [mk(2.5), mk(4.1)];
   }, []);
 
-  /* sector arc-text — drawn into canvas textures with the self-hosted mono font */
+  /* sector arc-text — canvas textures; glyph orientation flips by hemisphere so the
+     bottom string never renders mirrored/inverted (R2.3) */
   const sectorPlanes = useMemo(() => {
     const mk = (text: string, ringR: number, centerAngle: number) => {
       const SIZE = 1024;
@@ -137,14 +160,18 @@ export default function HubWorld() {
       const planeWorld = 10.2; /* world units the plane spans */
       const rPx = (ringR / planeWorld) * SIZE;
       const spacing = 0.052; /* radians per character */
-      /* reading order runs clockwise — traverse angles descending or the text mirrors */
       const chars = text.split('');
-      const a0 = centerAngle + ((chars.length - 1) / 2) * spacing;
+      const bottom = Math.sin(centerAngle) < 0;
+      /* top hemisphere: traverse clockwise (descending angle), glyph up = outward.
+         bottom hemisphere: traverse ascending + flip glyphs, so reading stays left→right upright. */
+      const a0 = bottom
+        ? centerAngle - ((chars.length - 1) / 2) * spacing
+        : centerAngle + ((chars.length - 1) / 2) * spacing;
       chars.forEach((ch, i) => {
-        const a = a0 - i * spacing;
+        const a = bottom ? a0 + i * spacing : a0 - i * spacing;
         ctx.save();
         ctx.translate(SIZE / 2 + Math.cos(a) * rPx, SIZE / 2 - Math.sin(a) * rPx);
-        ctx.rotate(Math.PI / 2 - a);
+        ctx.rotate(bottom ? -Math.PI / 2 - a : Math.PI / 2 - a);
         ctx.fillText(ch, 0, 0);
         ctx.restore();
       });
@@ -167,15 +194,21 @@ export default function HubWorld() {
     }
   }, [gl, sectorPlanes]);
 
-  /* pulse traffic buffers */
+  /* pulse traffic buffers — heads with fading trails (R2.3) */
   const traffic = useMemo(() => {
-    const positions = new Float32Array(PULSE_SLOTS * 3);
-    const alphas = new Float32Array(PULSE_SLOTS);
-    const kinds = new Float32Array(PULSE_SLOTS);
+    const count = PULSE_SLOTS * TRAIL;
+    const positions = new Float32Array(count * 3);
+    const alphas = new Float32Array(count);
+    const kinds = new Float32Array(count);
+    const heads = new Float32Array(count);
+    for (let s = 0; s < PULSE_SLOTS; s++) {
+      for (let k = 0; k < TRAIL; k++) heads[s * TRAIL + k] = k === 0 ? 1 : Math.max(0, 0.5 - k * 0.1);
+    }
     const g = new THREE.BufferGeometry();
     g.setAttribute('position', new THREE.BufferAttribute(positions, 3));
     g.setAttribute('aAlpha', new THREE.BufferAttribute(alphas, 1));
     g.setAttribute('aKind', new THREE.BufferAttribute(kinds, 1));
+    g.setAttribute('aHead', new THREE.BufferAttribute(heads, 1));
     g.boundingSphere = new THREE.Sphere(new THREE.Vector3(0, 0, 0), 6);
     const m = new THREE.ShaderMaterial({
       vertexShader: pulseTrafficVert,
@@ -217,10 +250,12 @@ export default function HubWorld() {
   }, [onStage, act]);
 
   /* ---------- per-frame simulation ---------- */
-  useFrame((state) => {
-    const t = state.clock.elapsedTime;
+  useFrame((state, dt) => {
     const { hovered, reducedMotion } = useStore.getState();
+    /* reduced motion: planets render static (R3) — freeze the clock they see */
+    const t = reducedMotion ? 7.3 : state.clock.elapsedTime;
     core.mat.uniforms.uTime.value = t;
+    core.coronaMat.uniforms.uTime.value = t;
 
     const hoveredIdx = hovered ? NODES.findIndex((n) => n.id === hovered) : -1;
 
@@ -232,18 +267,20 @@ export default function HubWorld() {
       const si = Math.sin(n.incline);
       const x = Math.cos(theta) * n.radius * fit.x;
       const y = Math.sin(theta) * n.radius * 0.94 * ci * fit.y;
-      const z = Math.sin(theta) * n.radius * si * 0.8;
+      /* deeper z-spread so the drag-orbit lean produces real parallax (R2.3) */
+      const z = Math.sin(theta) * n.radius * si * 1.8;
       _nodePos[i].set(x, y, z);
-      const mesh = nodeRefs.current[i];
-      if (mesh) {
-        mesh.position.copy(_nodePos[i]);
-        const sc = Math.max(0.0001, reveals[i].value) * (hoveredIdx === i ? 1.25 : 1);
-        mesh.scale.setScalar(sc);
-      }
-      const mat = nodeMats[i];
-      mat.uniforms.uActive.value += ((hoveredIdx === i ? 1 : 0) - mat.uniforms.uActive.value) * 0.15;
-      mat.uniforms.uDim.value += ((hoveredIdx !== -1 && hoveredIdx !== i ? 1 : 0) - mat.uniforms.uDim.value) * 0.15;
-      mat.uniforms.uReveal.value = reveals[i].value;
+
+      const ease = hoverEase.current[i];
+      ease.active += ((hoveredIdx === i ? 1 : 0) - ease.active) * 0.15;
+      ease.dim += ((hoveredIdx !== -1 && hoveredIdx !== i ? 1 : 0) - ease.dim) * 0.15;
+
+      const p = planets[i];
+      p.group.position.copy(_nodePos[i]);
+      /* hover: planet scales 1.15× (R2.3) */
+      const sc = Math.max(0.0001, reveals[i].value) * NODE_R * p.baseScale * (1 + ease.active * 0.15);
+      p.group.scale.setScalar(sc);
+      p.update(t, dt, ease.active, ease.dim, reveals[i].value);
 
       /* thread endpoint */
       const tp = threads[i].g.getAttribute('position') as THREE.BufferAttribute;
@@ -253,15 +290,17 @@ export default function HubWorld() {
       threads[i].m.opacity += (baseOp * reveals[i].value - threads[i].m.opacity) * 0.18;
     }
 
-    /* pulse traffic — irregular intervals 0.8–4s per thread; reduced motion = slow opacity ticks */
+    /* pulse traffic — irregular 0.8–4s per thread; trails follow heads (R2.3) */
     const { positions, alphas, kinds, slots, nextFire } = traffic;
     if (reducedMotion) {
-      for (let s = 0; s < PULSE_SLOTS; s++) {
-        const i = s % NODES.length;
+      positions.fill(0);
+      alphas.fill(0);
+      for (let i = 0; i < NODES.length; i++) {
+        const s = i * TRAIL; /* head point only, slow opacity tick */
         positions[s * 3] = _nodePos[i].x * 0.5;
         positions[s * 3 + 1] = _nodePos[i].y * 0.5;
         positions[s * 3 + 2] = _nodePos[i].z * 0.5;
-        alphas[s] = s < NODES.length ? (0.25 + 0.2 * Math.sin(t * 0.5 + i * 1.3)) * reveals[i].value : 0;
+        alphas[s] = (0.25 + 0.2 * Math.sin(state.clock.elapsedTime * 0.5 + i * 1.3)) * reveals[i].value;
         kinds[s] = i % 2;
       }
     } else {
@@ -269,12 +308,13 @@ export default function HubWorld() {
         if (t >= nextFire[i] && reveals[i].value > 0.9) {
           const free = slots.find((sl) => !sl.active);
           if (free) {
+            const si = slots.indexOf(free);
             free.active = true;
             free.node = i;
             free.dir = Math.random() < 0.55 ? 1 : -1;
             free.start = t;
             free.dur = 0.55 + Math.random() * 0.6;
-            kinds[slots.indexOf(free)] = free.dir === 1 ? 0 : 1;
+            for (let k = 0; k < TRAIL; k++) kinds[si * TRAIL + k] = free.dir === 1 ? 0 : 1;
           }
           nextFire[i] = t + 0.8 + Math.random() * 3.2;
         }
@@ -282,23 +322,30 @@ export default function HubWorld() {
       for (let s = 0; s < PULSE_SLOTS; s++) {
         const sl = slots[s];
         if (!sl.active) {
-          alphas[s] = 0;
-          positions[s * 3 + 1] = -999;
+          for (let k = 0; k < TRAIL; k++) {
+            alphas[s * TRAIL + k] = 0;
+            positions[(s * TRAIL + k) * 3 + 1] = -999;
+          }
           continue;
         }
-        let prog = (t - sl.start) / sl.dur;
-        if (prog >= 1) {
+        const raw = (t - sl.start) / sl.dur;
+        if (raw >= 1) {
           sl.active = false;
-          alphas[s] = 0;
+          for (let k = 0; k < TRAIL; k++) alphas[s * TRAIL + k] = 0;
           continue;
         }
-        if (sl.dir === -1) prog = 1 - prog;
         const np = _nodePos[sl.node];
-        positions[s * 3] = np.x * prog;
-        positions[s * 3 + 1] = np.y * prog;
-        positions[s * 3 + 2] = np.z * prog;
-        const fade = Math.min(1, Math.min((t - sl.start) / 0.12, (sl.dur - (t - sl.start)) / 0.18));
-        alphas[s] = Math.max(0, fade) * 0.95;
+        const fade = Math.max(0, Math.min(1, Math.min((t - sl.start) / 0.12, (sl.dur - (t - sl.start)) / 0.18)));
+        for (let k = 0; k < TRAIL; k++) {
+          let prog = raw - k * 0.05; /* trail samples behind the head */
+          if (prog < 0) prog = 0;
+          if (sl.dir === -1) prog = 1 - prog;
+          const idx = s * TRAIL + k;
+          positions[idx * 3] = np.x * prog;
+          positions[idx * 3 + 1] = np.y * prog;
+          positions[idx * 3 + 2] = np.z * prog;
+          alphas[idx] = fade * (k === 0 ? 1 : 0.5 - k * 0.1);
+        }
       }
     }
     (traffic.g.getAttribute('position') as THREE.BufferAttribute).needsUpdate = true;
@@ -337,15 +384,9 @@ export default function HubWorld() {
   return (
     <group ref={groupRef} position={[0, HUB_Y, 0]} visible={visible}>
       <mesh geometry={core.geo} material={core.mat} scale={fit.core} />
-      {NODES.map((n, i) => (
-        <mesh
-          key={n.id}
-          geometry={nodeGeo}
-          material={nodeMats[i]}
-          ref={(m) => {
-            nodeRefs.current[i] = m;
-          }}
-        />
+      <mesh geometry={core.coronaGeo} material={core.coronaMat} scale={fit.core} />
+      {planets.map((p, i) => (
+        <primitive key={NODES[i].id} object={p.group} />
       ))}
       {threads.map((th, i) => (
         <primitive key={NODES[i].id} object={th.line} />
@@ -356,7 +397,7 @@ export default function HubWorld() {
       {sectorPlanes.map((p, i) => (
         <mesh key={i} geometry={p.g} material={p.m} scale={[fit.x, fit.y * 0.94, 1]} position={[0, 0, 0.05]} />
       ))}
-      <points geometry={traffic.g} material={traffic.m} />
+      <points geometry={traffic.g} material={traffic.m} renderOrder={10} />
     </group>
   );
 }

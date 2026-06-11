@@ -13,11 +13,16 @@ const HOMES = {
 
 const MAX_YAW = THREE.MathUtils.degToRad(1.5);
 const MAX_PITCH = THREE.MathUtils.degToRad(1.0);
+/* R2.3 explorability — drag orbits the system ±12°, springs back slowly */
+const MAX_ORBIT = THREE.MathUtils.degToRad(12);
 
 /* preallocated scratch — no per-frame allocation */
 const _pos = new THREE.Vector3();
 const _look = new THREE.Vector3();
 const _offset = new THREE.Vector3();
+const _center = new THREE.Vector3();
+const _yAxis = new THREE.Vector3(0, 1, 0);
+const _xAxis = new THREE.Vector3(1, 0, 0);
 
 export default function CameraRig() {
   const camera = useThree((s) => s.camera) as THREE.PerspectiveCamera;
@@ -25,6 +30,12 @@ export default function CameraRig() {
   const cur = useRef({ x: 0, y: 0 });
   const drift = useRef(0);
   const hasPointer = useRef(false);
+  const orbit = useRef({ yaw: 0, pitch: 0, tYaw: 0, tPitch: 0, dragging: false, lastX: 0, lastY: 0 });
+  useEffect(() => {
+    if (import.meta.env.DEV || window.location.search.includes('scrub')) {
+      (window as unknown as Record<string, unknown>).__orbit = orbit.current;
+    }
+  }, []);
 
   useEffect(() => {
     handles.camera = camera;
@@ -48,6 +59,39 @@ export default function CameraRig() {
     return () => {
       window.removeEventListener('mousemove', onMouse);
       window.removeEventListener('deviceorientation', onTilt);
+    };
+  }, []);
+
+  /* drag-orbit — hub only, inert for reduced motion; lean around the system */
+  useEffect(() => {
+    const down = (e: PointerEvent) => {
+      const st = useStore.getState();
+      if (st.act !== 'hub' || st.reducedMotion) return;
+      if ((e.target as HTMLElement).closest('button, a')) return;
+      orbit.current.dragging = true;
+      orbit.current.lastX = e.clientX;
+      orbit.current.lastY = e.clientY;
+    };
+    const move = (e: PointerEvent) => {
+      const o = orbit.current;
+      if (!o.dragging) return;
+      o.tYaw = THREE.MathUtils.clamp(o.tYaw + (e.clientX - o.lastX) * 0.0016, -MAX_ORBIT, MAX_ORBIT);
+      o.tPitch = THREE.MathUtils.clamp(o.tPitch + (e.clientY - o.lastY) * 0.0014, -MAX_ORBIT * 0.85, MAX_ORBIT * 0.85);
+      o.lastX = e.clientX;
+      o.lastY = e.clientY;
+    };
+    const up = () => {
+      orbit.current.dragging = false;
+    };
+    window.addEventListener('pointerdown', down);
+    window.addEventListener('pointermove', move, { passive: true });
+    window.addEventListener('pointerup', up);
+    window.addEventListener('pointercancel', up);
+    return () => {
+      window.removeEventListener('pointerdown', down);
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', up);
+      window.removeEventListener('pointercancel', up);
     };
   }, []);
 
@@ -77,6 +121,21 @@ export default function CameraRig() {
     );
     _pos.copy(home.pos).add(_offset);
     _look.copy(home.look);
+
+    /* drag-orbit around the hub center — eased while dragging, slow spring back at rest */
+    const o = orbit.current;
+    if (!o.dragging) {
+      const back = 1 - Math.exp(-dt * 1.1);
+      o.tYaw += (0 - o.tYaw) * back;
+      o.tPitch += (0 - o.tPitch) * back;
+    }
+    const ok = 1 - Math.exp(-dt * 9);
+    o.yaw += (o.tYaw - o.yaw) * ok;
+    o.pitch += (o.tPitch - o.pitch) * ok;
+    if (act === 'hub' && Math.abs(o.yaw) + Math.abs(o.pitch) > 0.0001) {
+      _center.copy(home.look);
+      _pos.sub(_center).applyAxisAngle(_yAxis, o.yaw).applyAxisAngle(_xAxis, o.pitch).add(_center);
+    }
 
     /* chamber handoff (§2 Act IV.2): camera pushes toward the opened node */
     if (act === 'chamber' && chamberFocus.id) {

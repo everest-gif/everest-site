@@ -564,6 +564,19 @@ a {
   opacity: 1;
   translate: 0 0;
 }
+/* R2.3 — alternate label sides so close passes never stack label-on-label */
+.hub-node.lab-above .hub-node-btn {
+  flex-direction: column-reverse;
+  padding: 4px 10px 26px;
+}
+.hub-node.lab-above .hub-node-hit {
+  transform: translate(-50%, 0%);
+}
+.hub-node.lab-above .hub-chip {
+  top: auto;
+  bottom: 100%;
+  transform: translate(-50%, -8px);
+}
 .hub-core-label {
   position: absolute;
   top: 0;

@@ -5,6 +5,10 @@ import { nodeScreens, coreScreen } from '../scene/handles';
 
 /* DOM layer of the hub — projected node buttons (native keyboard nav + a11y),
    mono labels, stat chips, core label. Positions stream from HubWorld via handles. */
+
+/* R2.3 — collision-resolved label placement: alternate sides around the rings so
+   BEYOND/BIGBACK (and any close pass) can never stack label-on-label. */
+const LABEL_ABOVE = new Set(['jarvis', 'emerge', 'beyond', 'voxhalla']);
 export default function HubOverlay() {
   const act = useStore((s) => s.act);
   const hovered = useStore((s) => s.hovered);
@@ -88,7 +92,7 @@ export default function HubOverlay() {
   return (
     <div className="hub-overlay" ref={rootRef}>
       {NODES.map((n) => (
-        <div key={n.id} className="hub-node" data-node={n.id}>
+        <div key={n.id} className={`hub-node${LABEL_ABOVE.has(n.id) ? ' lab-above' : ''}`} data-node={n.id}>
           <button
             type="button"
             className={`hub-node-btn${hovered === n.id ? ' is-hot' : ''}${hovered && hovered !== n.id ? ' is-dim' : ''}`}
